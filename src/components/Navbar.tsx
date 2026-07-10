@@ -47,9 +47,7 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 font-semibold text-lg shadow-sm">
-            T
-          </div>
+          <img src="/favicon.svg" alt="Taskwai Logo" className="h-9 w-9 object-contain rounded-xl shadow-sm" />
           <div className="flex flex-col">
             <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50">Taskwai</span>
             <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">Profit Dashboard</span>

@@ -1,36 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <!-- Beautiful gradient for the green rising graph -->
-    <linearGradient id="greenGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#10B981" />
-      <stop offset="100%" stop-color="#34D399" />
+    <!-- Modern high-contrast bright emerald/neon green gradient -->
+    <linearGradient id="neonGreenGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10B981" />
     </linearGradient>
-    <!-- Glow effect for that premium modern SaaS vibe -->
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="12" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
 
-  <!-- Modern dark charcoal/slate rounded square background to pop on both dark and light browser tabs -->
-  <rect x="32" y="32" width="448" height="448" rx="112" fill="#0B1329" />
+  <!-- Premium dark slate squircle background for high contrast on all themes -->
+  <rect width="512" height="512" rx="144" fill="#090D16" />
 
-  <!-- Grid accent line to emphasize analytics/tracking theme -->
-  <line x1="96" y1="416" x2="416" y2="416" stroke="#1E293B" stroke-width="6" stroke-linecap="round" />
-  <line x1="96" y1="96" x2="96" y2="416" stroke="#1E293B" stroke-width="6" stroke-linecap="round" />
+  <!-- 
+    The "T-Profit" Logo:
+    A clever, ultra-clean 3-bar chart showing growth and profit.
+    The center bar is perfectly integrated with a crossbar to form a bold, professional letter "T" (Taskwai).
+  -->
+  <g fill="url(#neonGreenGrad)">
+    <!-- Left Bar (Short) -->
+    <rect x="120" y="260" width="48" height="140" rx="24" />
 
-  <!-- Translucent rising bars in the background for depth -->
-  <rect x="130" y="300" width="32" height="116" rx="8" fill="#10B981" opacity="0.15" />
-  <rect x="195" y="240" width="32" height="176" rx="8" fill="#10B981" opacity="0.25" />
-  <rect x="260" y="170" width="32" height="246" rx="8" fill="#10B981" opacity="0.4" />
-  <rect x="325" y="110" width="32" height="306" rx="8" fill="#10B981" opacity="0.6" />
-
-  <!-- Iconic glowing rising curve with arrow pointing up and right -->
-  <g filter="url(#glow)">
-    <!-- Main thick curved trend line -->
-    <path d="M 110 380 Q 230 380 360 140" fill="none" stroke="url(#greenGrad)" stroke-width="36" stroke-linecap="round" />
+    <!-- Center Bar (T-Stem, Medium) -->
+    <rect x="232" y="200" width="48" height="200" rx="24" />
     
-    <!-- Bold arrow head pointing top-right -->
-    <path d="M 280 140 L 360 140 L 360 220" fill="none" stroke="url(#greenGrad)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- T-Crossbar (Perfectly centered on the T-Stem) -->
+    <rect x="188" y="140" width="136" height="48" rx="24" />
+
+    <!-- Right Bar (Tallest) -->
+    <rect x="344" y="80" width="48" height="320" rx="24" />
   </g>
 </svg>
