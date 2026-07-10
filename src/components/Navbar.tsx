@@ -50,12 +50,12 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
           <img src="/favicon.svg" alt="Taskwai Logo" className="h-9 w-9 object-contain rounded-xl shadow-sm" />
           <div className="flex flex-col">
             <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50">Taskwai</span>
-            <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">Profit Dashboard</span>
+            <span className="hidden sm:inline text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">Profit Dashboard</span>
           </div>
         </div>
 
         {/* Navigation Menu - Desktop */}
-        <nav className="hidden md:flex space-x-1">
+        <nav className="hidden lg:flex space-x-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -130,9 +130,9 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
         </div>
       </div>
 
-      {/* Navigation Menu - Mobile (bottom bar or thin row) */}
-      <div className="md:hidden flex border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1.5 px-2 transition-colors duration-300">
-        <div className="flex space-x-1 w-full justify-between">
+      {/* Navigation Menu - Mobile (Premium Fixed Bottom Bar) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-lg pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)] transition-colors duration-300">
+        <div className="flex h-16 w-full items-center justify-around px-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -140,12 +140,20 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center gap-1 flex-1 py-1 px-2 rounded-lg transition-all ${
-                  isActive ? "text-zinc-950 dark:text-white bg-zinc-50 dark:bg-zinc-800 font-bold" : "text-zinc-400 dark:text-zinc-500"
+                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full rounded-xl transition-all cursor-pointer ${
+                  isActive
+                    ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
+                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                <span className="text-[10px] font-semibold">{item.label.split(" ")[0]}</span>
+                <div className={`p-1.5 rounded-xl transition-all duration-300 ${
+                  isActive 
+                    ? "bg-emerald-50 dark:bg-emerald-950/40 scale-110" 
+                    : "bg-transparent"
+                }`}>
+                  <Icon className="w-5 h-5 stroke-[2.25]" />
+                </div>
+                <span className="text-[9px] font-bold tracking-tight uppercase">{item.label.split(" ")[0]}</span>
               </button>
             );
           })}
