@@ -261,7 +261,15 @@ export const DataService = {
   async addDailyProfit(
     userId: string, 
     restaurantId: string, 
-    entry: { date: string; profit: number; notes?: string }
+    entry: { 
+      date: string; 
+      profit: number; 
+      notes?: string;
+      omzet?: number;
+      hppType?: "nominal" | "percentage";
+      hppVal?: number;
+      otherExpenses?: number;
+    }
   ): Promise<DailyProfit> {
     const id = `dp_${restaurantId}_${entry.date}_${Math.random().toString(36).substring(2, 7)}`;
     const newProfit: DailyProfit = {
@@ -270,7 +278,11 @@ export const DataService = {
       date: entry.date,
       profit: entry.profit,
       notes: entry.notes || "",
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      omzet: entry.omzet,
+      hppType: entry.hppType,
+      hppVal: entry.hppVal,
+      otherExpenses: entry.otherExpenses
     };
 
     if (!userId || userId === "demo") {
@@ -294,18 +306,27 @@ export const DataService = {
       if (!snapshot.empty) {
         // Update existing date
         const existingId = snapshot.docs[0].id;
-        await updateDoc(doc(db, "daily_profit", existingId), {
+        const updateData: any = {
           profit: entry.profit,
           notes: entry.notes || "",
-          createdAt: new Date().toISOString()
-        });
+          createdAt: new Date().toISOString(),
+          omzet: entry.omzet ?? null,
+          hppType: entry.hppType ?? null,
+          hppVal: entry.hppVal ?? null,
+          otherExpenses: entry.otherExpenses ?? null
+        };
+        await updateDoc(doc(db, "daily_profit", existingId), updateData);
         return {
           id: existingId,
           restaurantId,
           date: entry.date,
           profit: entry.profit,
           notes: entry.notes || "",
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          omzet: entry.omzet,
+          hppType: entry.hppType,
+          hppVal: entry.hppVal,
+          otherExpenses: entry.otherExpenses
         };
       } else {
         await setDoc(doc(db, "daily_profit", id), {
@@ -313,7 +334,11 @@ export const DataService = {
           date: entry.date,
           profit: entry.profit,
           notes: entry.notes || "",
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          omzet: entry.omzet ?? null,
+          hppType: entry.hppType ?? null,
+          hppVal: entry.hppVal ?? null,
+          otherExpenses: entry.otherExpenses ?? null
         });
         return newProfit;
       }

@@ -21,6 +21,10 @@ export interface DailyProfit {
   profit: number; // Daily operational profit
   notes?: string;
   createdAt: string;
+  omzet?: number;
+  hppType?: "nominal" | "percentage";
+  hppVal?: number;
+  otherExpenses?: number;
 }
 
 export interface Expenses {

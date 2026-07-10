@@ -95,12 +95,28 @@ function MainApp() {
   }, [user]);
 
   // 3. Handlers for database updates (with automatic instant state update, NO reload)
-  const handleSaveProfit = async (date: string, profit: number, notes?: string) => {
+  const handleSaveProfit = async (
+    date: string, 
+    profit: number, 
+    notes?: string,
+    omzet?: number,
+    hppType?: "nominal" | "percentage",
+    hppVal?: number,
+    otherExpenses?: number
+  ) => {
     if (!restaurant) return;
     const userId = user ? user.uid : "demo";
 
     try {
-      const newEntry = await DataService.addDailyProfit(userId, restaurant.id, { date, profit, notes });
+      const newEntry = await DataService.addDailyProfit(userId, restaurant.id, { 
+        date, 
+        profit, 
+        notes,
+        omzet,
+        hppType,
+        hppVal,
+        otherExpenses
+      });
       
       // Update profits list state instantly without page reload
       setProfits((prev) => {
