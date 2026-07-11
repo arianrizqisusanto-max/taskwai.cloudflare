@@ -76,59 +76,91 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
           // Set premium theme color: emerald (16, 185, 129)
           const primaryColor: [number, number, number] = [16, 185, 129];
 
-          // Header
+          // Helper: draw a full-page grid watermark on the current page
+          const drawWatermarkGrid = () => {
+            doc.saveGraphicsState && doc.saveGraphicsState();
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(220, 220, 220); // very light gray — visible but non-intrusive
+            const pageW = doc.internal.pageSize.width;
+            const pageH = doc.internal.pageSize.height;
+            const colGap = 42;  // horizontal spacing between watermark items
+            const rowGap = 20;  // vertical spacing between watermark items
+            for (let y = 15; y < pageH - 10; y += rowGap) {
+              for (let x = 10; x < pageW - 10; x += colGap) {
+                doc.text("taskwai.com", x, y, { angle: 30 });
+              }
+            }
+            doc.restoreGraphicsState && doc.restoreGraphicsState();
+          };
+
+          // Draw watermark on page 1 (before any content)
+          drawWatermarkGrid();
+
+          // ── Header Branding ──────────────────────────────────
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(9);
+          doc.setTextColor(16, 185, 129); // Emerald-500
+          doc.text("Taskwai.com - Dashboard Usaha Anda", 14, 12);
+
+          // Thin top accent line
+          doc.setDrawColor(16, 185, 129);
+          doc.setLineWidth(0.8);
+          doc.line(14, 14, 196, 14);
+
+          // ── Main Title ───────────────────────────────────────
           doc.setFont("Helvetica", "bold");
           doc.setFontSize(20);
           doc.setTextColor(30, 41, 59); // Slate-800
-          doc.text("LAPORAN KEUANGAN", 14, 20);
+          doc.text("LAPORAN KEUANGAN", 14, 24);
 
           doc.setFontSize(10);
           doc.setFont("Helvetica", "normal");
           doc.setTextColor(100, 116, 139); // Slate-500
-          doc.text(`Nama Usaha: ${restaurant?.name || "Belum Diatur"}`, 14, 26);
-          doc.text(`Filter Periode: ${filter.toUpperCase()}`, 14, 31);
-          doc.text(`Tanggal Cetak: ${formatIndoDate(todayStr)}`, 14, 36);
+          doc.text(`Nama Usaha: ${restaurant?.name || "Belum Diatur"}`, 14, 30);
+          doc.text(`Filter Periode: ${filter.toUpperCase()}`, 14, 35);
+          doc.text(`Tanggal Cetak: ${formatIndoDate(todayStr)}`, 14, 40);
 
           // Divider Line
           doc.setDrawColor(226, 232, 240); // Slate-200
           doc.setLineWidth(0.5);
-          doc.line(14, 40, 196, 40);
+          doc.line(14, 44, 196, 44);
 
-          // Summary Section
+          // ── Summary Section ──────────────────────────────────
           doc.setFont("Helvetica", "bold");
           doc.setFontSize(12);
           doc.setTextColor(15, 23, 42); // Slate-900
-          doc.text("Ringkasan Statistik", 14, 48);
+          doc.text("Ringkasan Statistik", 14, 52);
 
           doc.setFont("Helvetica", "normal");
           doc.setFontSize(10);
           doc.setTextColor(51, 65, 85); // Slate-700
-          
+
           const labelX = 14;
           const colonX = 48;
           const valueX = 51;
 
-          doc.text("Total Log Transaksi", labelX, 55);
-          doc.text(":", colonX, 55);
-          doc.text(`${totalDays} hari`, valueX, 55);
+          doc.text("Total Log Transaksi", labelX, 59);
+          doc.text(":", colonX, 59);
+          doc.text(`${totalDays} hari`, valueX, 59);
 
-          doc.text("Total Profit", labelX, 61);
-          doc.text(":", colonX, 61);
-          doc.text(formatRupiah(totalProfit), valueX, 61);
+          doc.text("Total Profit", labelX, 65);
+          doc.text(":", colonX, 65);
+          doc.text(formatRupiah(totalProfit), valueX, 65);
 
-          doc.text("Rata-rata Profit", labelX, 67);
-          doc.text(":", colonX, 67);
-          doc.text(formatRupiah(averageProfit), valueX, 67);
+          doc.text("Rata-rata Profit", labelX, 71);
+          doc.text(":", colonX, 71);
+          doc.text(formatRupiah(averageProfit), valueX, 71);
 
-          doc.text("Profit Tertinggi", labelX, 73);
-          doc.text(":", colonX, 73);
-          doc.text(maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0", valueX, 73);
+          doc.text("Profit Tertinggi", labelX, 77);
+          doc.text(":", colonX, 77);
+          doc.text(maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0", valueX, 77);
 
-          doc.text("Profit Terendah", labelX, 79);
-          doc.text(":", colonX, 79);
-          doc.text(minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0", valueX, 79);
+          doc.text("Profit Terendah", labelX, 83);
+          doc.text(":", colonX, 83);
+          doc.text(minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0", valueX, 83);
 
-          // Table Columns and Rows
+          // ── Table ────────────────────────────────────────────
           const headers = [["No", "Tanggal", "Hari", "Laba Kotor / Profit", "Catatan"]];
           const tableData = filteredProfits.map((p, index) => {
             const dateObj = new Date(p.date);
@@ -142,19 +174,18 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
             ];
           });
 
-          // Generate Table
           autoTable(doc, {
-            startY: 86,
+            startY: 90,
             head: headers,
             body: tableData,
             theme: "striped",
-            headStyles: { 
-              fillColor: primaryColor, 
+            headStyles: {
+              fillColor: primaryColor,
               textColor: [255, 255, 255],
               fontStyle: "bold"
             },
-            styles: { 
-              fontSize: 9, 
+            styles: {
+              fontSize: 9,
               font: "Helvetica",
               cellPadding: 3
             },
@@ -168,22 +199,22 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
             alternateRowStyles: {
               fillColor: [248, 250, 252] // Slate-50
             },
-            willDrawPage: (data) => {
-              // 1. Subtle diagonal watermark at the center of the page (under the table)
-              doc.saveGraphicsState && doc.saveGraphicsState();
-              doc.setFont("Helvetica", "bold");
-              doc.setFontSize(36);
-              doc.setTextColor(240, 240, 240); // very light gray
-              doc.text("taskwai.com", 105, 148, { align: "center", angle: 30 });
-              doc.restoreGraphicsState && doc.restoreGraphicsState();
+            willDrawPage: () => {
+              // Draw full-page grid watermark behind all content on each new page
+              drawWatermarkGrid();
             },
             didDrawPage: (data) => {
-              // 2. Small subtle watermark at the footer (outside the table)
+              // ── Page footer ──────────────────────────────────
               doc.setFont("Helvetica", "normal");
               doc.setFontSize(8);
-              doc.setTextColor(156, 163, 175); // Slate-400/Gray-400
-              doc.text("Laporan Keuangan • taskwai.com", 14, doc.internal.pageSize.height - 8);
-              doc.text(`Halaman ${data.pageNumber}`, doc.internal.pageSize.width - 25, doc.internal.pageSize.height - 8);
+              doc.setTextColor(156, 163, 175); // Gray-400
+              const pageH = doc.internal.pageSize.height;
+              const pageW = doc.internal.pageSize.width;
+              doc.setDrawColor(226, 232, 240);
+              doc.setLineWidth(0.3);
+              doc.line(14, pageH - 12, pageW - 14, pageH - 12);
+              doc.text("Taskwai.com - Dashboard Usaha Anda", 14, pageH - 8);
+              doc.text(`Halaman ${data.pageNumber}`, pageW - 25, pageH - 8);
             }
           });
 
