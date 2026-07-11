@@ -1,8 +1,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    
+    // Rules for restaurants: Each user can only read/write their own restaurant config
+    match /restaurants/{restaurantId} {
+      allow read, write: if request.auth != null && restaurantId == 'rest_' + request.auth.uid;
+    }
+    
+    // Rules for expenses: Each user can only read/write their own expenses config
+    match /expenses/{expensesId} {
+      allow read, write: if request.auth != null && expensesId == 'exp_' + request.auth.uid;
+    }
+    
+    // Rules for daily_profit logs: Each user can only read/write their own daily profit logs
+    match /daily_profit/{profitId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.restaurantId == 'rest_' + request.auth.uid) &&
+        (request.resource == null || request.resource.data.restaurantId == 'rest_' + request.auth.uid);
     }
   }
 }
