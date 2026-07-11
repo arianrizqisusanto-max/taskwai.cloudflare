@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_khJ4stNvwTMyKgBFWobVl8oz0Dcq7_s",
-  authDomain: "taskwai-com.firebaseapp.com",
+  authDomain: "auth.taskwai.com",
   projectId: "taskwai-com",
   storageBucket: "taskwai-com.firebasestorage.app",
   messagingSenderId: "888780289762",
