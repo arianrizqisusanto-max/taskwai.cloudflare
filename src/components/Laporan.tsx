@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DailyProfit } from "../types";
+import { DailyProfit, Restaurant } from "../types";
 import { formatRupiah, formatIndoDate } from "../lib/utils";
 import { FileText, Download, Calendar, Filter, FileSpreadsheet, ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
 import { useToast } from "./Toast";
@@ -10,11 +10,12 @@ import autoTable from "jspdf-autotable";
 
 interface LaporanProps {
   profits: DailyProfit[];
+  restaurant: Restaurant | null;
 }
 
 type FilterType = "hari" | "minggu" | "bulan";
 
-export default function Laporan({ profits }: LaporanProps) {
+export default function Laporan({ profits, restaurant }: LaporanProps) {
   const { showToast } = useToast();
   const [filter, setFilter] = useState<FilterType>("bulan");
 
@@ -84,7 +85,7 @@ export default function Laporan({ profits }: LaporanProps) {
           doc.setFontSize(10);
           doc.setFont("Helvetica", "normal");
           doc.setTextColor(100, 116, 139); // Slate-500
-          doc.text(`Aplikasi: Taskwai.com`, 14, 26);
+          doc.text(`Nama Usaha: ${restaurant?.name || "Belum Diatur"}`, 14, 26);
           doc.text(`Filter Periode: ${filter.toUpperCase()}`, 14, 31);
           doc.text(`Tanggal Cetak: ${formatIndoDate(todayStr)}`, 14, 36);
 
@@ -103,11 +104,29 @@ export default function Laporan({ profits }: LaporanProps) {
           doc.setFontSize(10);
           doc.setTextColor(51, 65, 85); // Slate-700
           
-          doc.text(`Total Log Transaksi :  ${totalDays} hari`, 14, 55);
-          doc.text(`Total Profit       :  ${formatRupiah(totalProfit)}`, 14, 61);
-          doc.text(`Rata-rata Profit    :  ${formatRupiah(averageProfit)}`, 14, 67);
-          doc.text(`Profit Tertinggi   :  ${maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0"}`, 14, 73);
-          doc.text(`Profit Terendah    :  ${minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0"}`, 14, 79);
+          const labelX = 14;
+          const colonX = 48;
+          const valueX = 51;
+
+          doc.text("Total Log Transaksi", labelX, 55);
+          doc.text(":", colonX, 55);
+          doc.text(`${totalDays} hari`, valueX, 55);
+
+          doc.text("Total Profit", labelX, 61);
+          doc.text(":", colonX, 61);
+          doc.text(formatRupiah(totalProfit), valueX, 61);
+
+          doc.text("Rata-rata Profit", labelX, 67);
+          doc.text(":", colonX, 67);
+          doc.text(formatRupiah(averageProfit), valueX, 67);
+
+          doc.text("Profit Tertinggi", labelX, 73);
+          doc.text(":", colonX, 73);
+          doc.text(maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0", valueX, 73);
+
+          doc.text("Profit Terendah", labelX, 79);
+          doc.text(":", colonX, 79);
+          doc.text(minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0", valueX, 79);
 
           // Table Columns and Rows
           const headers = [["No", "Tanggal", "Hari", "Laba Kotor / Profit", "Catatan"]];
@@ -159,7 +178,9 @@ export default function Laporan({ profits }: LaporanProps) {
           let csvContent = "\uFEFF"; // BOM for Excel UTF-8 support
           
           // Header Metadata
-          csvContent += `"LAPORAN KEUANGAN - TASKWAI"\r\n`;
+          const businessName = restaurant?.name || "TASKWAI";
+          csvContent += `"LAPORAN KEUANGAN - ${businessName.toUpperCase()}"\r\n`;
+          csvContent += `"Nama Usaha";"${businessName}"\r\n`;
           csvContent += `"Filter Periode";"${filter.toUpperCase()}"\r\n`;
           csvContent += `"Tanggal Cetak";"${todayStr}"\r\n\r\n`;
 

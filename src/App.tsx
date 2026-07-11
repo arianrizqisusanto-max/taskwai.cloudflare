@@ -198,7 +198,7 @@ function MainApp() {
           />
         );
       case "laporan":
-        return <Laporan profits={profits} />;
+        return <Laporan profits={profits} restaurant={restaurant} />;
       case "target":
         return (
           <Target
