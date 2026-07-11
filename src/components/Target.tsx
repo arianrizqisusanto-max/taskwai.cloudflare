@@ -37,7 +37,7 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
     setIsSaving(true);
     try {
       await onSaveRestaurant(name, targetVal);
-      showToast("Konfigurasi restoran dan target berhasil disimpan!", "success");
+      showToast("Konfigurasi usaha dan target berhasil disimpan!", "success");
     } catch (err) {
       console.error(err);
       showToast("Gagal menyimpan konfigurasi.", "error");
@@ -58,7 +58,7 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
           {/* Restaurant Name */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-              Nama Restoran / Rumah Makan
+              Nama Usaha Anda
             </label>
             <div className="relative">
               <Store className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
@@ -133,7 +133,7 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
           <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Targeting Formula</h3>
         </div>
         <p className="text-sm font-medium leading-relaxed text-zinc-300 italic">
-          "Bisnis kuliner yang sukses dibangun dari kejelasan target harian. Dengan mengeset target bulanan sebesar <span className="font-extrabold text-white font-mono">{formatRupiah(restaurant.monthlyTargetProfit)}</span>, Taskwai memandu Anda merealisasikannya langkah demi langkah setiap hari."
+          "Bisnis yang sukses dibangun dari kejelasan target harian. Dengan mengeset target bulanan, Taskwai memandu Anda merealisasikannya langkah demi langkah setiap hari."
         </p>
       </div>
     </div>

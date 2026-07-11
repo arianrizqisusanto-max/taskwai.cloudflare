@@ -235,7 +235,7 @@ function MainApp() {
 
       <footer className="py-8 pb-24 lg:pb-8 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-zinc-400 dark:text-zinc-500 font-bold tracking-wider uppercase">
-          Taskwai &copy; {new Date().getFullYear()} &bull; Dashboard Profit Harian khusus untuk Owner Restoran.
+          Taskwai &copy; {new Date().getFullYear()} &bull; Dashboard Usaha Anda.
         </div>
       </footer>
     </div>

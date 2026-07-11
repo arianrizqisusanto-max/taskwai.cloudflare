@@ -87,7 +87,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
       indicatorClass: "bg-emerald-500",
       textClass: "text-emerald-600 dark:text-emerald-400",
       icon: <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
-      message: "Target bulan ini masih aman di jalur yang benar. Pertahankan performa restoran Anda!"
+      message: "Target bulan ini masih aman di jalur yang benar. Pertahankan performa usaha Anda!"
     },
     yellow: {
       label: "Waspada",
@@ -172,7 +172,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
               {formatRupiah(profitToday)}
             </span>
             <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed">
-              Laba kotor operasional harian restoran Anda
+              Laba kotor operasional harian usaha Anda
             </span>
           </div>
         </motion.div>

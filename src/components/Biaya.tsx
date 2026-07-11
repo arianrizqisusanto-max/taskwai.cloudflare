@@ -117,7 +117,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">Atur Biaya Operasional Tetap</h2>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">Masukkan taksiran pengeluaran tetap bulanan restoran Anda.</p>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">Masukkan taksiran pengeluaran tetap bulanan usaha Anda.</p>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs font-mono shadow-sm">
               <Calculator className="w-3.5 h-3.5" />
@@ -271,7 +271,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] flex flex-col h-full justify-between">
           <div>
             <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider mb-2">Alokasi Biaya Bulanan</h3>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Diagram persentase sebaran pengeluaran restoran Anda</p>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Diagram persentase sebaran pengeluaran usaha Anda</p>
 
             <div className="h-[200px] w-full flex items-center justify-center my-6">
               {hasChartData ? (

@@ -1,6 +1,6 @@
 {
   "name": "Taskwai",
-  "description": "Dashboard Profit Harian khusus untuk Owner Restoran.",
+  "description": "Taskwai - Dashboard Usaha Anda.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
