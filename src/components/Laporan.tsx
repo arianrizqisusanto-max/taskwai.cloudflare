@@ -167,6 +167,22 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
             },
             alternateRowStyles: {
               fillColor: [248, 250, 252] // Slate-50
+            },
+            didDrawPage: (data) => {
+              // 1. Subtle diagonal watermark at the center of the page
+              doc.saveGraphicsState && doc.saveGraphicsState();
+              doc.setFont("Helvetica", "bold");
+              doc.setFontSize(36);
+              doc.setTextColor(243, 244, 246); // extremely light gray (zinc-100/slate-100)
+              doc.text("taskwai.com", 105, 148, { align: "center", angle: 30 });
+              doc.restoreGraphicsState && doc.restoreGraphicsState();
+
+              // 2. Small subtle watermark at the footer
+              doc.setFont("Helvetica", "normal");
+              doc.setFontSize(8);
+              doc.setTextColor(156, 163, 175); // Slate-400/Gray-400
+              doc.text("Laporan Keuangan • taskwai.com", 14, doc.internal.pageSize.height - 8);
+              doc.text(`Halaman ${data.pageNumber}`, doc.internal.pageSize.width - 25, doc.internal.pageSize.height - 8);
             }
           });
 
