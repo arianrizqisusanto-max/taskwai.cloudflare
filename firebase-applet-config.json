@@ -1,10 +1,10 @@
 {
-  "projectId": "predictive-terminus-8s7sz",
-  "appId": "1:316278253450:web:f10bec13d64f652f278a73",
-  "apiKey": "AIzaSyCYZCUmQfvFDLrJuA800k4A-35Vf7zUkso",
-  "authDomain": "predictive-terminus-8s7sz.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-60ab5c0b-950b-4390-baf0-2038b8f1b076",
-  "storageBucket": "predictive-terminus-8s7sz.firebasestorage.app",
-  "messagingSenderId": "316278253450",
+  "projectId": "taskwai-com",
+  "appId": "1:888780289762:web:8253de79617e330b9cd0bb",
+  "apiKey": "AIzaSyA_khJ4stNvwTMyKgBFWobVl8oz0Dcq7_s",
+  "authDomain": "taskwai-com.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "taskwai-com.firebasestorage.app",
+  "messagingSenderId": "888780289762",
   "measurementId": ""
 }

@@ -25,12 +25,28 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
   const todayStr = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(todayStr);
   const [omzetInput, setOmzetInput] = useState("");
+  const [useHpp, setUseHpp] = useState(() => {
+    try {
+      return localStorage.getItem("taskwai_use_hpp") !== "false";
+    } catch {
+      return true;
+    }
+  });
   const [hppType, setHppType] = useState<"nominal" | "percentage">("percentage");
   const [hppNominalInput, setHppNominalInput] = useState("");
   const [hppPercentInput, setHppPercentInput] = useState("35"); // Default standard HPP is often around 35%
   const [otherExpensesInput, setOtherExpensesInput] = useState("");
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const handleHppToggle = (enabled: boolean) => {
+    setUseHpp(enabled);
+    try {
+      localStorage.setItem("taskwai_use_hpp", String(enabled));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Parse helper
   const parseCurrency = (val: string) => {
@@ -43,14 +59,16 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
   
   let hppVal = 0;
   let hppValForDb = 0;
-  if (hppType === "nominal") {
-    const nominal = parseCurrency(hppNominalInput);
-    hppVal = nominal;
-    hppValForDb = nominal;
-  } else {
-    const pct = parseFloat(hppPercentInput) || 0;
-    hppVal = Math.round((omzetVal * pct) / 100);
-    hppValForDb = pct;
+  if (useHpp) {
+    if (hppType === "nominal") {
+      const nominal = parseCurrency(hppNominalInput);
+      hppVal = nominal;
+      hppValForDb = nominal;
+    } else {
+      const pct = parseFloat(hppPercentInput) || 0;
+      hppVal = Math.round((omzetVal * pct) / 100);
+      hppValForDb = pct;
+    }
   }
 
   const computedProfit = omzetVal - hppVal - otherExpensesVal;
@@ -76,8 +94,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
         computedProfit, 
         notes, 
         omzetVal, 
-        hppType, 
-        hppValForDb, 
+        useHpp ? hppType : undefined, 
+        useHpp ? hppValForDb : undefined, 
         otherExpensesVal
       );
       showToast(`Profit tanggal ${formatIndoDate(date)} berhasil disimpan!`, "success");
@@ -124,8 +142,12 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
           <div className="mb-6">
-            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">Pencatatan Laba Baru</h2>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">Berdasarkan rumus ringkas: Omzet - HPP - Pengeluaran Lain</p>
+            <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">Pencatatan Laba Baru</h2>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
+              {useHpp 
+                ? "Berdasarkan rumus ringkas: Omzet - HPP - Pengeluaran Lain"
+                : "Berdasarkan rumus ringkas: Omzet - Pengeluaran Lain"}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -166,76 +188,99 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
               </div>
             </div>
 
-            {/* HPP (COGS) Type Selector & Input */}
-            <div className="space-y-2 bg-zinc-50/50 dark:bg-zinc-950/25 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800/60">
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                  HPP (Cost of Goods Sold)
-                </label>
-                {/* Segmented control toggle */}
-                <div className="flex bg-zinc-200/80 dark:bg-zinc-800 p-0.5 rounded-lg text-[10px] font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setHppType("percentage")}
-                    className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
-                      hppType === "percentage"
-                        ? "bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs"
-                        : "text-zinc-500 dark:text-zinc-400"
-                    }`}
-                  >
-                    Persen (%)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setHppType("nominal")}
-                    className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
-                      hppType === "nominal"
-                        ? "bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs"
-                        : "text-zinc-500 dark:text-zinc-400"
-                    }`}
-                  >
-                    Nominal (Rp)
-                  </button>
-                </div>
+            {/* Toggle HPP Feature Switch */}
+            <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-950/45 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl">
+              <div className="flex flex-col pr-2">
+                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Aktifkan Fitur HPP</span>
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium leading-normal">Kalkulasi modal / bahan baku per porsi dagangan</span>
               </div>
-
-              {hppType === "nominal" ? (
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
-                    Rp
-                  </span>
-                  <input
-                    type="text"
-                    value={hppNominalInput}
-                    onChange={(e) => handleCurrencyChange(e.target.value, setHppNominalInput)}
-                    placeholder="e.g. 1.925.000"
-                    required
-                    className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
-                  />
-                </div>
-              ) : (
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={hppPercentInput}
-                    onChange={(e) => setHppPercentInput(e.target.value)}
-                    placeholder="e.g. 35"
-                    required
-                    className="w-full pl-4 pr-11 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
-                  />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none">
-                    %
-                  </span>
-                </div>
-              )}
-              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5 block leading-normal">
-                {hppType === "percentage" 
-                  ? "Bahan baku otomatis dikalkulasi dari % dikali Omzet." 
-                  : "Masukkan nominal belanja bahan baku / modal porsi hari ini."}
-              </span>
+              <button
+                type="button"
+                onClick={() => handleHppToggle(!useHpp)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  useHpp ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700"
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                    useHpp ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
             </div>
+
+            {/* HPP (COGS) Type Selector & Input */}
+            {useHpp && (
+              <div className="space-y-2 bg-zinc-50/50 dark:bg-zinc-950/25 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800/60">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                    HPP (Cost of Goods Sold)
+                  </label>
+                  {/* Segmented control toggle */}
+                  <div className="flex bg-zinc-200/80 dark:bg-zinc-800 p-0.5 rounded-lg text-[10px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setHppType("percentage")}
+                      className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
+                        hppType === "percentage"
+                          ? "bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs"
+                          : "text-zinc-500 dark:text-zinc-400"
+                      }`}
+                    >
+                      Persen (%)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHppType("nominal")}
+                      className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
+                        hppType === "nominal"
+                          ? "bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-xs"
+                          : "text-zinc-500 dark:text-zinc-400"
+                      }`}
+                    >
+                      Nominal (Rp)
+                    </button>
+                  </div>
+                </div>
+
+                {hppType === "nominal" ? (
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
+                      Rp
+                    </span>
+                    <input
+                      type="text"
+                      value={hppNominalInput}
+                      onChange={(e) => handleCurrencyChange(e.target.value, setHppNominalInput)}
+                      placeholder="e.g. 1.925.000"
+                      required={useHpp}
+                      className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={hppPercentInput}
+                      onChange={(e) => setHppPercentInput(e.target.value)}
+                      placeholder="e.g. 35"
+                      required={useHpp}
+                      className="w-full pl-4 pr-11 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
+                    />
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none">
+                      %
+                    </span>
+                  </div>
+                )}
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5 block leading-normal">
+                  {hppType === "percentage" 
+                    ? "Bahan baku otomatis dikalkulasi dari % dikali Omzet." 
+                    : "Masukkan nominal belanja bahan baku / modal porsi hari ini."}
+                </span>
+              </div>
+            )}
 
             {/* Other Expenses Input */}
             <div className="space-y-2">
@@ -259,7 +304,9 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             {/* Live Profit Calculation Panel */}
             <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/60 space-y-3 shadow-xs">
               <div className="flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800 pb-2">
-                <span className="text-xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Kalkulasi Laba Kotor</span>
+                <span className="text-xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  {useHpp ? "Kalkulasi Laba Kotor" : "Kalkulasi Omzet"}
+                </span>
                 <span className="flex items-center gap-1 text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                   <Sparkles className="w-3 h-3" /> Live
                 </span>
@@ -273,14 +320,16 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                   </span>
                 </div>
                 
-                <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">
-                    HPP ({hppType === "percentage" ? `${hppPercentInput || "0"}%` : "Nominal"}):
-                  </span>
-                  <span className="font-mono font-bold text-rose-500 dark:text-rose-400">
-                    - {formatRupiah(hppVal)}
-                  </span>
-                </div>
+                {useHpp && (
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500 dark:text-zinc-400">
+                      HPP ({hppType === "percentage" ? `${hppPercentInput || "0"}%` : "Nominal"}):
+                    </span>
+                    <span className="font-mono font-bold text-rose-500 dark:text-rose-400">
+                      - {formatRupiah(hppVal)}
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex justify-between">
                   <span className="text-zinc-500 dark:text-zinc-400">Pengeluaran Lainnya:</span>
@@ -290,7 +339,9 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                 </div>
                 
                 <div className="border-t border-dashed border-zinc-200 dark:border-zinc-800 my-2 pt-2.5 flex justify-between items-center">
-                  <span className="font-bold text-zinc-700 dark:text-zinc-300">Sisa Laba Bersih:</span>
+                  <span className="font-bold text-zinc-700 dark:text-zinc-300">
+                    {useHpp ? "Sisa Laba Bersih:" : "Total Omzet Kotor (Laba):"}
+                  </span>
                   <span className={`font-mono text-sm font-black ${computedProfit >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
                     {computedProfit >= 0 ? "+" : ""} {formatRupiah(computedProfit)}
                   </span>
@@ -412,10 +463,14 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                       <div>
                         Omzet: <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{formatRupiah(p.omzet || 0)}</span>
                       </div>
-                      <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
-                      <div>
-                        HPP ({p.hppType === "percentage" ? `${p.hppVal}%` : "Rp"}): <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(calculatedHpp)}</span>
-                      </div>
+                      {p.hppType ? (
+                        <>
+                          <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
+                          <div>
+                            HPP ({p.hppType === "percentage" ? `${p.hppVal}%` : "Rp"}): <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(calculatedHpp)}</span>
+                          </div>
+                        </>
+                      ) : null}
                       <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
                       <div>
                         Lainnya: <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(p.otherExpenses || 0)}</span>

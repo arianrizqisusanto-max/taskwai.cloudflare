@@ -3,19 +3,19 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCYZCUmQfvFDLrJuA800k4A-35Vf7zUkso",
-  authDomain: "predictive-terminus-8s7sz.firebaseapp.com",
-  projectId: "predictive-terminus-8s7sz",
-  storageBucket: "predictive-terminus-8s7sz.firebasestorage.app",
-  messagingSenderId: "316278253450",
-  appId: "1:316278253450:web:f10bec13d64f652f278a73"
+  apiKey: "AIzaSyA_khJ4stNvwTMyKgBFWobVl8oz0Dcq7_s",
+  authDomain: "taskwai-com.firebaseapp.com",
+  projectId: "taskwai-com",
+  storageBucket: "taskwai-com.firebasestorage.app",
+  messagingSenderId: "888780289762",
+  appId: "1:888780289762:web:8253de79617e330b9cd0bb"
 };
 
 // Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
-// Explicitly specify the database ID for this applet
-const db = getFirestore(app, "ai-studio-60ab5c0b-950b-4390-baf0-2038b8f1b076");
+// Use the default Firestore database for the custom project
+const db = getFirestore(app);
 
 export { app, auth, googleProvider, db };
