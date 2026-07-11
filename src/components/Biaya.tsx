@@ -94,28 +94,17 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
     { name: "Biaya Lain", value: valLain }
   ].filter(item => item.value > 0);
 
-  // Dynamic monochrome colors matching Apple/Vercel style depending on active theme
-  const isCurrentlyDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
-  const COLORS = isCurrentlyDark ? [
-    "#f4f4f5", // zinc-100
-    "#e4e4e7", // zinc-200
-    "#d4d4d8", // zinc-300
-    "#a1a1aa", // zinc-400
-    "#71717a", // zinc-500
-    "#52525b", // zinc-600
-    "#3f3f46", // zinc-700
-    "#27272a", // zinc-800
-    "#18181b", // zinc-900
-  ] : [
-    "#09090b", // zinc-950
-    "#27272a", // zinc-800
-    "#3f3f46", // zinc-700
-    "#52525b", // zinc-600
-    "#71717a", // zinc-500
-    "#a1a1aa", // zinc-400
-    "#d4d4d8", // zinc-300
-    "#e4e4e7", // zinc-200
-    "#f4f4f5", // zinc-100
+  // Vibrant modern colors that stand out elegantly in both light and dark modes
+  const COLORS = [
+    "#6366f1", // Indigo
+    "#10b981", // Emerald
+    "#f59e0b", // Amber
+    "#f43f5e", // Rose
+    "#0ea5e9", // Sky
+    "#7c3aed", // Violet
+    "#f97316", // Orange
+    "#0891b2", // Cyan
+    "#ec4899", // Pink
   ];
 
   const hasChartData = chartData.length > 0;
@@ -309,6 +298,8 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                         boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                         fontFamily: "Inter, sans-serif"
                       }}
+                      itemStyle={{ color: "var(--tooltip-text, #09090b)", fontSize: "12px", fontWeight: "600" }}
+                      labelStyle={{ color: "var(--tooltip-text, #09090b)", fontSize: "11px", opacity: 0.7 }}
                       formatter={(value: any) => [formatRupiah(Number(value)), "Jumlah"]}
                     />
                   </PieChart>

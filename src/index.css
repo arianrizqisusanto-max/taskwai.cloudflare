@@ -8,3 +8,16 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+:root {
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #e4e4e7;
+  --tooltip-text: #09090b;
+}
+
+.dark {
+  --tooltip-bg: #18181b;
+  --tooltip-border: #27272a;
+  --tooltip-text: #f4f4f5;
+}
+
+

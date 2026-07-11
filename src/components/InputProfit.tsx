@@ -423,7 +423,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                     </div>
                   ) : (
                     <div className="mt-1 pt-1.5 border-t border-dotted border-zinc-100 dark:border-zinc-800/40">
-                      <span className="text-[10px] text-zinc-350 dark:text-zinc-650 font-medium">Log tanpa rincian HPP (Pencatatan Lama)</span>
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">Log tanpa rincian HPP (Pencatatan Lama)</span>
                     </div>
                   )}
                 </motion.div>

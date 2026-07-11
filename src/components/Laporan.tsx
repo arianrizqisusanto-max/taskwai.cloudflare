@@ -94,7 +94,7 @@ export default function Laporan({ profits }: LaporanProps) {
           </button>
           <button
             onClick={() => handleExport("Excel")}
-            className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-955 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+            className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
             <span>Ekspor Excel</span>

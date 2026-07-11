@@ -297,7 +297,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
 
       {/* 4. Analisis Detail: Sisa Hari, Target Besok, Prediksi */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-350 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
           <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Sisa Hari Bulan Ini</span>
           <div className="my-4">
             <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
@@ -309,7 +309,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           </div>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-350 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
           <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Minimal Profit Harian Mulai Besok</span>
           <div className="my-4">
             <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
@@ -321,7 +321,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           </div>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-350 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
           <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Estimasi Profit Akhir Bulan</span>
           <div className="my-4">
             <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
@@ -380,6 +380,8 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                       boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                       fontFamily: "Inter, sans-serif"
                     }}
+                    itemStyle={{ color: "var(--tooltip-text, #09090b)", fontSize: "12px", fontWeight: "600" }}
+                    labelStyle={{ color: "var(--tooltip-text, #09090b)", fontSize: "11px", opacity: 0.7 }}
                     labelFormatter={(label, items) => {
                       if (items && items[0]) {
                         return items[0].payload.dateFull;
@@ -414,7 +416,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="w-5 h-5 text-zinc-800 dark:text-zinc-200" />
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-150 uppercase tracking-wider">Insight Otomatis</h3>
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Insight Otomatis</h3>
             </div>
 
             <div className="space-y-4">
@@ -423,7 +425,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                 <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
                   {businessStatus === "green" ? "✅" : "⚠️"}
                 </div>
-                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-350 leading-relaxed">
+                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
                   {businessStatus === "green" 
                     ? "Target profit bulanan Anda dalam status aman dan sangat mungkin tercapai." 
                     : `Laju profit saat ini kurang optimal untuk mencapai target bulanan ${formatRupiah(targetProfit)}.`
@@ -436,7 +438,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                 <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
                   🎯
                 </div>
-                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-350 leading-relaxed">
+                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
                   {remainingTarget > 0 
                     ? `Perlu mencapai minimal ${formatRupiah(targetDailyProfitTomorrow)} per hari selama sisa ${daysRemaining} hari ke depan.`
                     : "Luar biasa! Seluruh target profit bulan ini sudah tercapai sepenuhnya. Semua profit berikutnya adalah bonus bersih."
@@ -449,7 +451,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                 <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
                   📈
                 </div>
-                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-350 leading-relaxed">
+                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
                   Dengan rata-rata performa harian Anda sebesar <span className="font-bold text-zinc-950 dark:text-white">{formatRupiah(averageDailyProfit)}</span>, perkiraan total laba bulan ini adalah <span className="font-bold text-zinc-950 dark:text-white">{formatRupiah(predictionProfit)}</span>.
                 </div>
               </div>
@@ -459,7 +461,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                 <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
                   💡
                 </div>
-                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-350 leading-relaxed">
+                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
                   Setelah dikurangi Biaya Tetap sebesar <span className="font-bold text-zinc-950 dark:text-white">{formatRupiah(totalExpenses)}</span>, proyeksi laba bersih murni akhir bulan Anda adalah sekitar <span className="font-black text-zinc-950 dark:text-white">{formatRupiah(Math.max(0, predictionProfit - totalExpenses))}</span>.
                 </div>
               </div>

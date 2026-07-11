@@ -50,7 +50,7 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
     <div className="max-w-xl mx-auto space-y-6">
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="mb-6">
-          <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">Pengaturan Profil & Target</h2>
+          <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">Pengaturan Profil & Target</h2>
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">Konfigurasikan nama usaha dan target laba bersih bulanan Anda.</p>
         </div>
 
@@ -100,8 +100,8 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
           <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/80 flex items-start gap-3">
             <User className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5" />
             <div className="text-xs space-y-1">
-              <span className="font-bold text-zinc-850 dark:text-zinc-300 block uppercase tracking-wider text-[10px]">Koneksi Akun</span>
-              <p className="text-zinc-550 dark:text-zinc-400 leading-relaxed font-medium">
+              <span className="font-bold text-zinc-800 dark:text-zinc-300 block uppercase tracking-wider text-[10px]">Koneksi Akun</span>
+              <p className="text-zinc-500 dark:text-zinc-450 leading-relaxed font-medium">
                 {userEmail ? (
                   <>Terhubung sebagai <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">{userEmail}</span>. Data tersimpan aman di cloud database Firestore.</>
                 ) : (
@@ -132,7 +132,7 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
           <ShieldCheck className="w-5 h-5 text-zinc-400" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Targeting Formula</h3>
         </div>
-        <p className="text-sm font-medium leading-relaxed text-zinc-250 italic">
+        <p className="text-sm font-medium leading-relaxed text-zinc-300 italic">
           "Bisnis kuliner yang sukses dibangun dari kejelasan target harian. Dengan mengeset target bulanan sebesar <span className="font-extrabold text-white font-mono">{formatRupiah(restaurant.monthlyTargetProfit)}</span>, Taskwai memandu Anda merealisasikannya langkah demi langkah setiap hari."
         </p>
       </div>
