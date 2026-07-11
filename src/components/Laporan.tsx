@@ -4,6 +4,9 @@ import { formatRupiah, formatIndoDate } from "../lib/utils";
 import { FileText, Download, Calendar, Filter, FileSpreadsheet, ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
 import { useToast } from "./Toast";
 import { motion } from "motion/react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 
 interface LaporanProps {
   profits: DailyProfit[];
@@ -53,9 +56,148 @@ export default function Laporan({ profits }: LaporanProps) {
   const minProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => a.profit - b.profit)[0] : null;
 
   const handleExport = (type: "PDF" | "Excel") => {
+    if (filteredProfits.length === 0) {
+      showToast("Tidak ada data untuk diekspor", "error");
+      return;
+    }
+
     showToast(`Sedang menyiapkan dokumen ${type}...`, "info");
+
     setTimeout(() => {
-      showToast(`Laporan berhasil diekspor ke format ${type}!`, "success");
+      try {
+        if (type === "PDF") {
+          const doc = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+          });
+
+          // Set premium theme color: emerald (16, 185, 129)
+          const primaryColor: [number, number, number] = [16, 185, 129];
+
+          // Header
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(20);
+          doc.setTextColor(30, 41, 59); // Slate-800
+          doc.text("LAPORAN KEUANGAN", 14, 20);
+
+          doc.setFontSize(10);
+          doc.setFont("Helvetica", "normal");
+          doc.setTextColor(100, 116, 139); // Slate-500
+          doc.text(`Aplikasi: Taskwai.com`, 14, 26);
+          doc.text(`Filter Periode: ${filter.toUpperCase()}`, 14, 31);
+          doc.text(`Tanggal Cetak: ${formatIndoDate(todayStr)}`, 14, 36);
+
+          // Divider Line
+          doc.setDrawColor(226, 232, 240); // Slate-200
+          doc.setLineWidth(0.5);
+          doc.line(14, 40, 196, 40);
+
+          // Summary Section
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(12);
+          doc.setTextColor(15, 23, 42); // Slate-900
+          doc.text("Ringkasan Statistik", 14, 48);
+
+          doc.setFont("Helvetica", "normal");
+          doc.setFontSize(10);
+          doc.setTextColor(51, 65, 85); // Slate-700
+          
+          doc.text(`Total Log Transaksi :  ${totalDays} hari`, 14, 55);
+          doc.text(`Total Profit       :  ${formatRupiah(totalProfit)}`, 14, 61);
+          doc.text(`Rata-rata Profit    :  ${formatRupiah(averageProfit)}`, 14, 67);
+          doc.text(`Profit Tertinggi   :  ${maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0"}`, 14, 73);
+          doc.text(`Profit Terendah    :  ${minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0"}`, 14, 79);
+
+          // Table Columns and Rows
+          const headers = [["No", "Tanggal", "Hari", "Laba Kotor / Profit", "Catatan"]];
+          const tableData = filteredProfits.map((p, index) => {
+            const dateObj = new Date(p.date);
+            const weekday = dateObj.toLocaleDateString("id-ID", { weekday: "long" });
+            return [
+              (index + 1).toString(),
+              p.date,
+              weekday,
+              formatRupiah(p.profit),
+              p.notes || "-"
+            ];
+          });
+
+          // Generate Table
+          autoTable(doc, {
+            startY: 86,
+            head: headers,
+            body: tableData,
+            theme: "striped",
+            headStyles: { 
+              fillColor: primaryColor, 
+              textColor: [255, 255, 255],
+              fontStyle: "bold"
+            },
+            styles: { 
+              fontSize: 9, 
+              font: "Helvetica",
+              cellPadding: 3
+            },
+            columnStyles: {
+              0: { cellWidth: 12, halign: "center" },
+              1: { cellWidth: 32 },
+              2: { cellWidth: 32 },
+              3: { cellWidth: 45, halign: "right" },
+              4: { cellWidth: "auto" }
+            },
+            alternateRowStyles: {
+              fillColor: [248, 250, 252] // Slate-50
+            }
+          });
+
+          // Save File
+          doc.save(`Laporan_Keuangan_${filter}_${todayStr}.pdf`);
+          showToast("Laporan PDF berhasil diunduh!", "success");
+        } else {
+          // Excel (CSV Export)
+          let csvContent = "\uFEFF"; // BOM for Excel UTF-8 support
+          
+          // Header Metadata
+          csvContent += `"LAPORAN KEUANGAN - TASKWAI"\r\n`;
+          csvContent += `"Filter Periode";"${filter.toUpperCase()}"\r\n`;
+          csvContent += `"Tanggal Cetak";"${todayStr}"\r\n\r\n`;
+
+          // Summary Statistics
+          csvContent += `"Ringkasan Statistik"\r\n`;
+          csvContent += `"Total Log Transaksi";"${totalDays} hari"\r\n`;
+          csvContent += `"Total Profit";"${totalProfit}"\r\n`;
+          csvContent += `"Rata-rata Profit";"${averageProfit}"\r\n`;
+          csvContent += `"Profit Tertinggi";"${maxProfitEntry ? maxProfitEntry.profit : 0}"\r\n`;
+          csvContent += `"Profit Terendah";"${minProfitEntry ? minProfitEntry.profit : 0}"\r\n\r\n`;
+
+          // Table Headers
+          csvContent += `"No";"Tanggal";"Hari";"Laba Kotor / Profit";"Catatan"\r\n`;
+          
+          // Table Rows
+          filteredProfits.forEach((p, index) => {
+            const dateObj = new Date(p.date);
+            const weekday = dateObj.toLocaleDateString("id-ID", { weekday: "long" });
+            const note = p.notes ? p.notes.replace(/"/g, '""') : "";
+            csvContent += `"${index + 1}";"${p.date}";"${weekday}";"${p.profit}";"${note}"\r\n`;
+          });
+
+          // Download Action
+          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.setAttribute("href", url);
+          link.setAttribute("download", `Laporan_Keuangan_${filter}_${todayStr}.csv`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          showToast("Laporan Excel (CSV) berhasil diunduh!", "success");
+        }
+      } catch (error) {
+        console.error("Export Error:", error);
+        showToast("Terjadi kesalahan saat mengunduh dokumen.", "error");
+      }
     }, 1500);
   };
 
