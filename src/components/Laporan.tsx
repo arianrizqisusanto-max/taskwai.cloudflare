@@ -76,26 +76,6 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
           // Set premium theme color: emerald (16, 185, 129)
           const primaryColor: [number, number, number] = [16, 185, 129];
 
-          // Helper: draw a full-page grid watermark on the current page
-          const drawWatermarkGrid = () => {
-            doc.saveGraphicsState && doc.saveGraphicsState();
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(220, 220, 220); // very light gray — visible but non-intrusive
-            const pageW = doc.internal.pageSize.width;
-            const pageH = doc.internal.pageSize.height;
-            const colGap = 42;  // horizontal spacing between watermark items
-            const rowGap = 20;  // vertical spacing between watermark items
-            for (let y = 15; y < pageH - 10; y += rowGap) {
-              for (let x = 10; x < pageW - 10; x += colGap) {
-                doc.text("taskwai.com", x, y, { angle: 30 });
-              }
-            }
-            doc.restoreGraphicsState && doc.restoreGraphicsState();
-          };
-
-          // Draw watermark on page 1 (before any content)
-          drawWatermarkGrid();
 
           // ── Header Branding ──────────────────────────────────
           doc.setFont("Helvetica", "bold");
@@ -199,10 +179,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
             alternateRowStyles: {
               fillColor: [248, 250, 252] // Slate-50
             },
-            willDrawPage: () => {
-              // Draw full-page grid watermark behind all content on each new page
-              drawWatermarkGrid();
-            },
+
             didDrawPage: (data) => {
               // ── Page footer ──────────────────────────────────
               doc.setFont("Helvetica", "normal");
