@@ -1,65 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <defs>
-    <!-- Ultra-premium neon/emerald gradient with perfect luminosity -->
-    <linearGradient id="neonGreen" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#047857" />
-      <stop offset="50%" stop-color="#10B981" />
-      <stop offset="100%" stop-color="#34D399" />
-    </linearGradient>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="120" fill="#10B981"/>
 
-    <!-- Sleek glassmorphism / translucent white for light highlight reflection -->
-    <linearGradient id="glassHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8" />
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.1" />
-    </linearGradient>
+  <!-- Bar chart: 3 bars increasing height, bold, rounded tops, white -->
+  <!-- Bar 1 (shortest, left) -->
+  <rect x="112" y="292" width="80" height="148" rx="18" fill="white"/>
 
-    <!-- Soft ambient glow for that premium, modern SaaS feel -->
-    <filter id="premiumGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
+  <!-- Bar 2 (medium, center) -->
+  <rect x="216" y="192" width="80" height="248" rx="18" fill="white"/>
 
-  <!-- Clean, dark high-contrast background squircle -->
-  <rect width="512" height="512" rx="144" fill="#090D16" />
-
-  <!-- 
-    The "Quantum Ascent" Logo (Out of the Box & Professional):
-    An abstract, mathematically-aligned 3D isometric staircase where the bars float 
-    and overlap in a satisfying geometric pattern. It forms an iconic "W" (Wai) 
-    and "T" (Taskwai) hybrid silhouette.
-  -->
-  <g filter="url(#premiumGlow)" stroke-linejoin="round" stroke-linecap="round">
-    
-    <!-- === COLUMN 1 (Bottom Left, Short & Wide) === -->
-    <!-- Left Shaded Face -->
-    <polygon points="120,340 180,370 180,430 120,400" fill="#045A43" opacity="0.85" />
-    <!-- Right Shaded Face -->
-    <polygon points="180,370 240,340 240,400 180,430" fill="#059669" />
-    <!-- Top Glowing Face -->
-    <polygon points="120,340 180,310 240,340 180,370" fill="url(#neonGreen)" />
-    <!-- Light Reflection Highlight Line -->
-    <polyline points="120,340 180,370 240,340" fill="none" stroke="url(#glassHighlight)" stroke-width="4" opacity="0.6" />
-
-    <!-- === COLUMN 2 (Middle, Medium & Floating) === -->
-    <!-- Left Shaded Face -->
-    <polygon points="200,240 260,270 260,390 200,360" fill="#046A4E" opacity="0.9" />
-    <!-- Right Shaded Face -->
-    <polygon points="260,270 320,240 320,360 260,390" fill="#10B981" />
-    <!-- Top Glowing Face -->
-    <polygon points="200,240 260,210 320,240 260,270" fill="url(#neonGreen)" />
-    <!-- Light Reflection Highlight Line -->
-    <polyline points="200,240 260,270 320,240" fill="none" stroke="url(#glassHighlight)" stroke-width="4" opacity="0.6" />
-
-    <!-- === COLUMN 3 (Top Right, Tallest & Floating Peak) === -->
-    <!-- Left Shaded Face -->
-    <polygon points="280,140 340,170 340,350 280,320" fill="#047857" />
-    <!-- Right Shaded Face -->
-    <polygon points="340,170 400,140 400,320 340,350" fill="#34D399" />
-    <!-- Top Glowing Face -->
-    <polygon points="280,140 340,110 400,140 340,170" fill="url(#neonGreen)" />
-    <!-- Light Reflection Highlight Line -->
-    <polyline points="280,140 340,170 400,140" fill="none" stroke="url(#glassHighlight)" stroke-width="4" opacity="0.7" />
-
-  </g>
+  <!-- Bar 3 (tallest, right) -->
+  <rect x="320" y="92" width="80" height="348" rx="18" fill="white"/>
 </svg>

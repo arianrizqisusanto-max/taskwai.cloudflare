@@ -2,6 +2,7 @@ import { auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signOut, User } from "firebase/auth";
 import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon } from "lucide-react";
 import { useToast } from "./Toast";
+import TaskwaiLogo from "./TaskwaiLogo";
 
 interface NavbarProps {
   user: User | null;
@@ -48,9 +49,9 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Logo */}
           <div className="flex items-center gap-3">
-            <img src="/favicon.svg" alt="Taskwai Logo" className="h-9 w-9 object-contain rounded-xl shadow-sm" />
+            <TaskwaiLogo size={36} />
             <div className="flex flex-col">
-              <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50">Taskwai</span>
+              <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50">taskwai</span>
               <span className="hidden sm:inline text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">Profit Dashboard</span>
             </div>
           </div>
