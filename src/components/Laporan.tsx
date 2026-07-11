@@ -168,16 +168,17 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
             alternateRowStyles: {
               fillColor: [248, 250, 252] // Slate-50
             },
-            didDrawPage: (data) => {
-              // 1. Subtle diagonal watermark at the center of the page
+            willDrawPage: (data) => {
+              // 1. Subtle diagonal watermark at the center of the page (under the table)
               doc.saveGraphicsState && doc.saveGraphicsState();
               doc.setFont("Helvetica", "bold");
               doc.setFontSize(36);
-              doc.setTextColor(243, 244, 246); // extremely light gray (zinc-100/slate-100)
+              doc.setTextColor(240, 240, 240); // very light gray
               doc.text("taskwai.com", 105, 148, { align: "center", angle: 30 });
               doc.restoreGraphicsState && doc.restoreGraphicsState();
-
-              // 2. Small subtle watermark at the footer
+            },
+            didDrawPage: (data) => {
+              // 2. Small subtle watermark at the footer (outside the table)
               doc.setFont("Helvetica", "normal");
               doc.setFontSize(8);
               doc.setTextColor(156, 163, 175); // Slate-400/Gray-400
