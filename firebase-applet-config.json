@@ -2,7 +2,7 @@
   "projectId": "taskwai-com",
   "appId": "1:888780289762:web:8253de79617e330b9cd0bb",
   "apiKey": "AIzaSyA_khJ4stNvwTMyKgBFWobVl8oz0Dcq7_s",
-  "authDomain": "taskwai.com",
+  "authDomain": "taskwai-com.firebaseapp.com",
   "firestoreDatabaseId": "(default)",
   "storageBucket": "taskwai-com.firebasestorage.app",
   "messagingSenderId": "888780289762",
