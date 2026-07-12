@@ -27,13 +27,14 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   // Staff Credentials states
   const [staffUsername, setStaffUsername] = useState(restaurant.staffUsername || "");
   const [staffPassword, setStaffPassword] = useState(restaurant.staffPassword || "");
+  const [staffPasswordConfirm, setStaffPasswordConfirm] = useState(restaurant.staffPassword || "");
   const [isSavingStaff, setIsSavingStaff] = useState(false);
   const [isEditingStaff, setIsEditingStaff] = useState(false);
 
   const handleStaffSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!staffUsername.trim() || !staffPassword.trim()) {
-      showToast("Username dan password staff tidak boleh kosong.", "warning");
+    if (!staffUsername.trim() || !staffPassword.trim() || !staffPasswordConfirm.trim()) {
+      showToast("Username, password, dan konfirmasi password staff harus diisi.", "warning");
       return;
     }
 
@@ -53,6 +54,11 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
       return;
     }
 
+    if (staffPassword.trim() !== staffPasswordConfirm.trim()) {
+      showToast("Password dan konfirmasi password tidak cocok.", "warning");
+      return;
+    }
+
     setIsSavingStaff(true);
     try {
       await onSaveStaffCredentials(staffUsername.trim(), staffPassword.trim());
@@ -69,6 +75,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   const handleStaffCancel = () => {
     setStaffUsername(restaurant.staffUsername || "");
     setStaffPassword(restaurant.staffPassword || "");
+    setStaffPasswordConfirm(restaurant.staffPassword || "");
     setIsEditingStaff(false);
   };
 
@@ -336,12 +343,31 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
               <input
-                type="password"
+                type="text"
                 required
                 disabled={!isEditingStaff || isSavingStaff}
                 value={staffPassword}
                 onChange={(e) => setStaffPassword(e.target.value)}
                 placeholder="Masukkan password staff"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Confirm Password */}
+          <div className="space-y-2 animate-in fade-in duration-200">
+            <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+              Konfirmasi Password Staff
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
+              <input
+                type="text"
+                required
+                disabled={!isEditingStaff || isSavingStaff}
+                value={staffPasswordConfirm}
+                onChange={(e) => setStaffPasswordConfirm(e.target.value)}
+                placeholder="Ulangi password staff"
                 className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
               />
             </div>
