@@ -166,10 +166,13 @@ export const DataService = {
       return await this.getRestaurant(userId);
     } catch (error) {
       console.error("Error updating restaurant:", error);
-      const rest = getLocal<Restaurant>(`taskwai_restaurant_${userId}`) || DEFAULT_RESTAURANT(userId);
-      const updated = { ...rest, ...data };
-      setLocal(`taskwai_restaurant_${userId}`, updated);
-      return updated;
+      if (!userId || userId === "demo") {
+        const rest = getLocal<Restaurant>(`taskwai_restaurant_${userId}`) || DEFAULT_RESTAURANT(userId);
+        const updated = { ...rest, ...data };
+        setLocal(`taskwai_restaurant_${userId}`, updated);
+        return updated;
+      }
+      throw error;
     }
   },
 
@@ -216,10 +219,13 @@ export const DataService = {
       return await this.getExpenses(userId, restaurantId);
     } catch (error) {
       console.error("Error updating expenses:", error);
-      const exp = getLocal<Expenses>(`taskwai_expenses_${userId}`) || DEFAULT_EXPENSES(userId, restaurantId);
-      const updated = { ...exp, ...data, updatedAt: new Date().toISOString() };
-      setLocal(`taskwai_expenses_${userId}`, updated);
-      return updated;
+      if (!userId || userId === "demo") {
+        const exp = getLocal<Expenses>(`taskwai_expenses_${userId}`) || DEFAULT_EXPENSES(userId, restaurantId);
+        const updated = { ...exp, ...data, updatedAt: new Date().toISOString() };
+        setLocal(`taskwai_expenses_${userId}`, updated);
+        return updated;
+      }
+      throw error;
     }
   },
 
@@ -405,11 +411,14 @@ export const DataService = {
       }
     } catch (error) {
       console.error("Error adding daily profit:", error);
-      const profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`) || [];
-      const filtered = profits.filter((p) => p.date !== entry.date);
-      const updated = [newProfit, ...filtered];
-      setLocal(`taskwai_daily_profits_${userId}`, updated);
-      return newProfit;
+      if (!userId || userId === "demo") {
+        const profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`) || [];
+        const filtered = profits.filter((p) => p.date !== entry.date);
+        const updated = [newProfit, ...filtered];
+        setLocal(`taskwai_daily_profits_${userId}`, updated);
+        return newProfit;
+      }
+      throw error;
     }
   },
 
@@ -425,9 +434,13 @@ export const DataService = {
       await deleteDoc(doc(db, "daily_profit", id));
     } catch (error) {
       console.error("Error deleting daily profit:", error);
-      const profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`) || [];
-      const filtered = profits.filter((p) => p.id !== id);
-      setLocal(`taskwai_daily_profits_${userId}`, filtered);
+      if (!userId || userId === "demo") {
+        const profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`) || [];
+        const filtered = profits.filter((p) => p.id !== id);
+        setLocal(`taskwai_daily_profits_${userId}`, filtered);
+        return;
+      }
+      throw error;
     }
   },
 
