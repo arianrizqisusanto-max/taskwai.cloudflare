@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signOut, User } from "firebase/auth";
-import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle, RotateCw } from "lucide-react";
 import { useToast } from "./Toast";
 import TaskwaiLogo from "./TaskwaiLogo";
 import { useTranslation } from "../lib/LanguageContext";
@@ -27,7 +27,15 @@ export default function Navbar({
 }: NavbarProps) {
   const { showToast } = useToast();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { t } = useTranslation();
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      window.location.reload();
+    }, 400);
+  };
 
   const handleLogin = async () => {
     try {
@@ -112,6 +120,16 @@ export default function Navbar({
                 <span>{t("nav.demoMode", "Mode Demo")}</span>
               </div>
             )}
+
+            {/* Refresh Button */}
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-955 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
+              title={t("nav.refresh", "Muat Ulang")}
+            >
+              <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} />
+            </button>
 
             {/* Dark Mode Toggle */}
             <button
