@@ -8,6 +8,14 @@ import { useTranslation } from "../lib/LanguageContext";
 
 import { Restaurant } from "../types";
 
+interface StaffLocalHistoryItem {
+  id: string;
+  date: string;
+  omzet: number;
+  branch: string;
+  submittedAt: string;
+}
+
 interface InputProfitProps {
   profits: DailyProfit[];
   onSaveProfit: (
@@ -60,6 +68,15 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
 
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const [staffLocalHistory, setStaffLocalHistory] = useState<StaffLocalHistoryItem[]>(() => {
+    try {
+      const saved = localStorage.getItem("taskwai_staff_local_history");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const handleHppToggle = (enabled: boolean) => {
     setUseHpp(enabled);
@@ -138,6 +155,31 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
       }
       if (inputterInput.trim()) {
         localStorage.setItem("taskwai_last_inputter", inputterInput.trim());
+      }
+
+      // Add to local submit history for staff mode
+      if (isStaffMode) {
+        try {
+          const now = new Date();
+          const jamMenit = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+          const tglInput = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}`;
+          
+          const newItem: StaffLocalHistoryItem = {
+            id: `lh_${Date.now()}`,
+            date: date,
+            omzet: omzetVal,
+            branch: branchInput.trim() || "-",
+            submittedAt: `${tglInput} ${jamMenit}`
+          };
+          
+          const savedHistory = localStorage.getItem("taskwai_staff_local_history");
+          const historyArr: StaffLocalHistoryItem[] = savedHistory ? JSON.parse(savedHistory) : [];
+          const updatedHistory = [newItem, ...historyArr].slice(0, 5); // Keep last 5 entries
+          localStorage.setItem("taskwai_staff_local_history", JSON.stringify(updatedHistory));
+          setStaffLocalHistory(updatedHistory);
+        } catch (e) {
+          console.warn("Failed to save local history:", e);
+        }
       }
 
       // Keep state clean but preserve HPP percentage for easier repetitive daily entry
@@ -502,6 +544,50 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
             {t("profit.tipDesc", "Menyimpan data pada tanggal yang sudah terisi sebelumnya akan memperbarui (overwrite) nilai profit tanggal tersebut otomatis.")}
           </p>
         </div>
+
+        {/* Staff Local Submit History */}
+        {isStaffMode && staffLocalHistory.length > 0 && (
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_8px_20px_-8px_rgba(0,0,0,0.03)] space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Riwayat Kirim HP Ini</span>
+              <button 
+                type="button"
+                onClick={() => {
+                  if (confirm("Hapus riwayat pengiriman lokal di HP ini?")) {
+                    localStorage.removeItem("taskwai_staff_local_history");
+                    setStaffLocalHistory([]);
+                  }
+                }}
+                className="text-[9px] font-bold text-rose-500 hover:text-rose-600 transition-colors flex items-center gap-1 cursor-pointer bg-transparent border-0 outline-none"
+              >
+                Hapus
+              </button>
+            </div>
+            
+            <div className="space-y-1.5">
+              {staffLocalHistory.map((item) => (
+                <div key={item.id} className="flex justify-between items-center text-[11px] py-1.5 px-2.5 bg-zinc-50/50 dark:bg-zinc-950/25 border border-zinc-100 dark:border-zinc-800/40 rounded-xl">
+                  <div className="flex flex-col">
+                    <span className="font-extrabold text-zinc-800 dark:text-zinc-200">
+                      {formatRupiah(item.omzet)}
+                    </span>
+                    <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-semibold mt-0.5">
+                      Cabang: <span className="font-bold text-zinc-650 dark:text-zinc-400">{item.branch}</span>
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="font-mono text-zinc-500 dark:text-zinc-400 font-bold">
+                      {formatIndoDate(item.date, lang).split(",")[1]?.trim() || item.date}
+                    </span>
+                    <span className="text-[9px] text-zinc-400 dark:text-zinc-600 font-medium mt-0.5">
+                      Input: {item.submittedAt}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* History Log Column */}
