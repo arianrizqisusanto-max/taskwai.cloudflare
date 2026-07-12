@@ -153,6 +153,15 @@ function MainApp() {
     const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
 
     try {
+      console.log("[DEBUG handleSaveProfit]", {
+        userId,
+        authUid: user?.uid || "NO_AUTH",
+        isAnonymous: user?.isAnonymous,
+        restaurantId: restaurant.id,
+        expectedRestId: `rest_${userId}`,
+        match: restaurant.id === `rest_${userId}`,
+        staffSession: staffSession ? { ownerId: staffSession.ownerId, restaurantId: staffSession.restaurantId } : null
+      });
       const newEntry = await DataService.addDailyProfit(userId, restaurant.id, { 
         date, 
         profit, 

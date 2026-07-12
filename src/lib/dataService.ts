@@ -368,6 +368,7 @@ export const DataService = {
         // Update existing date for this specific branch
         const existingId = existingDoc.id;
         const updateData: any = {
+          restaurantId,
           profit: entry.profit,
           notes: entry.notes || "",
           createdAt: new Date().toISOString(),
