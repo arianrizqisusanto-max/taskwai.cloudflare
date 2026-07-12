@@ -50,7 +50,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
 
   // Parse helper
   const parseCurrency = (val: string) => {
-    return parseFloat(val.replace(/[^0-9.-]+/g, "")) || 0;
+    const cleanStr = val.replace(/[^0-9]/g, "");
+    return parseInt(cleanStr, 10) || 0;
   };
 
   // Live Calculations

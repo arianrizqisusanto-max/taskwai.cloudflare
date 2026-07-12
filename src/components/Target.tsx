@@ -28,7 +28,8 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const targetVal = parseFloat(targetInput.replace(/[^0-9.-]+/g, ""));
+    const cleanStr = targetInput.replace(/[^0-9]/g, "");
+    const targetVal = parseInt(cleanStr, 10);
     if (isNaN(targetVal) || targetVal <= 0) {
       showToast("Harap masukkan nominal target yang valid.", "warning");
       return;

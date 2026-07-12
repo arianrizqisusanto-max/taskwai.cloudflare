@@ -36,7 +36,8 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
   };
 
   const parseValue = (str: string): number => {
-    const parsed = parseFloat(str.replace(/[^0-9.-]+/g, ""));
+    const cleanStr = str.replace(/[^0-9]/g, "");
+    const parsed = parseInt(cleanStr, 10);
     return isNaN(parsed) ? 0 : parsed;
   };
 
