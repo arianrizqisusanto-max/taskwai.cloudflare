@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signOut, User as FirebaseUser } from "firebase/auth";
-import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle, RotateCw, Sparkles, X, TrendingUp, Users, Coins, Cloud, Lock, User as UserIcon, UserCheck } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle, RotateCw, Sparkles, X, TrendingUp, Users, Coins, Cloud, Lock, User as UserIcon, UserCheck, Eye, EyeOff } from "lucide-react";
 import { useToast } from "./Toast";
 import TaskwaiLogo from "./TaskwaiLogo";
 import { useTranslation } from "../lib/LanguageContext";
@@ -42,6 +42,7 @@ export default function Navbar({
   const [staffUsernameInput, setStaffUsernameInput] = useState("");
   const [staffPasswordInput, setStaffPasswordInput] = useState("");
   const [isLoggingInStaff, setIsLoggingInStaff] = useState(false);
+  const [showStaffPassword, setShowStaffPassword] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -543,14 +544,26 @@ export default function Navbar({
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                     <input
-                      type="password"
+                      type={showStaffPassword ? "text" : "password"}
                       required
                       disabled={isLoggingInStaff}
                       value={staffPasswordInput}
                       onChange={(e) => setStaffPasswordInput(e.target.value)}
                       placeholder="Masukkan password staff"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs font-semibold text-zinc-900 dark:text-zinc-100"
+                      className="w-full pl-10 pr-10 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs font-semibold text-zinc-900 dark:text-zinc-100"
                     />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      onClick={() => setShowStaffPassword(!showStaffPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-250 focus:outline-none cursor-pointer"
+                    >
+                      {showStaffPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                   </div>
                 </div>
 

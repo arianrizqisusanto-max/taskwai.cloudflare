@@ -455,7 +455,8 @@ export const DataService = {
     // Write new mapping
     await setDoc(doc(db, "staff_accounts", hash), {
       restaurantId,
-      ownerId: userId
+      ownerId: userId,
+      staffActive: true
     });
 
     // Update restaurant doc
@@ -477,6 +478,18 @@ export const DataService = {
     }
 
     const restDocRef = doc(db, "restaurants", restaurantId);
+    
+    // Also update staffActive status in staff_accounts mapping
+    const restSnap = await getDoc(restDocRef);
+    if (restSnap.exists()) {
+      const hash = restSnap.data().staffHash || "";
+      if (hash) {
+        await updateDoc(doc(db, "staff_accounts", hash), {
+          staffActive: active
+        });
+      }
+    }
+
     await updateDoc(restDocRef, {
       staffActive: active
     });
@@ -507,16 +520,10 @@ export const DataService = {
       throw new Error("Username atau Password staff salah.");
     }
 
-    const { restaurantId, ownerId } = accountSnap.data() as { restaurantId: string; ownerId: string };
+    const { restaurantId, ownerId, staffActive } = accountSnap.data() as { restaurantId: string; ownerId: string; staffActive?: boolean };
 
-    // Fetch the restaurant document to verify if the account is active
-    const restDocRef = doc(db, "restaurants", restaurantId);
-    const restSnap = await getDoc(restDocRef);
-    if (restSnap.exists()) {
-      const restData = restSnap.data();
-      if (restData.staffActive === false) {
-        throw new Error("Akun staff telah dinonaktifkan oleh pemilik usaha.");
-      }
+    if (staffActive === false) {
+      throw new Error("Akun staff telah dinonaktifkan oleh pemilik usaha.");
     }
 
     // Authenticate anonymously in Firebase Auth
