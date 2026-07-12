@@ -24,7 +24,13 @@ function MainApp() {
   const [user, setUser] = useState<User | null>(null);
   const [authInitialized, setAuthInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("taskwai_staff_session");
+      return saved ? "input" : "dashboard";
+    }
+    return "dashboard";
+  });
 
   // Staff Mode Session State
   const [staffSession, setStaffSession] = useState<{ restaurantId: string; ownerId: string; role: "staff" } | null>(() => {
