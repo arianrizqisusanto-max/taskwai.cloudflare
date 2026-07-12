@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { DailyProfit } from "../types";
 import { formatRupiah, formatIndoDate } from "../lib/utils";
-import { Save, Calendar, Coins, AlignLeft, Trash2, HelpCircle, Sparkles, Percent } from "lucide-react";
-import { motion } from "motion/react";
+import { Save, Calendar, Coins, AlignLeft, Trash2, HelpCircle, Sparkles, Percent, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
 
@@ -68,6 +68,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
 
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const [staffLocalHistory, setStaffLocalHistory] = useState<StaffLocalHistoryItem[]>(() => {
     try {
@@ -128,12 +129,13 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
     }
 
     if (isStaffMode) {
-      const confirmMsg = `Apakah Anda yakin ingin mengirim laporan ini?\n\nMohon periksa kembali:\n- Tanggal Operasional: ${formatIndoDate(date, lang)}\n- Nominal Omzet: ${formatRupiah(omzetVal)}\n- Nama Cabang: ${branchInput.trim() || "(Belum diisi)"}\n\nPastikan data di atas sudah benar ya, agar tidak terjadi kesalahan pencatatan dan menghindari teguran dari bos/atasan Anda. 😊`;
-      if (!confirm(confirmMsg)) {
-        return;
-      }
+      setShowConfirmModal(true);
+    } else {
+      await executeSave();
     }
+  };
 
+  const executeSave = async () => {
     setIsSaving(true);
     try {
       await onSaveProfit(
@@ -697,6 +699,75 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
         </div>
       </div>
       )}
+      {/* Custom Staff Submit Confirmation Modal */}
+      <AnimatePresence>
+        {showConfirmModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop overlay with blur */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowConfirmModal(false)}
+              className="absolute inset-0 bg-zinc-950/65 backdrop-blur-sm"
+            />
+            
+            {/* Modal Box */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-sm rounded-3xl bg-white dark:bg-zinc-900 p-5 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80 z-10"
+            >
+              <h3 className="text-sm font-black text-zinc-950 dark:text-zinc-50 tracking-tight mb-4 flex items-center gap-2">
+                <AlertCircle className="w-4.5 h-4.5 text-emerald-500 animate-pulse" />
+                Konfirmasi Laporan
+              </h3>
+              
+              {/* Structured Data Display */}
+              <div className="space-y-2 py-3 px-3.5 bg-zinc-50/50 dark:bg-zinc-950/25 border border-zinc-100 dark:border-zinc-800/40 rounded-2xl text-xs font-semibold mb-5">
+                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/40 pb-2">
+                  <span className="text-zinc-400 dark:text-zinc-500">Tanggal</span>
+                  <span className="font-mono text-zinc-800 dark:text-zinc-200">{formatIndoDate(date, lang).split(",")[1]?.trim() || date}</span>
+                </div>
+                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/40 py-2">
+                  <span className="text-zinc-400 dark:text-zinc-500">Nominal Omzet</span>
+                  <span className="font-mono text-emerald-600 dark:text-emerald-450 font-bold">{formatRupiah(omzetVal)}</span>
+                </div>
+                <div className="flex justify-between pt-1">
+                  <span className="text-zinc-400 dark:text-zinc-500">Cabang</span>
+                  <span className="text-zinc-800 dark:text-zinc-200">{branchInput.trim() || "-"}</span>
+                </div>
+              </div>
+              
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 text-center font-bold mb-5 leading-normal">
+                cek sekali lagi apakah data ini benar?<br />
+                <span className="text-rose-500/90 dark:text-rose-450 font-extrabold">Biar Tidak Di komplain Bos anda.</span>
+              </p>
+              
+              <div className="flex gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/65 font-bold text-xs transition-colors cursor-pointer bg-transparent"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowConfirmModal(false);
+                    executeSave();
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-900 dark:hover:bg-white text-white dark:text-zinc-950 font-bold text-xs transition-colors cursor-pointer border-0"
+                >
+                  Kirim Data
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
