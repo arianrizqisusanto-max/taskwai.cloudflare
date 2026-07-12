@@ -1,4 +1,21 @@
 export function formatRupiah(value: number): string {
+  let currency = "rupiah";
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("taskwai_currency");
+    if (saved === "dollar") {
+      currency = "dollar";
+    }
+  }
+
+  if (currency === "dollar") {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+  }
+
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",

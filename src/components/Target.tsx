@@ -13,9 +13,13 @@ interface TargetProps {
 
 export default function Target({ restaurant, onSaveRestaurant, userEmail }: TargetProps) {
   const { showToast } = useToast();
-  const { lang, setLang, t } = useTranslation();
+  const { lang, setLang, t, currency, setCurrency, currencySymbol } = useTranslation();
   const [name, setName] = useState(restaurant.name);
-  const [targetInput, setTargetInput] = useState(new Intl.NumberFormat("id-ID").format(restaurant.monthlyTargetProfit));
+  
+  const isDollar = currency === "dollar";
+  const formatLocale = isDollar ? "en-US" : "id-ID";
+
+  const [targetInput, setTargetInput] = useState(new Intl.NumberFormat(formatLocale).format(restaurant.monthlyTargetProfit));
   const [isSaving, setIsSaving] = useState(false);
 
   const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,8 +28,22 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
       setTargetInput("");
       return;
     }
-    const formatted = new Intl.NumberFormat("id-ID").format(Number(rawValue));
+    const formatted = new Intl.NumberFormat(formatLocale).format(Number(rawValue));
     setTargetInput(formatted);
+  };
+
+  const handleCurrencyToggle = (newCurrency: "rupiah" | "dollar") => {
+    if (newCurrency === currency) return;
+    
+    const cleanStr = targetInput.replace(/[^0-9]/g, "");
+    const parsed = parseInt(cleanStr, 10);
+    
+    setCurrency(newCurrency);
+    
+    if (!isNaN(parsed) && parsed > 0) {
+      const newLocale = newCurrency === "dollar" ? "en-US" : "id-ID";
+      setTargetInput(new Intl.NumberFormat(newLocale).format(parsed));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,14 +101,14 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
             </label>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
-                Rp
+                {currencySymbol}
               </span>
               <input
                 type="text"
                 value={targetInput}
                 onChange={handleTargetChange}
                 required
-                placeholder="e.g. 50.000.000"
+                placeholder={isDollar ? "e.g. 5,000" : "e.g. 50.000.000"}
                 className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
               />
             </div>
@@ -126,6 +144,37 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
                 }`}
               >
                 🇬🇧 {t("target.langEnglish", "English")}
+              </button>
+            </div>
+          </div>
+
+          {/* Currency Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+              {t("target.currency", "Mata Uang / Currency")}
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => handleCurrencyToggle("rupiah")}
+                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
+                  currency === "rupiah"
+                    ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 border-transparent font-black shadow-sm"
+                    : "bg-zinc-50 dark:bg-zinc-950 text-zinc-500 border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
+                }`}
+              >
+                🇮🇩 Rupiah (Rp)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCurrencyToggle("dollar")}
+                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
+                  currency === "dollar"
+                    ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 border-transparent font-black shadow-sm"
+                    : "bg-zinc-50 dark:bg-zinc-950 text-zinc-500 border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
+                }`}
+              >
+                💵 Dollar ($)
               </button>
             </div>
           </div>

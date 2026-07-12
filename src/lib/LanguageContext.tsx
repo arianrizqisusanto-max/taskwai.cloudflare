@@ -2,11 +2,15 @@ import React, { createContext, useContext, useState } from "react";
 import { enTranslations } from "./translations";
 
 type Language = "id" | "en";
+type Currency = "rupiah" | "dollar";
 
 interface LanguageContextProps {
   lang: Language;
   setLang: (lang: Language) => void;
   t: (key: string, defaultVal: string) => string;
+  currency: Currency;
+  setCurrency: (currency: Currency) => void;
+  currencySymbol: string;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
@@ -20,10 +24,29 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return "id";
   });
 
+  const [currency, setCurrencyState] = useState<Currency>(() => {
+    if (typeof window !== "undefined") {
+      const savedCurrency = localStorage.getItem("taskwai_currency");
+      return (savedCurrency === "dollar" || savedCurrency === "rupiah") ? savedCurrency : "rupiah";
+    }
+    return "rupiah";
+  });
+
   const setLang = (newLang: Language) => {
     setLangState(newLang);
     try {
       localStorage.setItem("taskwai_lang", newLang);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const setCurrency = (newCurrency: Currency) => {
+    setCurrencyState(newCurrency);
+    try {
+      localStorage.setItem("taskwai_currency", newCurrency);
+      // Force trigger storage event or sync so non-react formatters update if needed
+      window.dispatchEvent(new Event("storage"));
     } catch (e) {
       console.error(e);
     }
@@ -34,8 +57,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return enTranslations[key] || defaultVal;
   };
 
+  const currencySymbol = currency === "dollar" ? "$" : "Rp";
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t }}>
+    <LanguageContext.Provider value={{ lang, setLang, t, currency, setCurrency, currencySymbol }}>
       {children}
     </LanguageContext.Provider>
   );

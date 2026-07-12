@@ -13,19 +13,22 @@ interface BiayaProps {
 
 export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
   const { showToast } = useToast();
-  const { t } = useTranslation();
+  const { t, currency, currencySymbol } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
 
+  const isDollar = currency === "dollar";
+  const formatLocale = isDollar ? "en-US" : "id-ID";
+
   // Individual states for all expenses
-  const [sewaTempat, setSewaTempat] = useState(new Intl.NumberFormat("id-ID").format(expenses.sewaTempat));
-  const [gajiKaryawan, setGajiKaryawan] = useState(new Intl.NumberFormat("id-ID").format(expenses.gajiKaryawan));
-  const [royaltiFranchise, setRoyaltiFranchise] = useState(new Intl.NumberFormat("id-ID").format(expenses.royaltiFranchise));
-  const [listrik, setListrik] = useState(new Intl.NumberFormat("id-ID").format(expenses.listrik));
-  const [air, setAir] = useState(new Intl.NumberFormat("id-ID").format(expenses.air));
-  const [internet, setInternet] = useState(new Intl.NumberFormat("id-ID").format(expenses.internet));
-  const [marketing, setMarketing] = useState(new Intl.NumberFormat("id-ID").format(expenses.marketing));
-  const [pajak, setPajak] = useState(new Intl.NumberFormat("id-ID").format(expenses.pajak));
-  const [biayaLain, setBiayaLain] = useState(new Intl.NumberFormat("id-ID").format(expenses.biayaLain));
+  const [sewaTempat, setSewaTempat] = useState(new Intl.NumberFormat(formatLocale).format(expenses.sewaTempat));
+  const [gajiKaryawan, setGajiKaryawan] = useState(new Intl.NumberFormat(formatLocale).format(expenses.gajiKaryawan));
+  const [royaltiFranchise, setRoyaltiFranchise] = useState(new Intl.NumberFormat(formatLocale).format(expenses.royaltiFranchise));
+  const [listrik, setListrik] = useState(new Intl.NumberFormat(formatLocale).format(expenses.listrik));
+  const [air, setAir] = useState(new Intl.NumberFormat(formatLocale).format(expenses.air));
+  const [internet, setInternet] = useState(new Intl.NumberFormat(formatLocale).format(expenses.internet));
+  const [marketing, setMarketing] = useState(new Intl.NumberFormat(formatLocale).format(expenses.marketing));
+  const [pajak, setPajak] = useState(new Intl.NumberFormat(formatLocale).format(expenses.pajak));
+  const [biayaLain, setBiayaLain] = useState(new Intl.NumberFormat(formatLocale).format(expenses.biayaLain));
 
   const handleCurrencyChange = (val: string, setter: (v: string) => void) => {
     const rawValue = val.replace(/[^0-9]/g, "");
@@ -33,7 +36,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
       setter("");
       return;
     }
-    const formatted = new Intl.NumberFormat("id-ID").format(Number(rawValue));
+    const formatted = new Intl.NumberFormat(formatLocale).format(Number(rawValue));
     setter(formatted);
   };
 
@@ -133,7 +136,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.sewa", "Sewa Tempat")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={sewaTempat}
@@ -147,7 +150,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.gaji", "Gaji Karyawan")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={gajiKaryawan}
@@ -161,7 +164,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.royalti", "Royalti Franchise")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={royaltiFranchise}
@@ -175,7 +178,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.listrik", "Listrik")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={listrik}
@@ -189,7 +192,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.air", "Air")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={air}
@@ -203,7 +206,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.internet", "Internet")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={internet}
@@ -217,7 +220,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.marketing", "Marketing")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={marketing}
@@ -231,7 +234,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.pajak", "Pajak")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={pajak}
@@ -245,7 +248,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             <div className="space-y-1.5 sm:col-span-2">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.lain", "Biaya Lain-Lain")}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
                 <input
                   type="text"
                   value={biayaLain}

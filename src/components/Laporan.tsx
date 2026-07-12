@@ -137,11 +137,11 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
 
           doc.text(t("laporan.highestProfit", "Profit Tertinggi"), labelX, 77);
           doc.text(":", colonX, 77);
-          doc.text(maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0", valueX, 77);
+          doc.text(maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : formatRupiah(0), valueX, 77);
 
           doc.text(t("laporan.lowestProfit", "Profit Terendah"), labelX, 83);
           doc.text(":", colonX, 83);
-          doc.text(minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0", valueX, 83);
+          doc.text(minProfitEntry ? formatRupiah(minProfitEntry.profit) : formatRupiah(0), valueX, 83);
 
           // ── Table ────────────────────────────────────────────
           const headers = [[
@@ -325,7 +325,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.01)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("laporan.highestProfit", "Profit Tertinggi")}</span>
           <span className="font-mono text-2xl font-black text-zinc-950 dark:text-zinc-50 block mt-2 tracking-tight flex items-center gap-1.5">
-            {maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0"}
+            {maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : formatRupiah(0)}
             {maxProfitEntry && <ArrowUpRight className="w-5 h-5 text-emerald-600 shrink-0" />}
           </span>
         </div>
@@ -334,7 +334,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.01)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("laporan.lowestProfit", "Profit Terendah")}</span>
           <span className="font-mono text-2xl font-black text-zinc-950 dark:text-zinc-50 block mt-2 tracking-tight flex items-center gap-1.5">
-            {minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0"}
+            {minProfitEntry ? formatRupiah(minProfitEntry.profit) : formatRupiah(0)}
             {minProfitEntry && <ArrowDownRight className="w-5 h-5 text-rose-600 shrink-0" />}
           </span>
         </div>

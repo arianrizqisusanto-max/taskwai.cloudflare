@@ -12,7 +12,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ restaurant, profits, expenses }: DashboardProps) {
-  const { lang, t } = useTranslation();
+  const { lang, t, currencySymbol } = useTranslation();
   // 1. Core Date Setup
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -374,7 +374,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                   <YAxis 
                     tickLine={false} 
                     axisLine={false}
-                    tickFormatter={(val) => `Rp${val / 1000}k`}
+                    tickFormatter={(val) => `${currencySymbol}${val / 1000}k`}
                     tick={{ fontSize: 10, fill: "#a1a1aa", fontFamily: "monospace", fontWeight: 500 }}
                   />
                   <Tooltip

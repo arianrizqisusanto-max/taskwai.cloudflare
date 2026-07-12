@@ -175,6 +175,7 @@ export const enTranslations: Record<string, string> = {
   "target.connectedAs": "Connected as {email}. Data is securely synced to Firestore cloud database.",
   "target.demoModeText": "You are currently using Local Demo Mode (Guest). Data is only stored in your browser. Connect to Google in the top navigation for cloud sync.",
   "target.language": "Language / Bahasa",
+  "target.currency": "Currency",
   "target.langIndonesian": "Indonesian (Default)",
   "target.langEnglish": "English",
   "target.save": "Save Configuration",

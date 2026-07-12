@@ -22,7 +22,10 @@ interface InputProfitProps {
 
 export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: InputProfitProps) {
   const { showToast } = useToast();
-  const { lang, t } = useTranslation();
+  const { lang, t, currency, currencySymbol } = useTranslation();
+  
+  const isDollar = currency === "dollar";
+  const formatLocale = isDollar ? "en-US" : "id-ID";
   
   const todayStr = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(todayStr);
@@ -123,7 +126,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       setter("");
       return;
     }
-    const formatted = new Intl.NumberFormat("id-ID").format(Number(rawValue));
+    const formatted = new Intl.NumberFormat(formatLocale).format(Number(rawValue));
     setter(formatted);
   };
 
@@ -178,7 +181,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
-                  Rp
+                  {currencySymbol}
                 </span>
                 <input
                   type="text"
@@ -241,7 +244,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                           : "text-zinc-500 dark:text-zinc-400"
                       }`}
                     >
-                      {t("profit.nominal", "Nominal (Rp)")}
+                      {t("profit.nominal", "Nominal (Rp)").replace("(Rp)", `(${currencySymbol})`)}
                     </button>
                   </div>
                 </div>
@@ -249,7 +252,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                 {hppType === "nominal" ? (
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
-                      Rp
+                      {currencySymbol}
                     </span>
                     <input
                       type="text"
@@ -292,7 +295,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
-                  Rp
+                  {currencySymbol}
                 </span>
                 <input
                   type="text"
@@ -470,7 +473,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                         <>
                           <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
                           <div>
-                            {t("laporan.tableHpp", "HPP")} ({p.hppType === "percentage" ? `${p.hppVal}%` : "Rp"}): <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(calculatedHpp)}</span>
+                            {t("laporan.tableHpp", "HPP")} ({p.hppType === "percentage" ? `${p.hppVal}%` : currencySymbol}): <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(calculatedHpp)}</span>
                           </div>
                         </>
                       ) : null}
