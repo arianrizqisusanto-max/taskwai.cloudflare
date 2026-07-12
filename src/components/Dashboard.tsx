@@ -189,7 +189,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         >
           <div className="flex justify-between items-start">
             <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.profitMonth", "Profit Bulan Ini")}</span>
-            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
               {t("dashboard.daysEntered", "{count} entri hari").replace("{count}", String(daysEnteredCount))}
             </span>
           </div>
@@ -268,7 +268,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
       >
         <div className="flex justify-between items-center mb-3.5">
           <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 tracking-tight uppercase">{t("dashboard.targetMet", "Progress Pencapaian Target")}</span>
-          <span className="font-mono text-lg font-black text-zinc-955 dark:text-white">{progressPercent}%</span>
+          <span className="font-mono text-lg font-black text-zinc-950 dark:text-white">{progressPercent}%</span>
         </div>
         
         {/* Progress Bar Track */}
@@ -305,7 +305,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
           <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.daysRemaining", "Sisa Hari Bulan Ini")}</span>
           <div className="my-4">
-            <span className="font-mono text-4xl font-black text-zinc-955 dark:text-white block tracking-tight">
+            <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
               {daysRemaining} {t("dashboard.daysUnit", "Hari")}
             </span>
             <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed font-medium">
@@ -317,7 +317,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
           <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.targetDaily", "Minimal Profit Harian Mulai Besok")}</span>
           <div className="my-4">
-            <span className="font-mono text-4xl font-black text-zinc-955 dark:text-white block tracking-tight">
+            <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
               {formatRupiah(targetDailyProfitTomorrow)}
             </span>
             <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed font-medium">
@@ -329,7 +329,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
           <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.prediction", "Estimasi Profit Akhir Bulan")}</span>
           <div className="my-4">
-            <span className="font-mono text-4xl font-black text-zinc-955 dark:text-white block tracking-tight">
+            <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
               {formatRupiah(predictionProfit)}
             </span>
             <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed font-medium">
@@ -440,7 +440,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
 
               {/* Insight 2: Action step */}
               <div className="flex items-start gap-3">
-                <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
+                <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
                   🎯
                 </div>
                 <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
@@ -453,7 +453,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
 
               {/* Insight 3: Prediction projection */}
               <div className="flex items-start gap-3">
-                <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
+                <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
                   📈
                 </div>
                 <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
@@ -463,7 +463,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
 
               {/* Insight 4: Real Net profit breakdown */}
               <div className="flex items-start gap-3 border-t border-zinc-100 dark:border-zinc-800/80 pt-3 mt-3">
-                <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
+                <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
                   💡
                 </div>
                 <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">

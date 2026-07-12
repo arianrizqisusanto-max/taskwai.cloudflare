@@ -119,10 +119,10 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">{t("biaya.title", "Atur Biaya Operasional Tetap")}</h2>
+              <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("biaya.title", "Atur Biaya Operasional Tetap")}</h2>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("biaya.subtitle", "Masukkan taksiran pengeluaran tetap bulanan usaha Anda.")}</p>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-955 font-bold rounded-xl text-xs font-mono shadow-sm">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs font-mono shadow-sm">
               <Calculator className="w-3.5 h-3.5" />
               <span>{t("biaya.total", "Total")}: {formatRupiah(totalBiaya)}</span>
             </div>
@@ -138,7 +138,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={sewaTempat}
                   onChange={(e) => handleCurrencyChange(e.target.value, setSewaTempat)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -152,7 +152,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={gajiKaryawan}
                   onChange={(e) => handleCurrencyChange(e.target.value, setGajiKaryawan)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={royaltiFranchise}
                   onChange={(e) => handleCurrencyChange(e.target.value, setRoyaltiFranchise)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={listrik}
                   onChange={(e) => handleCurrencyChange(e.target.value, setListrik)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={air}
                   onChange={(e) => handleCurrencyChange(e.target.value, setAir)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -208,7 +208,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={internet}
                   onChange={(e) => handleCurrencyChange(e.target.value, setInternet)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={marketing}
                   onChange={(e) => handleCurrencyChange(e.target.value, setMarketing)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -236,7 +236,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={pajak}
                   onChange={(e) => handleCurrencyChange(e.target.value, setPajak)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -250,7 +250,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   type="text"
                   value={biayaLain}
                   onChange={(e) => handleCurrencyChange(e.target.value, setBiayaLain)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -273,7 +273,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
       <div className="lg:col-span-2 space-y-6">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] flex flex-col h-full justify-between">
           <div>
-            <h3 className="text-sm font-bold text-zinc-955 dark:text-zinc-100 uppercase tracking-wider mb-2">{t("biaya.chartTitle", "Alokasi Biaya Bulanan")}</h3>
+            <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider mb-2">{t("biaya.chartTitle", "Alokasi Biaya Bulanan")}</h3>
             <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">{t("biaya.chartSubtitle", "Diagram persentase sebaran pengeluaran usaha Anda")}</p>
 
             <div className="h-[200px] w-full flex items-center justify-center my-6">
@@ -308,7 +308,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex flex-col items-center text-zinc-400 bg-zinc-50/50 dark:bg-zinc-955/20 border border-dashed border-zinc-200 dark:border-zinc-800/80 w-full h-full justify-center rounded-xl">
+                <div className="flex flex-col items-center text-zinc-400 bg-zinc-50/50 dark:bg-zinc-905 dark:bg-zinc-950/20 border border-dashed border-zinc-200 dark:border-zinc-800/80 w-full h-full justify-center rounded-xl">
                   <Landmark className="w-8 h-8 text-zinc-350 dark:text-zinc-600 mb-2" />
                   <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">{t("biaya.noData", "Belum ada pengeluaran diisi")}</span>
                 </div>
@@ -334,7 +334,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             </div>
           </div>
 
-          <div className="bg-zinc-50 dark:bg-zinc-955/40 border border-zinc-200/50 dark:border-zinc-800/80 rounded-xl p-4 flex gap-2.5 mt-6">
+          <div className="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/80 rounded-xl p-4 flex gap-2.5 mt-6">
             <HelpCircle className="w-5 h-5 text-zinc-400 shrink-0 mt-0.5" />
             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
               {t("biaya.helpText", "Biaya operasional ini digunakan sebagai pengurang untuk menghitung Laba Bersih Sebenarnya (Real Net Profit) dari akumulasi profit harian Anda di akhir bulan.")}

@@ -145,7 +145,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
           <div className="mb-6">
-            <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">{t("profit.title", "Pencatatan Laba Baru")}</h2>
+            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("profit.title", "Pencatatan Laba Baru")}</h2>
             <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
               {useHpp 
                 ? t("profit.subtitleFormulaWithHpp", "Berdasarkan rumus ringkas: Omzet - HPP - Pengeluaran Lain")
@@ -257,7 +257,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                       onChange={(e) => handleCurrencyChange(e.target.value, setHppNominalInput)}
                       placeholder="e.g. 1.925.000"
                       required={useHpp}
-                      className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
+                      className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
                     />
                   </div>
                 ) : (
@@ -270,7 +270,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                       onChange={(e) => setHppPercentInput(e.target.value)}
                       placeholder="e.g. 35"
                       required={useHpp}
-                      className="w-full pl-4 pr-11 py-2.5 bg-white dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
+                      className="w-full pl-4 pr-11 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
                     />
                     <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none">
                       %
@@ -305,7 +305,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             </div>
 
             {/* Live Profit Calculation Panel */}
-            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-955/60 border border-zinc-200/50 dark:border-zinc-800/60 space-y-3 shadow-xs">
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/60 space-y-3 shadow-xs">
               <div className="flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800 pb-2">
                 <span className="text-xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                   {useHpp ? t("profit.grossProfitCalc", "Kalkulasi Laba Kotor") : t("profit.omzetCalc", "Kalkulasi Omzet")}
@@ -396,7 +396,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">{t("profit.history", "Riwayat Profit Masuk")}</h2>
+            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("profit.history", "Riwayat Profit Masuk")}</h2>
             <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("profit.historySubtitle", "Daftar log profit harian yang tersimpan di sistem.")}</p>
           </div>
           <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1 uppercase tracking-wider">
@@ -425,7 +425,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col p-4 bg-white dark:bg-zinc-900/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-955/20 border border-zinc-100 dark:border-zinc-800/60 hover:border-zinc-200 dark:hover:border-zinc-700 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+                  className="flex flex-col p-4 bg-white dark:bg-zinc-900/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800/60 hover:border-zinc-200 dark:hover:border-zinc-700 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0 pr-4">

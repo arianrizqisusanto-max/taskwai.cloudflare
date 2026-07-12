@@ -273,7 +273,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
                   onClick={() => setFilter(type)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     filter === type
-                      ? "bg-white dark:bg-zinc-800 text-zinc-955 dark:text-zinc-100 shadow-sm"
+                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-zinc-100 shadow-sm"
                       : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-650 dark:hover:text-zinc-300"
                   }`}
                 >
@@ -308,7 +308,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         {/* Total profit */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.01)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("laporan.totalProfitFiltered", "Total Profit Terfilter")}</span>
-          <span className="font-mono text-2xl font-black text-zinc-955 dark:text-zinc-50 block mt-2 tracking-tight">
+          <span className="font-mono text-2xl font-black text-zinc-950 dark:text-zinc-50 block mt-2 tracking-tight">
             {formatRupiah(totalProfit)}
           </span>
         </div>
@@ -316,7 +316,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         {/* Average */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.01)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("laporan.averageProfit", "Rata-rata Profit")}</span>
-          <span className="font-mono text-2xl font-black text-zinc-955 dark:text-zinc-50 block mt-2 tracking-tight">
+          <span className="font-mono text-2xl font-black text-zinc-950 dark:text-zinc-50 block mt-2 tracking-tight">
             {formatRupiah(averageProfit)}
           </span>
         </div>
@@ -324,7 +324,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         {/* Highest profit */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.01)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("laporan.highestProfit", "Profit Tertinggi")}</span>
-          <span className="font-mono text-2xl font-black text-zinc-955 dark:text-zinc-50 block mt-2 tracking-tight flex items-center gap-1.5">
+          <span className="font-mono text-2xl font-black text-zinc-950 dark:text-zinc-50 block mt-2 tracking-tight flex items-center gap-1.5">
             {maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : "Rp0"}
             {maxProfitEntry && <ArrowUpRight className="w-5 h-5 text-emerald-600 shrink-0" />}
           </span>
@@ -333,7 +333,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         {/* Lowest profit */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.01)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("laporan.lowestProfit", "Profit Terendah")}</span>
-          <span className="font-mono text-2xl font-black text-zinc-955 dark:text-zinc-50 block mt-2 tracking-tight flex items-center gap-1.5">
+          <span className="font-mono text-2xl font-black text-zinc-950 dark:text-zinc-50 block mt-2 tracking-tight flex items-center gap-1.5">
             {minProfitEntry ? formatRupiah(minProfitEntry.profit) : "Rp0"}
             {minProfitEntry && <ArrowDownRight className="w-5 h-5 text-rose-600 shrink-0" />}
           </span>
@@ -342,7 +342,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
 
       {/* Logs Table */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
-        <h3 className="text-sm font-bold text-zinc-955 dark:text-zinc-100 uppercase tracking-wider mb-4">{t("laporan.detailedReportTitle", "Laporan Keuangan Rinci")}</h3>
+        <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider mb-4">{t("laporan.detailedReportTitle", "Laporan Keuangan Rinci")}</h3>
 
         <div className="overflow-x-auto">
           {filteredProfits.length > 0 ? (
@@ -364,11 +364,11 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
                       key={p.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="hover:bg-zinc-50/50 dark:hover:bg-zinc-955/20 text-sm transition-colors"
+                      className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 text-sm transition-colors"
                     >
                       <td className="py-3.5 px-4 font-mono font-bold text-zinc-500 dark:text-zinc-400 text-xs">{p.date}</td>
                       <td className="py-3.5 px-4 font-bold text-zinc-800 dark:text-zinc-200">{weekday}</td>
-                      <td className="py-3.5 px-4 font-mono font-black text-zinc-955 dark:text-zinc-50">{formatRupiah(p.profit)}</td>
+                      <td className="py-3.5 px-4 font-mono font-black text-zinc-950 dark:text-zinc-50">{formatRupiah(p.profit)}</td>
                       <td className="py-3.5 px-4 text-xs text-zinc-500 dark:text-zinc-400 max-w-xs truncate italic font-medium">
                         {p.notes ? `"${p.notes}"` : "-"}
                       </td>
@@ -378,7 +378,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
               </tbody>
             </table>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-955/20">
+            <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/20">
               <Calendar className="w-10 h-10 text-zinc-300 dark:text-zinc-600 mb-2" />
               {(() => {
                 let filterLabel = filter === "hari" ? t("laporan.filterHari", "Harian") : filter === "minggu" ? t("laporan.filterMinggu", "Mingguan") : t("laporan.filterBulan", "Bulanan");
