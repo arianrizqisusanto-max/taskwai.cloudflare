@@ -734,6 +734,22 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   <span className="text-zinc-400 dark:text-zinc-500">Nominal Omzet</span>
                   <span className="font-mono text-emerald-600 dark:text-emerald-450 font-bold">{formatRupiah(omzetVal)}</span>
                 </div>
+                {useHpp && (
+                  <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/40 py-2">
+                    <span className="text-zinc-400 dark:text-zinc-500">Potongan HPP ({hppType === "percentage" ? `${hppPercentInput}%` : "Nominal"})</span>
+                    <span className="font-mono text-rose-500 font-bold">-{formatRupiah(hppVal)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/40 py-2">
+                  <span className="text-zinc-400 dark:text-zinc-500">Pengeluaran Lain</span>
+                  <span className="font-mono text-rose-500 font-bold">-{formatRupiah(otherExpensesVal)}</span>
+                </div>
+                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/40 py-2">
+                  <span className="text-zinc-400 dark:text-zinc-500">Total Laba Bersih</span>
+                  <span className={`font-mono font-bold ${computedProfit >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-500"}`}>
+                    {formatRupiah(computedProfit)}
+                  </span>
+                </div>
                 <div className="flex justify-between pt-1">
                   <span className="text-zinc-400 dark:text-zinc-500">Cabang</span>
                   <span className="text-zinc-800 dark:text-zinc-200">{branchInput.trim() || "-"}</span>
