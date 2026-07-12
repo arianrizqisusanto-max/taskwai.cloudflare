@@ -67,9 +67,10 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
       await onSaveStaffCredentials(staffUsername.trim(), staffPassword.trim());
       showToast("Kredensial akses staff berhasil diperbarui!", "success");
       setIsEditingStaff(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      showToast("Gagal memperbarui kredensial staff.", "error");
+      const errMsg = err?.message || "Gagal memperbarui kredensial staff.";
+      showToast(`Gagal memperbarui kredensial staff: ${errMsg}`, "error");
     } finally {
       setIsSavingStaff(false);
     }
@@ -112,9 +113,10 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
     try {
       await onToggleStaffActive(newStatus);
       showToast(newStatus ? "Akun staff berhasil diaktifkan kembali!" : "Akun staff dinonaktifkan.", "success");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      showToast("Gagal mengubah status keaktifan staff.", "error");
+      const errMsg = err?.message || "Gagal mengubah status keaktifan staff.";
+      showToast(`Gagal mengubah status keaktifan staff: ${errMsg}`, "error");
     } finally {
       setIsTogglingActive(false);
     }
