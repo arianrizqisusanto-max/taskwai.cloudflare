@@ -21,6 +21,7 @@ import { ToastProvider, useToast } from "./components/Toast";
 function MainApp() {
   const { showToast } = useToast();
   const [user, setUser] = useState<User | null>(null);
+  const [authInitialized, setAuthInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -57,12 +58,15 @@ function MainApp() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setAuthInitialized(true);
     });
     return () => unsubscribe();
   }, []);
 
   // 2. Fetch data based on User Session (Real Firebase vs Demo)
   useEffect(() => {
+    if (!authInitialized) return;
+
     const fetchData = async () => {
       setLoading(true);
       const userId = user ? user.uid : "demo";
@@ -92,7 +96,7 @@ function MainApp() {
     };
 
     fetchData();
-  }, [user]);
+  }, [user, authInitialized]);
 
   // 3. Handlers for database updates (with automatic instant state update, NO reload)
   const handleSaveProfit = async (
@@ -169,7 +173,7 @@ function MainApp() {
 
   // Render correct tab view dynamically
   const renderView = () => {
-    if (loading || !restaurant || !expenses) {
+    if (!authInitialized || loading || !restaurant || !expenses) {
       return <SkeletonLoader />;
     }
 
@@ -224,9 +228,10 @@ function MainApp() {
         user={user}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        restaurantName={restaurant ? restaurant.name : "Taskwai"}
+        restaurantName={restaurant ? restaurant.name : "taskwai"}
         isDark={isDark}
         toggleDark={toggleDark}
+        authInitialized={authInitialized}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">

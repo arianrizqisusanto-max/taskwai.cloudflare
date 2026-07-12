@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signOut, User } from "firebase/auth";
-import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon } from "lucide-react";
+import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle } from "lucide-react";
 import { useToast } from "./Toast";
 import TaskwaiLogo from "./TaskwaiLogo";
 
@@ -11,10 +12,20 @@ interface NavbarProps {
   restaurantName: string;
   isDark: boolean;
   toggleDark: () => void;
+  authInitialized: boolean;
 }
 
-export default function Navbar({ user, activeTab, setActiveTab, restaurantName, isDark, toggleDark }: NavbarProps) {
+export default function Navbar({
+  user,
+  activeTab,
+  setActiveTab,
+  restaurantName,
+  isDark,
+  toggleDark,
+  authInitialized,
+}: NavbarProps) {
   const { showToast } = useToast();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -26,7 +37,12 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    setShowLogoutConfirm(false);
     try {
       await signOut(auth);
       showToast("Berhasil keluar.", "info");
@@ -63,13 +79,13 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
               const isActive = activeTab === item.id;
               return (
                 <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                    isActive
-                      ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 shadow-sm font-black"
-                      : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-55 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
-                  }`}
+                   key={item.id}
+                   onClick={() => setActiveTab(item.id)}
+                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                     isActive
+                       ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 shadow-sm font-black"
+                       : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-55 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {item.label}
@@ -81,7 +97,9 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
           {/* Auth Button and Badges */}
           <div className="flex items-center gap-2.5">
             {/* Status Badge */}
-            {user ? (
+            {!authInitialized ? (
+              <div className="hidden sm:block h-6 w-24 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-full animate-pulse" />
+            ) : user ? (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Cloud Sync</span>
@@ -102,7 +120,9 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
             </button>
 
-            {user ? (
+            {!authInitialized ? (
+              <div className="h-9 w-20 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-xl animate-pulse" />
+            ) : user ? (
               <div className="flex items-center gap-2 pl-1.5">
                 {user.photoURL && (
                   <img
@@ -113,7 +133,7 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
                   />
                 )}
                 <button
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -162,6 +182,53 @@ export default function Navbar({ user, activeTab, setActiveTab, restaurantName, 
           })}
         </div>
       </div>
+
+      {/* Premium Confirmation Dialog / Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop Overlay */}
+          <div 
+            className="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setShowLogoutConfirm(false)}
+          />
+
+          {/* Modal Container */}
+          <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center">
+              {/* Icon Container */}
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 mb-4">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+
+              {/* Title */}
+              <h3 className="text-base font-bold text-zinc-950 dark:text-zinc-50 mb-1.5">
+                Konfirmasi Keluar
+              </h3>
+              
+              {/* Description */}
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px] mb-6">
+                Apakah Anda benar-benar yakin ingin keluar dari akun Anda?
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex w-full gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleConfirmLogout}
+                  className="flex-1 rounded-xl bg-red-600 dark:bg-red-500 px-4 py-2.5 text-xs font-bold text-white hover:bg-red-700 dark:hover:bg-red-600 shadow-sm transition-colors cursor-pointer"
+                >
+                  Ya, Keluar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
