@@ -620,6 +620,19 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                 }
               }
 
+              // Extract time from createdAt
+              let timeStr = "";
+              try {
+                if (p.createdAt) {
+                  const d = new Date(p.createdAt);
+                  if (!isNaN(d.getTime())) {
+                    timeStr = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                  }
+                }
+              } catch (e) {
+                console.warn(e);
+              }
+
               return (
                 <motion.div
                   key={p.id}
@@ -638,6 +651,21 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                         <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
                           {formatIndoDate(p.date, lang).split(",")[1]} {/* Get just date and month */}
                         </span>
+                      </div>
+                      
+                      {/* Meta information row: Cabang, Penginput, Jam */}
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-[9px] font-bold">
+                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-650 dark:text-zinc-400 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                          🏢 {p.branchName || "Pusat"}
+                        </span>
+                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-650 dark:text-zinc-400 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                          👤 {p.inputterName || "Owner"}
+                        </span>
+                        {timeStr && (
+                          <span className="bg-zinc-50 dark:bg-zinc-800/40 text-zinc-400 dark:text-zinc-500 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 font-mono">
+                            ⏰ {timeStr}
+                          </span>
+                        )}
                       </div>
                     </div>
 
