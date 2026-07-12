@@ -4,6 +4,7 @@ import { signInWithPopup, signOut, User } from "firebase/auth";
 import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle } from "lucide-react";
 import { useToast } from "./Toast";
 import TaskwaiLogo from "./TaskwaiLogo";
+import { useTranslation } from "../lib/LanguageContext";
 
 interface NavbarProps {
   user: User | null;
@@ -26,14 +27,15 @@ export default function Navbar({
 }: NavbarProps) {
   const { showToast } = useToast();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const { t } = useTranslation();
 
   const handleLogin = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-      showToast("Berhasil masuk menggunakan akun Google!", "success");
+      showToast(t("nav.loginSuccess", "Berhasil masuk menggunakan akun Google!"), "success");
     } catch (error: any) {
       console.error("Login error:", error);
-      showToast("Gagal masuk dengan Google. Anda tetap dapat menggunakan Mode Demo Offline.", "warning");
+      showToast(t("nav.loginError", "Gagal masuk dengan Google. Anda tetap dapat menggunakan Mode Demo Offline."), "warning");
     }
   };
 
@@ -45,18 +47,18 @@ export default function Navbar({
     setShowLogoutConfirm(false);
     try {
       await signOut(auth);
-      showToast("Berhasil keluar.", "info");
+      showToast(t("nav.logoutSuccess", "Berhasil keluar."), "info");
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "input", label: "Catat Profit", icon: DollarSign },
-    { id: "biaya", label: "Biaya Operasional", icon: Landmark },
-    { id: "laporan", label: "Laporan", icon: FileText },
-    { id: "target", label: "Pengaturan", icon: Settings },
+    { id: "dashboard", label: t("nav.dashboard", "Dashboard"), icon: LayoutDashboard },
+    { id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign },
+    { id: "biaya", label: t("nav.biaya", "Biaya Operasional"), icon: Landmark },
+    { id: "laporan", label: t("nav.laporan", "Laporan"), icon: FileText },
+    { id: "target", label: t("nav.target", "Pengaturan"), icon: Settings },
   ];
 
   return (
@@ -68,7 +70,7 @@ export default function Navbar({
             <TaskwaiLogo size={36} />
             <div className="flex flex-col">
               <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50">taskwai</span>
-              <span className="hidden sm:inline text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">Profit Dashboard</span>
+              <span className="hidden sm:inline text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">{t("nav.profitDashboard", "Profit Dashboard")}</span>
             </div>
           </div>
 
@@ -102,12 +104,12 @@ export default function Navbar({
             ) : user ? (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Cloud Sync</span>
+                <span>{t("nav.cloudSync", "Cloud Sync")}</span>
               </div>
             ) : (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-[10px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-                <span>Mode Demo</span>
+                <span>{t("nav.demoMode", "Mode Demo")}</span>
               </div>
             )}
 
@@ -115,7 +117,7 @@ export default function Navbar({
             <button
               onClick={toggleDark}
               className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
-              title={isDark ? "Mode Terang" : "Mode Gelap"}
+              title={isDark ? t("nav.lightMode", "Mode Terang") : t("nav.darkMode", "Mode Gelap")}
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
             </button>
@@ -137,16 +139,16 @@ export default function Navbar({
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden xs:inline">Keluar</span>
+                  <span className="hidden xs:inline">{t("nav.logout", "Keluar")}</span>
                 </button>
               </div>
             ) : (
               <button
                 onClick={handleLogin}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white dark:text-zinc-950 bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-950 dark:hover:bg-white rounded-xl transition-all shadow-sm cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white dark:text-zinc-950 bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-955 dark:hover:bg-white rounded-xl transition-all shadow-sm cursor-pointer"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Login</span>
+                <span>{t("nav.login", "Login")}</span>
               </button>
             )}
           </div>

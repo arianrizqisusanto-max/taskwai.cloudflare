@@ -4,6 +4,7 @@ import { formatRupiah, formatIndoDate } from "../lib/utils";
 import { Save, Calendar, Coins, AlignLeft, Trash2, HelpCircle, Sparkles, Percent } from "lucide-react";
 import { motion } from "motion/react";
 import { useToast } from "./Toast";
+import { useTranslation } from "../lib/LanguageContext";
 
 interface InputProfitProps {
   profits: DailyProfit[];
@@ -21,6 +22,7 @@ interface InputProfitProps {
 
 export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: InputProfitProps) {
   const { showToast } = useToast();
+  const { lang, t } = useTranslation();
   
   const todayStr = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(todayStr);
@@ -78,12 +80,12 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
     e.preventDefault();
     
     if (omzetVal <= 0) {
-      showToast("Harap masukkan nilai omzet yang valid (lebih besar dari 0)", "warning");
+      showToast(t("profit.invalidOmzet", "Harap masukkan nilai omzet yang valid (lebih besar dari 0)"), "warning");
       return;
     }
 
     if (computedProfit < 0) {
-      if (!confirm("Peringatan: Kalkulasi profit harian Anda bernilai minus (rugi). Apakah Anda yakin ingin menyimpan?")) {
+      if (!confirm(t("profit.lossWarning", "Peringatan: Kalkulasi profit harian Anda bernilai minus (rugi). Apakah Anda yakin ingin menyimpan?"))) {
         return;
       }
     }
@@ -99,7 +101,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
         useHpp ? hppValForDb : undefined, 
         otherExpensesVal
       );
-      showToast(`Profit tanggal ${formatIndoDate(date)} berhasil disimpan!`, "success");
+      showToast(t("profit.saveSuccess", "Profit tanggal {date} berhasil disimpan!").replace("{date}", formatIndoDate(date, lang)), "success");
       
       // Keep state clean but preserve HPP percentage for easier repetitive daily entry
       setOmzetInput("");
@@ -108,7 +110,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       setNotes("");
     } catch (err) {
       console.error(err);
-      showToast("Gagal menyimpan profit harian.", "error");
+      showToast(t("profit.saveError", "Gagal menyimpan profit harian."), "error");
     } finally {
       setIsSaving(false);
     }
@@ -126,13 +128,13 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
   };
 
   const handleDelete = async (id: string, logDate: string) => {
-    if (confirm(`Apakah Anda yakin ingin menghapus data profit tanggal ${formatIndoDate(logDate)}?`)) {
+    if (confirm(t("profit.deleteConfirm", "Apakah Anda yakin ingin menghapus data profit tanggal {date}?").replace("{date}", formatIndoDate(logDate, lang)))) {
       try {
         await onDeleteProfit(id);
-        showToast("Data profit berhasil dihapus.", "info");
+        showToast(t("profit.deleteSuccess", "Data profit berhasil dihapus."), "info");
       } catch (err) {
         console.error(err);
-        showToast("Gagal menghapus data profit.", "error");
+        showToast(t("profit.deleteError", "Gagal menghapus data profit."), "error");
       }
     }
   };
@@ -143,11 +145,11 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
           <div className="mb-6">
-            <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">Pencatatan Laba Baru</h2>
+            <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">{t("profit.title", "Pencatatan Laba Baru")}</h2>
             <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
               {useHpp 
-                ? "Berdasarkan rumus ringkas: Omzet - HPP - Pengeluaran Lain"
-                : "Berdasarkan rumus ringkas: Omzet - Pengeluaran Lain"}
+                ? t("profit.subtitleFormulaWithHpp", "Berdasarkan rumus ringkas: Omzet - HPP - Pengeluaran Lain")
+                : t("profit.subtitleFormulaWithoutHpp", "Berdasarkan rumus ringkas: Omzet - Pengeluaran Lain")}
             </p>
           </div>
 
@@ -155,7 +157,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             {/* Date Field */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Tanggal Operasional
+                {t("profit.date", "Tanggal Operasional")}
               </label>
               <div className="relative">
                 <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
@@ -172,7 +174,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             {/* Omzet Input */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Total Omzet (Pendapatan Hari Ini)
+                {t("profit.omzet", "Total Omzet (Pendapatan Hari Ini)")}
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
@@ -192,8 +194,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             {/* Toggle HPP Feature Switch */}
             <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-950/45 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl">
               <div className="flex flex-col pr-2">
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Aktifkan Fitur HPP</span>
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium leading-normal">Kalkulasi modal / bahan baku per porsi dagangan</span>
+                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t("profit.hppFeature", "Aktifkan Fitur HPP")}</span>
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium leading-normal">{t("profit.hppFeatureDesc", "Kalkulasi modal / bahan baku per porsi dagangan")}</span>
               </div>
               <button
                 type="button"
@@ -215,7 +217,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
               <div className="space-y-2 bg-zinc-50/50 dark:bg-zinc-950/25 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800/60">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                    HPP (Cost of Goods Sold)
+                    {t("profit.hpp", "HPP (Cost of Goods Sold)")}
                   </label>
                   {/* Segmented control toggle */}
                   <div className="flex bg-zinc-200/80 dark:bg-zinc-800 p-0.5 rounded-lg text-[10px] font-bold">
@@ -228,7 +230,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                           : "text-zinc-500 dark:text-zinc-400"
                       }`}
                     >
-                      Persen (%)
+                      {t("profit.percent", "Persen (%)")}
                     </button>
                     <button
                       type="button"
@@ -239,7 +241,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                           : "text-zinc-500 dark:text-zinc-400"
                       }`}
                     >
-                      Nominal (Rp)
+                      {t("profit.nominal", "Nominal (Rp)")}
                     </button>
                   </div>
                 </div>
@@ -255,7 +257,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                       onChange={(e) => handleCurrencyChange(e.target.value, setHppNominalInput)}
                       placeholder="e.g. 1.925.000"
                       required={useHpp}
-                      className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
+                      className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
                     />
                   </div>
                 ) : (
@@ -268,7 +270,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                       onChange={(e) => setHppPercentInput(e.target.value)}
                       placeholder="e.g. 35"
                       required={useHpp}
-                      className="w-full pl-4 pr-11 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
+                      className="w-full pl-4 pr-11 py-2.5 bg-white dark:bg-zinc-955 border border-zinc-200/60 dark:border-zinc-800/80 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono"
                     />
                     <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none">
                       %
@@ -277,8 +279,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                 )}
                 <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5 block leading-normal">
                   {hppType === "percentage" 
-                    ? "Bahan baku otomatis dikalkulasi dari % dikali Omzet." 
-                    : "Masukkan nominal belanja bahan baku / modal porsi hari ini."}
+                    ? t("profit.hppPercentDesc", "Bahan baku otomatis dikalkulasi dari % dikali Omzet.") 
+                    : t("profit.hppNominalDesc", "Masukkan nominal belanja bahan baku / modal porsi hari ini.")}
                 </span>
               </div>
             )}
@@ -286,7 +288,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             {/* Other Expenses Input */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Pengeluaran Lain-lain Hari Ini
+                {t("profit.otherExpenses", "Pengeluaran Lain-lain Hari Ini")}
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500 select-none font-mono">
@@ -303,10 +305,10 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             </div>
 
             {/* Live Profit Calculation Panel */}
-            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/60 space-y-3 shadow-xs">
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-955/60 border border-zinc-200/50 dark:border-zinc-800/60 space-y-3 shadow-xs">
               <div className="flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800 pb-2">
                 <span className="text-xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                  {useHpp ? "Kalkulasi Laba Kotor" : "Kalkulasi Omzet"}
+                  {useHpp ? t("profit.grossProfitCalc", "Kalkulasi Laba Kotor") : t("profit.omzetCalc", "Kalkulasi Omzet")}
                 </span>
                 <span className="flex items-center gap-1 text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                   <Sparkles className="w-3 h-3" /> Live
@@ -315,7 +317,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
               
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Total Omzet:</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">{t("profit.totalOmzet", "Total Omzet:")}</span>
                   <span className="font-mono font-bold text-zinc-800 dark:text-zinc-200">
                     + {formatRupiah(omzetVal)}
                   </span>
@@ -324,7 +326,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                 {useHpp && (
                   <div className="flex justify-between">
                     <span className="text-zinc-500 dark:text-zinc-400">
-                      HPP ({hppType === "percentage" ? `${hppPercentInput || "0"}%` : "Nominal"}):
+                      {t("profit.hppLabel", "HPP")} ({hppType === "percentage" ? `${hppPercentInput || "0"}%` : "Nominal"}):
                     </span>
                     <span className="font-mono font-bold text-rose-500 dark:text-rose-400">
                       - {formatRupiah(hppVal)}
@@ -333,7 +335,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                 )}
 
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Pengeluaran Lainnya:</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">{t("profit.otherExpensesLabel", "Pengeluaran Lainnya:")}</span>
                   <span className="font-mono font-bold text-rose-500 dark:text-rose-400">
                     - {formatRupiah(otherExpensesVal)}
                   </span>
@@ -341,7 +343,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                 
                 <div className="border-t border-dashed border-zinc-200 dark:border-zinc-800 my-2 pt-2.5 flex justify-between items-center">
                   <span className="font-bold text-zinc-700 dark:text-zinc-300">
-                    {useHpp ? "Sisa Laba Bersih:" : "Total Omzet Kotor (Laba):"}
+                    {useHpp ? t("profit.netProfitResult", "Sisa Laba Bersih:") : t("profit.grossProfitResult", "Total Omzet Kotor (Laba):")}
                   </span>
                   <span className={`font-mono text-sm font-black ${computedProfit >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
                     {computedProfit >= 0 ? "+" : ""} {formatRupiah(computedProfit)}
@@ -354,7 +356,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                  Catatan Tambahan <span className="text-zinc-400 dark:text-zinc-500 font-normal lowercase">(opsional)</span>
+                  {t("profit.notes", "Catatan Tambahan")} <span className="text-zinc-400 dark:text-zinc-500 font-normal lowercase">{t("profit.optional", "(opsional)")}</span>
                 </label>
               </div>
               <div className="relative">
@@ -362,7 +364,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. Ramai pesanan katering, cuaca hujan, dsb."
+                  placeholder={t("profit.notesPlaceholder", "Ramai pesanan katering, cuaca hujan, dsb.")}
                   rows={2}
                   className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-medium"
                 />
@@ -376,7 +378,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
               className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm disabled:opacity-50 cursor-pointer text-sm"
             >
               <Save className="w-4 h-4" />
-              <span>{isSaving ? "Menyimpan..." : "Simpan Profit"}</span>
+              <span>{isSaving ? t("profit.saving", "Menyimpan...") : t("profit.save", "Simpan Profit")}</span>
             </button>
           </form>
         </div>
@@ -385,7 +387,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
         <div className="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-4 flex gap-3">
           <HelpCircle className="w-5 h-5 text-zinc-400 shrink-0 mt-0.5" />
           <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-            Menyimpan data pada tanggal yang sudah terisi sebelumnya akan memperbarui (overwrite) nilai profit tanggal tersebut otomatis.
+            {t("profit.tipDesc", "Menyimpan data pada tanggal yang sudah terisi sebelumnya akan memperbarui (overwrite) nilai profit tanggal tersebut otomatis.")}
           </p>
         </div>
       </div>
@@ -394,11 +396,11 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">Riwayat Profit Masuk</h2>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">Daftar log profit harian yang tersimpan di sistem.</p>
+            <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">{t("profit.history", "Riwayat Profit Masuk")}</h2>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("profit.historySubtitle", "Daftar log profit harian yang tersimpan di sistem.")}</p>
           </div>
           <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1 uppercase tracking-wider">
-            Total: {profits.length} hari
+            {t("profit.historyTotal", "Total: {count} hari").replace("{count}", String(profits.length))}
           </span>
         </div>
 
@@ -423,7 +425,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col p-4 bg-white dark:bg-zinc-900/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800/60 hover:border-zinc-200 dark:hover:border-zinc-700 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+                  className="flex flex-col p-4 bg-white dark:bg-zinc-900/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-955/20 border border-zinc-100 dark:border-zinc-800/60 hover:border-zinc-200 dark:hover:border-zinc-700 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0 pr-4">
@@ -432,7 +434,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                           {p.date}
                         </span>
                         <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
-                          {formatIndoDate(p.date).split(",")[1]} {/* Get just date and month */}
+                          {formatIndoDate(p.date, lang).split(",")[1]} {/* Get just date and month */}
                         </span>
                       </div>
                     </div>
@@ -444,7 +446,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                       <button
                         onClick={() => handleDelete(p.id, p.date)}
                         className="p-1.5 rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-450 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
-                        title="Hapus log"
+                        title={t("profit.deleteTooltip", "Hapus log")}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -462,24 +464,24 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
                   {hasBreakdown ? (
                     <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2.5 pt-2 border-t border-zinc-100 dark:border-zinc-800/40 text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold tracking-tight">
                       <div>
-                        Omzet: <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{formatRupiah(p.omzet || 0)}</span>
+                        {t("laporan.tableTurnover", "Omzet")}: <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{formatRupiah(p.omzet || 0)}</span>
                       </div>
                       {p.hppType ? (
                         <>
                           <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
                           <div>
-                            HPP ({p.hppType === "percentage" ? `${p.hppVal}%` : "Rp"}): <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(calculatedHpp)}</span>
+                            {t("laporan.tableHpp", "HPP")} ({p.hppType === "percentage" ? `${p.hppVal}%` : "Rp"}): <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(calculatedHpp)}</span>
                           </div>
                         </>
                       ) : null}
                       <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
                       <div>
-                        Lainnya: <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(p.otherExpenses || 0)}</span>
+                        {t("profit.otherExpensesLabel", "Lainnya")}: <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(p.otherExpenses || 0)}</span>
                       </div>
                     </div>
                   ) : (
                     <div className="mt-1 pt-1.5 border-t border-dotted border-zinc-100 dark:border-zinc-800/40">
-                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">Log tanpa rincian HPP (Pencatatan Lama)</span>
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">{t("profit.oldLogDesc", "Log tanpa rincian HPP (Pencatatan Lama)")}</span>
                     </div>
                   )}
                 </motion.div>
@@ -488,8 +490,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/25">
               <Coins className="w-10 h-10 text-zinc-300 dark:text-zinc-600 mb-2" />
-              <p className="text-xs font-bold text-zinc-500">Belum ada riwayat profit harian.</p>
-              <p className="text-[10px] mt-1 text-zinc-400">Silakan tambahkan menggunakan form di sebelah kiri.</p>
+              <p className="text-xs font-bold text-zinc-500">{t("profit.noHistory", "Belum ada riwayat profit harian.")}</p>
+              <p className="text-[10px] mt-1 text-zinc-400">{t("profit.noHistoryDesc", "Silakan tambahkan menggunakan form di sebelah kiri.")}</p>
             </div>
           )}
         </div>

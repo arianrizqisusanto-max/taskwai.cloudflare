@@ -7,12 +7,12 @@ export function formatRupiah(value: number): string {
   }).format(value);
 }
 
-export function formatIndoDate(dateStr: string): string {
+export function formatIndoDate(dateStr: string, lang: "id" | "en" = "id"): string {
   if (!dateStr) return "";
   const [year, month, day] = dateStr.split("-");
   const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
   
-  return dateObj.toLocaleDateString("id-ID", {
+  return dateObj.toLocaleDateString(lang === "en" ? "en-US" : "id-ID", {
     weekday: "long",
     day: "numeric",
     month: "long",

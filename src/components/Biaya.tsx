@@ -4,6 +4,7 @@ import { formatRupiah } from "../lib/utils";
 import { Landmark, Save, Calculator, HelpCircle, CheckCircle } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useToast } from "./Toast";
+import { useTranslation } from "../lib/LanguageContext";
 
 interface BiayaProps {
   expenses: Expenses;
@@ -12,6 +13,7 @@ interface BiayaProps {
 
 export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
 
   // Individual states for all expenses
@@ -73,10 +75,10 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
 
     try {
       await onSaveExpenses(updatedData);
-      showToast("Biaya operasional bulanan berhasil diperbarui!", "success");
+      showToast(t("biaya.success", "Biaya operasional bulanan berhasil diperbarui!"), "success");
     } catch (err) {
       console.error(err);
-      showToast("Gagal memperbarui biaya operasional.", "error");
+      showToast(t("biaya.error", "Gagal memperbarui biaya operasional."), "error");
     } finally {
       setIsSaving(false);
     }
@@ -84,15 +86,15 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
 
   // Pie chart data preparation
   const chartData = [
-    { name: "Sewa Tempat", value: valSewa },
-    { name: "Gaji Karyawan", value: valGaji },
-    { name: "Royalti Franchise", value: valFranchise },
-    { name: "Listrik", value: valListrik },
-    { name: "Air", value: valAir },
-    { name: "Internet", value: valInternet },
-    { name: "Marketing", value: valMarketing },
-    { name: "Pajak", value: valPajak },
-    { name: "Biaya Lain", value: valLain }
+    { name: t("biaya.sewa", "Sewa Tempat"), value: valSewa },
+    { name: t("biaya.gaji", "Gaji Karyawan"), value: valGaji },
+    { name: t("biaya.royalti", "Royalti Franchise"), value: valFranchise },
+    { name: t("biaya.listrik", "Listrik"), value: valListrik },
+    { name: t("biaya.air", "Air"), value: valAir },
+    { name: t("biaya.internet", "Internet"), value: valInternet },
+    { name: t("biaya.marketing", "Marketing"), value: valMarketing },
+    { name: t("biaya.pajak", "Pajak"), value: valPajak },
+    { name: t("biaya.lain", "Biaya Lain-Lain"), value: valLain }
   ].filter(item => item.value > 0);
 
   // Vibrant modern colors that stand out elegantly in both light and dark modes
@@ -117,138 +119,138 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">Atur Biaya Operasional Tetap</h2>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">Masukkan taksiran pengeluaran tetap bulanan usaha Anda.</p>
+              <h2 className="text-lg font-black text-zinc-955 dark:text-zinc-50 tracking-tight">{t("biaya.title", "Atur Biaya Operasional Tetap")}</h2>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("biaya.subtitle", "Masukkan taksiran pengeluaran tetap bulanan usaha Anda.")}</p>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs font-mono shadow-sm">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-955 font-bold rounded-xl text-xs font-mono shadow-sm">
               <Calculator className="w-3.5 h-3.5" />
-              <span>Total: {formatRupiah(totalBiaya)}</span>
+              <span>{t("biaya.total", "Total")}: {formatRupiah(totalBiaya)}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Sewa Tempat */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Sewa Tempat</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.sewa", "Sewa Tempat")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={sewaTempat}
                   onChange={(e) => handleCurrencyChange(e.target.value, setSewaTempat)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Gaji Karyawan */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Gaji Karyawan</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.gaji", "Gaji Karyawan")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={gajiKaryawan}
                   onChange={(e) => handleCurrencyChange(e.target.value, setGajiKaryawan)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Royalti Franchise */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Royalti Franchise</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.royalti", "Royalti Franchise")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={royaltiFranchise}
                   onChange={(e) => handleCurrencyChange(e.target.value, setRoyaltiFranchise)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Listrik */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Listrik</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.listrik", "Listrik")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={listrik}
                   onChange={(e) => handleCurrencyChange(e.target.value, setListrik)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Air */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Air</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.air", "Air")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={air}
                   onChange={(e) => handleCurrencyChange(e.target.value, setAir)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Internet */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Internet</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.internet", "Internet")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={internet}
                   onChange={(e) => handleCurrencyChange(e.target.value, setInternet)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Marketing */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Marketing</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.marketing", "Marketing")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={marketing}
                   onChange={(e) => handleCurrencyChange(e.target.value, setMarketing)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Pajak */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Pajak</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.pajak", "Pajak")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={pajak}
                   onChange={(e) => handleCurrencyChange(e.target.value, setPajak)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Biaya Lain */}
             <div className="space-y-1.5 sm:col-span-2">
-              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Biaya Lain-Lain</label>
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.lain", "Biaya Lain-Lain")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">Rp</span>
                 <input
                   type="text"
                   value={biayaLain}
                   onChange={(e) => handleCurrencyChange(e.target.value, setBiayaLain)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-955 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-955/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
               </div>
             </div>
@@ -261,7 +263,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
               className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-semibold py-2.5 px-6 rounded-xl transition-all shadow-sm disabled:opacity-50 text-sm cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              <span>{isSaving ? "Menyimpan..." : "Simpan Perubahan Biaya"}</span>
+              <span>{isSaving ? t("biaya.saving", "Menyimpan...") : t("biaya.save", "Simpan Perubahan Biaya")}</span>
             </button>
           </div>
         </div>
@@ -271,8 +273,8 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
       <div className="lg:col-span-2 space-y-6">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] flex flex-col h-full justify-between">
           <div>
-            <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider mb-2">Alokasi Biaya Bulanan</h3>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">Diagram persentase sebaran pengeluaran usaha Anda</p>
+            <h3 className="text-sm font-bold text-zinc-955 dark:text-zinc-100 uppercase tracking-wider mb-2">{t("biaya.chartTitle", "Alokasi Biaya Bulanan")}</h3>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">{t("biaya.chartSubtitle", "Diagram persentase sebaran pengeluaran usaha Anda")}</p>
 
             <div className="h-[200px] w-full flex items-center justify-center my-6">
               {hasChartData ? (
@@ -301,14 +303,14 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                       }}
                       itemStyle={{ color: "var(--tooltip-text, #09090b)", fontSize: "12px", fontWeight: "600" }}
                       labelStyle={{ color: "var(--tooltip-text, #09090b)", fontSize: "11px", opacity: 0.7 }}
-                      formatter={(value: any) => [formatRupiah(Number(value)), "Jumlah"]}
+                      formatter={(value: any) => [formatRupiah(Number(value)), t("biaya.total", "Total")]}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex flex-col items-center text-zinc-400 bg-zinc-50/50 dark:bg-zinc-950/20 border border-dashed border-zinc-200 dark:border-zinc-800/80 w-full h-full justify-center rounded-xl">
+                <div className="flex flex-col items-center text-zinc-400 bg-zinc-50/50 dark:bg-zinc-955/20 border border-dashed border-zinc-200 dark:border-zinc-800/80 w-full h-full justify-center rounded-xl">
                   <Landmark className="w-8 h-8 text-zinc-350 dark:text-zinc-600 mb-2" />
-                  <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">Belum ada pengeluaran diisi</span>
+                  <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">{t("biaya.noData", "Belum ada pengeluaran diisi")}</span>
                 </div>
               )}
             </div>
@@ -332,10 +334,10 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
             </div>
           </div>
 
-          <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/80 rounded-xl p-4 flex gap-2.5 mt-6">
+          <div className="bg-zinc-50 dark:bg-zinc-955/40 border border-zinc-200/50 dark:border-zinc-800/80 rounded-xl p-4 flex gap-2.5 mt-6">
             <HelpCircle className="w-5 h-5 text-zinc-400 shrink-0 mt-0.5" />
             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-              Biaya operasional ini digunakan sebagai pengurang untuk menghitung Laba Bersih Sebenarnya (Real Net Profit) dari akumulasi profit harian Anda di akhir bulan.
+              {t("biaya.helpText", "Biaya operasional ini digunakan sebagai pengurang untuk menghitung Laba Bersih Sebenarnya (Real Net Profit) dari akumulasi profit harian Anda di akhir bulan.")}
             </p>
           </div>
         </div>

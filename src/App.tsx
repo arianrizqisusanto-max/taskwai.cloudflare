@@ -17,6 +17,7 @@ import Laporan from "./components/Laporan";
 import Target from "./components/Target";
 import SkeletonLoader from "./components/SkeletonLoader";
 import { ToastProvider, useToast } from "./components/Toast";
+import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
 
 function MainApp() {
   const { showToast } = useToast();
@@ -222,6 +223,8 @@ function MainApp() {
     }
   };
 
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 flex flex-col font-sans text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
       <Navbar
@@ -240,7 +243,7 @@ function MainApp() {
 
       <footer className="py-8 pb-24 lg:pb-8 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-zinc-400 dark:text-zinc-500 font-bold tracking-wider uppercase">
-          Taskwai &copy; {new Date().getFullYear()} &bull; Dashboard Usaha Anda.
+          Taskwai &copy; {new Date().getFullYear()} &bull; {t("nav.profitDashboard", "Dashboard Usaha Anda.")}
         </div>
       </footer>
     </div>
@@ -249,8 +252,10 @@ function MainApp() {
 
 export default function App() {
   return (
-    <ToastProvider>
-      <MainApp />
-    </ToastProvider>
+    <LanguageProvider>
+      <ToastProvider>
+        <MainApp />
+      </ToastProvider>
+    </LanguageProvider>
   );
 }
