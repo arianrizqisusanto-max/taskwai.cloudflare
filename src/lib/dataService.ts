@@ -331,25 +331,36 @@ export const DataService = {
 
     if (!userId || userId === "demo") {
       const profits = await this.getDailyProfits("demo", restaurantId);
-      // Remove duplicates for same date if any, or support multiple
-      const filtered = profits.filter((p) => p.date !== entry.date);
+      const targetBranch = entry.branchName || "";
+      // Remove duplicate for same date AND same branchName
+      const filtered = profits.filter((p) => {
+        const pBranch = p.branchName || "";
+        return !(p.date === entry.date && pBranch.trim().toLowerCase() === targetBranch.trim().toLowerCase());
+      });
       const updated = [newProfit, ...filtered];
       setLocal("taskwai_daily_profits", updated);
       return newProfit;
     }
 
     try {
-      // Check if entry for this date already exists, update or allow multiple.
-      // Let's do check and overwrite if date exists, so they don't get duplicates on the same date unless they want to
+      // Check if entry for this date AND branch already exists, update or allow multiple.
       const q = query(
         collection(db, "daily_profit"),
         where("restaurantId", "==", restaurantId),
         where("date", "==", entry.date)
       );
       const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        // Update existing date
-        const existingId = snapshot.docs[0].id;
+      
+      const targetBranch = entry.branchName || "";
+      const existingDoc = snapshot.docs.find(doc => {
+        const data = doc.data();
+        const docBranch = data.branchName || "";
+        return docBranch.trim().toLowerCase() === targetBranch.trim().toLowerCase();
+      });
+
+      if (existingDoc) {
+        // Update existing date for this specific branch
+        const existingId = existingDoc.id;
         const updateData: any = {
           profit: entry.profit,
           notes: entry.notes || "",

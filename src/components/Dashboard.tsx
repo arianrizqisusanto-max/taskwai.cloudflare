@@ -31,9 +31,9 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   const currentMonthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
   const currentMonthProfits = profits.filter(p => p.date.startsWith(currentMonthPrefix));
 
-  // Profit Hari Ini
-  const todayEntry = currentMonthProfits.find(p => p.date === todayStr);
-  const profitToday = todayEntry ? todayEntry.profit : 0;
+  // Profit Hari Ini (Sum of all branch profits logged today)
+  const todayEntries = currentMonthProfits.filter(p => p.date === todayStr);
+  const profitToday = todayEntries.reduce((acc, curr) => acc + curr.profit, 0);
 
   // Profit Bulan Ini (Sum of daily profits)
   const totalProfitMonth = currentMonthProfits.reduce((acc, curr) => acc + curr.profit, 0);
@@ -59,9 +59,9 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   // Progress Percentage
   const progressPercent = targetProfit > 0 ? Math.min(100, Math.round((totalProfitMonth / targetProfit) * 100)) : 0;
 
-  // Average Daily Profit based on entries entered so far
-  const daysEnteredCount = currentMonthProfits.length;
-  const averageDailyProfit = daysEnteredCount > 0 ? totalProfitMonth / daysEnteredCount : 0;
+  // Average Daily Profit based on unique days logged so far (handles multiple branches on same date)
+  const uniqueDaysEntered = new Set(currentMonthProfits.map(p => p.date)).size;
+  const averageDailyProfit = uniqueDaysEntered > 0 ? totalProfitMonth / uniqueDaysEntered : 0;
 
   // Prediksi Profit Akhir Bulan
   const predictionProfit = averageDailyProfit * totalDaysInMonth;
@@ -111,18 +111,25 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
 
   const currentStatus = statusConfigs[businessStatus];
 
-  // 4. Data for Chart (Daily logs sorted by date ascending)
-  const chartData = [...currentMonthProfits]
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .map(p => {
-      // Format to short date "DD/MM"
-      const parts = p.date.split("-");
+  // 4. Data for Chart (Daily logs grouped by date and sorted ascending)
+  const groupedByDate = currentMonthProfits.reduce((acc, curr) => {
+    if (!acc[curr.date]) {
+      acc[curr.date] = 0;
+    }
+    acc[curr.date] += curr.profit;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const chartData = Object.entries(groupedByDate)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([dateKey, profitSum]) => {
+      const parts = dateKey.split("-");
       const day = parts[2];
       const month = parts[1];
       return {
-        dateFull: formatIndoDate(p.date, lang),
+        dateFull: formatIndoDate(dateKey, lang),
         label: `${day}/${month}`,
-        "Profit Harian": p.profit,
+        "Profit Harian": profitSum,
       };
     });
 
@@ -190,7 +197,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           <div className="flex justify-between items-start">
             <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.profitMonth", "Profit Bulan Ini")}</span>
             <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
-              {t("dashboard.daysEntered", "{count} entri hari").replace("{count}", String(daysEnteredCount))}
+              {t("dashboard.daysEntered", "{count} entri hari").replace("{count}", String(currentMonthProfits.length))}
             </span>
           </div>
           <div className="mt-4">
