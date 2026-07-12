@@ -35,13 +35,13 @@ export default function TaskwaiLogo({
         <rect width="512" height="512" rx="120" fill="#10B981" />
 
         {/* Bar 1 — shortest, left */}
-        <rect x="148" y="276" width="60" height="111" rx="14" fill="white" />
+        <rect x="112" y="292" width="80" height="148" rx="18" fill="white" />
 
         {/* Bar 2 — medium, center */}
-        <rect x="226" y="201" width="60" height="186" rx="14" fill="white" />
+        <rect x="216" y="192" width="80" height="248" rx="18" fill="white" />
 
         {/* Bar 3 — tallest, right */}
-        <rect x="304" y="126" width="60" height="261" rx="14" fill="white" />
+        <rect x="320" y="92" width="80" height="348" rx="18" fill="white" />
       </svg>
 
       {/* Optional wordmark */}
