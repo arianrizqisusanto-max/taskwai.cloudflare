@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { DailyProfit, Restaurant } from "../types";
 import { formatRupiah, formatIndoDate } from "../lib/utils";
-import { FileText, Download, Calendar, Filter, FileSpreadsheet, ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
+import { FileText, Download, Calendar, Filter, ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
 import { useToast } from "./Toast";
 import { motion } from "motion/react";
 import jsPDF from "jspdf";
@@ -62,207 +62,160 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
   const maxProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => b.profit - a.profit)[0] : null;
   const minProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => a.profit - b.profit)[0] : null;
 
-  const handleExport = (type: "PDF" | "Excel") => {
+  const handleExportPDF = () => {
     if (filteredProfits.length === 0) {
       showToast(t("laporan.exportNoData", "Tidak ada data untuk diekspor"), "error");
       return;
     }
 
-    showToast(t("laporan.exportPreparing", "Sedang menyiapkan dokumen {type}...").replace("{type}", type), "info");
+    showToast(t("laporan.exportPreparing", "Sedang menyiapkan dokumen {type}...").replace("{type}", "PDF"), "info");
 
     setTimeout(() => {
       try {
-        if (type === "PDF") {
-          const doc = new jsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: "a4",
-          });
+        const doc = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+        });
 
-          // Set premium theme color: emerald (16, 185, 129)
-          const primaryColor: [number, number, number] = [16, 185, 129];
+        // Set premium theme color: emerald (16, 185, 129)
+        const primaryColor: [number, number, number] = [16, 185, 129];
 
+        // ── Header Branding ──────────────────────────────────
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(16, 185, 129); // Emerald-500
+        doc.text(t("laporan.pdfBranding", "Taskwai.com - Dashboard Usaha Anda"), 14, 12);
 
-          // ── Header Branding ──────────────────────────────────
-          doc.setFont("Helvetica", "bold");
-          doc.setFontSize(9);
-          doc.setTextColor(16, 185, 129); // Emerald-500
-          doc.text(t("laporan.pdfBranding", "Taskwai.com - Dashboard Usaha Anda"), 14, 12);
+        // Thin top accent line
+        doc.setDrawColor(16, 185, 129);
+        doc.setLineWidth(0.8);
+        doc.line(14, 14, 196, 14);
 
-          // Thin top accent line
-          doc.setDrawColor(16, 185, 129);
-          doc.setLineWidth(0.8);
-          doc.line(14, 14, 196, 14);
+        // ── Main Title ───────────────────────────────────────
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(20);
+        doc.setTextColor(30, 41, 59); // Slate-800
+        doc.text(t("laporan.pdfTitle", "LAPORAN KEUANGAN"), 14, 24);
 
-          // ── Main Title ───────────────────────────────────────
-          doc.setFont("Helvetica", "bold");
-          doc.setFontSize(20);
-          doc.setTextColor(30, 41, 59); // Slate-800
-          doc.text(t("laporan.pdfTitle", "LAPORAN KEUANGAN"), 14, 24);
+        doc.setFontSize(10);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(100, 116, 139); // Slate-500
+        doc.text(`${t("laporan.businessName", "Nama Usaha")}: ${restaurant?.name || t("laporan.notSet", "Belum Diatur")}`, 14, 30);
+        
+        let filterLabel = filter === "hari" ? t("laporan.filterHari", "Harian") : filter === "minggu" ? t("laporan.filterMinggu", "Mingguan") : t("laporan.filterBulan", "Bulanan");
+        doc.text(`${t("laporan.periodFilter", "Filter Periode")}: ${filterLabel}`, 14, 35);
+        doc.text(`${t("laporan.printDate", "Tanggal Cetak")}: ${formatIndoDate(todayStr, lang)}`, 14, 40);
 
-          doc.setFontSize(10);
-          doc.setFont("Helvetica", "normal");
-          doc.setTextColor(100, 116, 139); // Slate-500
-          doc.text(`${t("laporan.businessName", "Nama Usaha")}: ${restaurant?.name || t("laporan.notSet", "Belum Diatur")}`, 14, 30);
-          
-          let filterLabel = filter === "hari" ? t("laporan.filterHari", "Harian") : filter === "minggu" ? t("laporan.filterMinggu", "Mingguan") : t("laporan.filterBulan", "Bulanan");
-          doc.text(`${t("laporan.periodFilter", "Filter Periode")}: ${filterLabel}`, 14, 35);
-          doc.text(`${t("laporan.printDate", "Tanggal Cetak")}: ${formatIndoDate(todayStr, lang)}`, 14, 40);
+        // Divider Line
+        doc.setDrawColor(226, 232, 240); // Slate-200
+        doc.setLineWidth(0.5);
+        doc.line(14, 44, 196, 44);
 
-          // Divider Line
-          doc.setDrawColor(226, 232, 240); // Slate-200
-          doc.setLineWidth(0.5);
-          doc.line(14, 44, 196, 44);
+        // ── Summary Section ──────────────────────────────────
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(15, 23, 42); // Slate-900
+        doc.text(t("laporan.summaryTitle", "Ringkasan Statistik"), 14, 52);
 
-          // ── Summary Section ──────────────────────────────────
-          doc.setFont("Helvetica", "bold");
-          doc.setFontSize(12);
-          doc.setTextColor(15, 23, 42); // Slate-900
-          doc.text(t("laporan.summaryTitle", "Ringkasan Statistik"), 14, 52);
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(51, 65, 85); // Slate-700
 
-          doc.setFont("Helvetica", "normal");
-          doc.setFontSize(10);
-          doc.setTextColor(51, 65, 85); // Slate-700
+        const labelX = 14;
+        const colonX = 48;
+        const valueX = 51;
 
-          const labelX = 14;
-          const colonX = 48;
-          const valueX = 51;
+        doc.text(t("laporan.totalLogs", "Total Log Transaksi"), labelX, 59);
+        doc.text(":", colonX, 59);
+        doc.text(`${totalDays} ${t("laporan.daysUnit", "hari")}`, valueX, 59);
 
-          doc.text(t("laporan.totalLogs", "Total Log Transaksi"), labelX, 59);
-          doc.text(":", colonX, 59);
-          doc.text(`${totalDays} ${t("laporan.daysUnit", "hari")}`, valueX, 59);
+        doc.text(t("laporan.totalProfit", "Total Profit"), labelX, 65);
+        doc.text(":", colonX, 65);
+        doc.text(formatRupiah(totalProfit), valueX, 65);
 
-          doc.text(t("laporan.totalProfit", "Total Profit"), labelX, 65);
-          doc.text(":", colonX, 65);
-          doc.text(formatRupiah(totalProfit), valueX, 65);
+        doc.text(t("laporan.averageProfit", "Rata-rata Profit"), labelX, 71);
+        doc.text(":", colonX, 71);
+        doc.text(formatRupiah(averageProfit), valueX, 71);
 
-          doc.text(t("laporan.averageProfit", "Rata-rata Profit"), labelX, 71);
-          doc.text(":", colonX, 71);
-          doc.text(formatRupiah(averageProfit), valueX, 71);
+        doc.text(t("laporan.highestProfit", "Profit Tertinggi"), labelX, 77);
+        doc.text(":", colonX, 77);
+        doc.text(maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : formatRupiah(0), valueX, 77);
 
-          doc.text(t("laporan.highestProfit", "Profit Tertinggi"), labelX, 77);
-          doc.text(":", colonX, 77);
-          doc.text(maxProfitEntry ? formatRupiah(maxProfitEntry.profit) : formatRupiah(0), valueX, 77);
+        doc.text(t("laporan.lowestProfit", "Profit Terendah"), labelX, 83);
+        doc.text(":", colonX, 83);
+        doc.text(minProfitEntry ? formatRupiah(minProfitEntry.profit) : formatRupiah(0), valueX, 83);
 
-          doc.text(t("laporan.lowestProfit", "Profit Terendah"), labelX, 83);
-          doc.text(":", colonX, 83);
-          doc.text(minProfitEntry ? formatRupiah(minProfitEntry.profit) : formatRupiah(0), valueX, 83);
+        // ── Table ────────────────────────────────────────────
+        const headers = [[
+          t("laporan.tableNo", "No"), 
+          t("laporan.tableDate", "Tanggal"), 
+          t("laporan.tableDay", "Hari"), 
+          t("laporan.tableGrossProfit", "Laba Kotor / Profit"), 
+          "Cabang",
+          "Penginput",
+          t("laporan.tableNotes", "Catatan")
+        ]];
+        const tableData = filteredProfits.map((p, index) => {
+          const dateObj = new Date(p.date);
+          const weekday = dateObj.toLocaleDateString(lang === "en" ? "en-US" : "id-ID", { weekday: "long" });
+          return [
+            (index + 1).toString(),
+            p.date,
+            weekday,
+            formatRupiah(p.profit),
+            p.branchName || "-",
+            p.inputterName || "-",
+            p.notes || "-"
+          ];
+        });
 
-          // ── Table ────────────────────────────────────────────
-          const headers = [[
-            t("laporan.tableNo", "No"), 
-            t("laporan.tableDate", "Tanggal"), 
-            t("laporan.tableDay", "Hari"), 
-            t("laporan.tableGrossProfit", "Laba Kotor / Profit"), 
-            "Cabang",
-            "Penginput",
-            t("laporan.tableNotes", "Catatan")
-          ]];
-          const tableData = filteredProfits.map((p, index) => {
-            const dateObj = new Date(p.date);
-            const weekday = dateObj.toLocaleDateString(lang === "en" ? "en-US" : "id-ID", { weekday: "long" });
-            return [
-              (index + 1).toString(),
-              p.date,
-              weekday,
-              formatRupiah(p.profit),
-              p.branchName || "-",
-              p.inputterName || "-",
-              p.notes || "-"
-            ];
-          });
+        autoTable(doc, {
+          startY: 90,
+          head: headers,
+          body: tableData,
+          theme: "striped",
+          headStyles: {
+            fillColor: primaryColor,
+            textColor: [255, 255, 255],
+            fontStyle: "bold"
+          },
+          styles: {
+            fontSize: 9,
+            font: "Helvetica",
+            cellPadding: 3
+          },
+          columnStyles: {
+            0: { cellWidth: 10, halign: "center" },
+            1: { cellWidth: 24 },
+            2: { cellWidth: 24 },
+            3: { cellWidth: 35, halign: "right" },
+            4: { cellWidth: 30 },
+            5: { cellWidth: 25 },
+            6: { cellWidth: "auto" }
+          },
+          alternateRowStyles: {
+            fillColor: [248, 250, 252] // Slate-50
+          },
 
-          autoTable(doc, {
-            startY: 90,
-            head: headers,
-            body: tableData,
-            theme: "striped",
-            headStyles: {
-              fillColor: primaryColor,
-              textColor: [255, 255, 255],
-              fontStyle: "bold"
-            },
-            styles: {
-              fontSize: 9,
-              font: "Helvetica",
-              cellPadding: 3
-            },
-            columnStyles: {
-              0: { cellWidth: 10, halign: "center" },
-              1: { cellWidth: 24 },
-              2: { cellWidth: 24 },
-              3: { cellWidth: 35, halign: "right" },
-              4: { cellWidth: 30 },
-              5: { cellWidth: 25 },
-              6: { cellWidth: "auto" }
-            },
-            alternateRowStyles: {
-              fillColor: [248, 250, 252] // Slate-50
-            },
+          didDrawPage: (data) => {
+            // ── Page footer ──────────────────────────────────
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(156, 163, 175); // Gray-400
+            const pageH = doc.internal.pageSize.height;
+            const pageW = doc.internal.pageSize.width;
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.3);
+            doc.line(14, pageH - 12, pageW - 14, pageH - 12);
+            doc.text(t("laporan.pdfBranding", "Taskwai.com - Dashboard Usaha Anda"), 14, pageH - 8);
+            doc.text(t("laporan.pdfPage", "Halaman {num}").replace("{num}", String(data.pageNumber)), pageW - 25, pageH - 8);
+          }
+        });
 
-            didDrawPage: (data) => {
-              // ── Page footer ──────────────────────────────────
-              doc.setFont("Helvetica", "normal");
-              doc.setFontSize(8);
-              doc.setTextColor(156, 163, 175); // Gray-400
-              const pageH = doc.internal.pageSize.height;
-              const pageW = doc.internal.pageSize.width;
-              doc.setDrawColor(226, 232, 240);
-              doc.setLineWidth(0.3);
-              doc.line(14, pageH - 12, pageW - 14, pageH - 12);
-              doc.text(t("laporan.pdfBranding", "Taskwai.com - Dashboard Usaha Anda"), 14, pageH - 8);
-              doc.text(t("laporan.pdfPage", "Halaman {num}").replace("{num}", String(data.pageNumber)), pageW - 25, pageH - 8);
-            }
-          });
-
-          // Save File
-          doc.save(`Laporan_Keuangan_${filter}_${todayStr}.pdf`);
-          showToast(t("laporan.pdfExportSuccess", "Laporan PDF berhasil diunduh!"), "success");
-        } else {
-          // Excel (CSV Export)
-          let csvContent = "\uFEFF"; // BOM for Excel UTF-8 support
-          
-          // Header Metadata
-          const businessName = restaurant?.name || "TASKWAI";
-          csvContent += `"${t("laporan.pdfTitle", "LAPORAN KEUANGAN").toUpperCase()} - ${businessName.toUpperCase()}"\r\n`;
-          csvContent += `"${t("laporan.businessName", "Nama Usaha")}";"${businessName}"\r\n`;
-          let filterLabel = filter === "hari" ? t("laporan.filterHari", "Harian") : filter === "minggu" ? t("laporan.filterMinggu", "Mingguan") : t("laporan.filterBulan", "Bulanan");
-          csvContent += `"${t("laporan.periodFilter", "Filter Periode")}";"${filterLabel}"\r\n`;
-          csvContent += `"${t("laporan.printDate", "Tanggal Cetak")}";"${formatIndoDate(todayStr, lang)}"\r\n\r\n`;
-
-          // Summary Statistics
-          csvContent += `"${t("laporan.summaryTitle", "Ringkasan Statistik")}"\r\n`;
-          csvContent += `"${t("laporan.totalLogs", "Total Log Transaksi")}";"${totalDays} ${t("laporan.daysUnit", "hari")}"\r\n`;
-          csvContent += `"${t("laporan.totalProfit", "Total Profit")}";"${totalProfit}"\r\n`;
-          csvContent += `"${t("laporan.averageProfit", "Rata-rata Profit")}";"${averageProfit}"\r\n`;
-          csvContent += `"${t("laporan.highestProfit", "Profit Tertinggi")}";"${maxProfitEntry ? maxProfitEntry.profit : 0}"\r\n`;
-          csvContent += `"${t("laporan.lowestProfit", "Profit Terendah")}";"${minProfitEntry ? minProfitEntry.profit : 0}"\r\n\r\n`;
-
-          // Table Headers
-          csvContent += `"${t("laporan.tableNo", "No")}";"${t("laporan.tableDate", "Tanggal")}";"${t("laporan.tableDay", "Hari")}";"${t("laporan.tableGrossProfit", "Laba Kotor / Profit")}";"Cabang";"Penginput";"${t("laporan.tableNotes", "Catatan")}"\r\n`;
-          
-          // Table Rows
-          filteredProfits.forEach((p, index) => {
-            const dateObj = new Date(p.date);
-            const weekday = dateObj.toLocaleDateString(lang === "en" ? "en-US" : "id-ID", { weekday: "long" });
-            const note = p.notes ? p.notes.replace(/"/g, '""') : "";
-            const branch = p.branchName ? p.branchName.replace(/"/g, '""') : "";
-            const inputter = p.inputterName ? p.inputterName.replace(/"/g, '""') : "";
-            csvContent += `"${index + 1}";"${p.date}";"${weekday}";"${p.profit}";"${branch}";"${inputter}";"${note}"\r\n`;
-          });
-
-          // Download Action
-          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.setAttribute("href", url);
-          link.setAttribute("download", `Laporan_Keuangan_${filter}_${todayStr}.csv`);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          showToast(t("laporan.csvExportSuccess", "Laporan Excel (CSV) berhasil diunduh!"), "success");
-        }
+        // Save File
+        doc.save(`Laporan_Keuangan_${filter}_${todayStr}.pdf`);
+        showToast(t("laporan.pdfExportSuccess", "Laporan PDF berhasil diunduh!"), "success");
       } catch (error) {
         console.error("Export Error:", error);
         showToast(t("laporan.exportError", "Terjadi kesalahan saat mengunduh dokumen."), "error");
@@ -319,18 +272,11 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         {/* Right: Export buttons */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => handleExport("PDF")}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-950 text-zinc-700 dark:text-zinc-300 font-bold text-xs border border-zinc-200 dark:border-zinc-800 rounded-xl transition-all cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+            onClick={handleExportPDF}
+            className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
           >
             <Download className="w-3.5 h-3.5" />
             <span>{t("laporan.exportPdf", "Ekspor PDF")}</span>
-          </button>
-          <button
-            onClick={() => handleExport("Excel")}
-            className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>{t("laporan.exportExcel", "Ekspor Excel")}</span>
           </button>
         </div>
       </div>
