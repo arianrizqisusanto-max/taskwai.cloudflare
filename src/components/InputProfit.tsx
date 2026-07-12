@@ -33,7 +33,13 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
   const isDollar = currency === "dollar";
   const formatLocale = isDollar ? "en-US" : "id-ID";
   
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = (() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  })();
   const [date, setDate] = useState(todayStr);
   const [omzetInput, setOmzetInput] = useState("");
   const [useHpp, setUseHpp] = useState(() => {

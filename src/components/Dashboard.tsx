@@ -18,7 +18,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth(); // 0-indexed
   const currentDateNum = today.getDate();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(currentDateNum).padStart(2, "0")}`;
 
   // Number of days in current month
   const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();

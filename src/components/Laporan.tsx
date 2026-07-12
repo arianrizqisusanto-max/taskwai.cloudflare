@@ -21,7 +21,13 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
   const [filter, setFilter] = useState<FilterType>("bulan");
   const [selectedBranch, setSelectedBranch] = useState<string>("");
 
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = (() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  })();
 
   // Helper: check if date is within past N days
   const isWithinPastDays = (dateStr: string, days: number): boolean => {
