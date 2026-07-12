@@ -11,7 +11,6 @@ import {
   addDoc, 
   updateDoc, 
   deleteDoc,
-  orderBy,
   limit
 } from "firebase/firestore";
 import { Restaurant, DailyProfit, Expenses } from "../types";
@@ -243,27 +242,13 @@ export const DataService = {
     try {
       const q = query(
         collection(db, "daily_profit"),
-        where("restaurantId", "==", restaurantId),
-        orderBy("date", "desc")
+        where("restaurantId", "==", restaurantId)
       );
       const querySnapshot = await getDocs(q);
       const profits: DailyProfit[] = [];
       querySnapshot.forEach((doc) => {
         profits.push({ id: doc.id, ...doc.data() } as DailyProfit);
       });
-
-      // If it's a new database and has no profits yet, let's load default mock so it doesn't look completely empty,
-      // or we can let them start empty. The prompt says "Owner restoran yang baru pertama kali membuka aplikasi harus langsung mengerti tanpa perlu belajar."
-      // It's incredibly elegant to pre-fill with realistic logs if empty!
-      if (profits.length === 0) {
-        const defaults = generateDefaultDailyProfits(restaurantId);
-        // Save them to firestore
-        for (const p of defaults) {
-          const { id, ...data } = p;
-          await setDoc(doc(db, "daily_profit", id), data);
-          profits.push(p);
-        }
-      }
 
       return profits.sort((a, b) => b.date.localeCompare(a.date));
     } catch (error) {

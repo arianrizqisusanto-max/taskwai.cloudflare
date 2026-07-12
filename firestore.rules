@@ -2,42 +2,53 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if the current user is a valid authenticated staff member of a restaurant
+    // Helper: check if caller is an authenticated staff of the given restaurant
     function isStaffOf(restaurantId) {
       return request.auth != null && 
         exists(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)).data.restaurantId == restaurantId;
     }
     
-    // Rules for restaurants: Owners have full access; staff can read and update branches list
+    // Restaurants
     match /restaurants/{restaurantId} {
-      allow read, update: if request.auth != null && (restaurantId == 'rest_' + request.auth.uid || isStaffOf(restaurantId));
+      allow read, update: if request.auth != null && (
+        restaurantId == 'rest_' + request.auth.uid || isStaffOf(restaurantId)
+      );
       allow create, delete: if request.auth != null && restaurantId == 'rest_' + request.auth.uid;
     }
     
-    // Rules for expenses: Owners have full access; staff can read (required for app initialization)
+    // Expenses
     match /expenses/{expensesId} {
       allow read: if request.auth != null && (
         expensesId == 'exp_' + request.auth.uid || 
-        (exists(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)) && 'exp_' + get(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)).data.ownerId == expensesId)
+        (exists(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)) && 
+         'exp_' + get(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)).data.ownerId == expensesId)
       );
       allow write: if request.auth != null && expensesId == 'exp_' + request.auth.uid;
     }
     
-    // Rules for daily_profit logs: Owners have full access; staff can read/write logs for their branch
+    // Daily profit logs — separated read/create/update/delete for clean query validation
     match /daily_profit/{profitId} {
-      allow read, write: if request.auth != null && (
-        // Owner access
-        (resource == null || resource.data.restaurantId == 'rest_' + request.auth.uid) &&
-        (request.resource == null || request.resource.data.restaurantId == 'rest_' + request.auth.uid)
-      ) || (
-        // Staff access
-        (resource == null || isStaffOf(resource.data.restaurantId)) &&
-        (request.resource == null || isStaffOf(request.resource.data.restaurantId))
+      // READ: owner can read their own restaurant's data, staff can read their assigned restaurant
+      allow read: if request.auth != null && (
+        resource.data.restaurantId == 'rest_' + request.auth.uid ||
+        isStaffOf(resource.data.restaurantId)
+      );
+      
+      // CREATE: owner or staff can create new entries for their restaurant
+      allow create: if request.auth != null && (
+        request.resource.data.restaurantId == 'rest_' + request.auth.uid ||
+        isStaffOf(request.resource.data.restaurantId)
+      );
+      
+      // UPDATE/DELETE: owner or staff can modify entries belonging to their restaurant
+      allow update, delete: if request.auth != null && (
+        resource.data.restaurantId == 'rest_' + request.auth.uid ||
+        isStaffOf(resource.data.restaurantId)
       );
     }
 
-    // Rules for staff_accounts: Public read by credential hash during login; write by owner only
+    // Staff accounts: public read for login; write by owner only
     match /staff_accounts/{hash} {
       allow read: if true;
       allow write: if request.auth != null && 
@@ -45,7 +56,7 @@ service cloud.firestore {
         (request.resource == null || request.resource.data.ownerId == request.auth.uid);
     }
 
-    // Rules for staff_sessions: Users can read and write their own active staff session document
+    // Staff sessions: users can only manage their own session
     match /staff_sessions/{sessionUid} {
       allow read, write: if request.auth != null && request.auth.uid == sessionUid;
     }
