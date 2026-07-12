@@ -32,6 +32,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   const [isSavingStaff, setIsSavingStaff] = useState(false);
   const [isEditingStaff, setIsEditingStaff] = useState(false);
   const [isTogglingActive, setIsTogglingActive] = useState(false);
+  const [showStaffGuide, setShowStaffGuide] = useState(false);
 
   const handleStaffSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -364,6 +365,36 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium font-sans">
             Atur kredensial staff tunggal agar karyawan di semua cabang dapat login dan menginput omzet harian.
           </p>
+
+          <button
+            type="button"
+            onClick={() => setShowStaffGuide(!showStaffGuide)}
+            className="mt-2.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-450 dark:hover:text-emerald-400 flex items-center gap-1 cursor-pointer transition-colors outline-none focus:outline-none"
+          >
+            <span>💡</span>
+            <span className="underline decoration-dotted underline-offset-4 font-bold">
+              {showStaffGuide ? "Sembunyikan Panduan Penggunaan" : "Cara Menggunakan Akun Staff"}
+            </span>
+          </button>
+          
+          {showStaffGuide && (
+            <div className="mt-3.5 p-4 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/80 rounded-2xl space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+              <h4 className="text-xs font-black text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5 uppercase tracking-wider">
+                <span>📖</span> Panduan Akses Staff Toko
+              </h4>
+              <ol className="text-[11px] text-zinc-500 dark:text-zinc-400 space-y-2 list-decimal pl-4 font-medium leading-relaxed">
+                <li>
+                  <strong>Bikin Akun Staff:</strong> Tentukan satu username & password di bawah ini, lalu klik Simpan.
+                </li>
+                <li>
+                  <strong>Bisa Login di Perangkat Manapun:</strong> Berikan kredensial ini kepada karyawan Anda. Karyawan dapat login di perangkat/HP manapun melalui situs <span className="font-bold text-zinc-700 dark:text-zinc-200">taskwai.com</span>.
+                </li>
+                <li>
+                  <strong>Khusus Input Omzet Saja:</strong> Demi keamanan data keuangan Anda, tampilan akun staff dibatasi secara penuh hanya untuk memasukkan data omzet harian cabang, tanpa bisa melihat riwayat profit ataupun dashboard performa utama owner.
+                </li>
+              </ol>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleStaffSubmit} className="space-y-5">
