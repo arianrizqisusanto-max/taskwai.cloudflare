@@ -9,10 +9,11 @@ interface TargetProps {
   restaurant: Restaurant;
   onSaveRestaurant: (name: string, target: number) => Promise<void>;
   onSaveStaffCredentials: (username: string, password: string) => Promise<void>;
+  onToggleStaffActive: (active: boolean) => Promise<void>;
   userEmail: string | null;
 }
 
-export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCredentials, userEmail }: TargetProps) {
+export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCredentials, onToggleStaffActive, userEmail }: TargetProps) {
   const { showToast } = useToast();
   const { lang, setLang, t, currency, setCurrency, currencySymbol } = useTranslation();
   const [name, setName] = useState(restaurant.name);
@@ -30,6 +31,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   const [staffPasswordConfirm, setStaffPasswordConfirm] = useState(restaurant.staffPassword || "");
   const [isSavingStaff, setIsSavingStaff] = useState(false);
   const [isEditingStaff, setIsEditingStaff] = useState(false);
+  const [isTogglingActive, setIsTogglingActive] = useState(false);
 
   const handleStaffSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +79,44 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
     setStaffPassword(restaurant.staffPassword || "");
     setStaffPasswordConfirm(restaurant.staffPassword || "");
     setIsEditingStaff(false);
+  };
+
+  const checkCanEditStaff = (): boolean => {
+    if (!restaurant.staffUpdatedAt) return true; // allow edit if never updated before
+
+    const lastUpdate = new Date(restaurant.staffUpdatedAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - lastUpdate.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 60) {
+      const remaining = 60 - diffDays;
+      showToast(`Perubahan akun staff hanya diperbolehkan minimal 60 hari sekali. Terakhir diubah ${diffDays} hari yang lalu (butuh ${remaining} hari lagi).`, "warning");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleStartEditStaff = () => {
+    if (checkCanEditStaff()) {
+      setIsEditingStaff(true);
+    }
+  };
+
+  const handleToggleActive = async () => {
+    const currentStatus = restaurant.staffActive !== false;
+    const newStatus = !currentStatus;
+    setIsTogglingActive(true);
+    try {
+      await onToggleStaffActive(newStatus);
+      showToast(newStatus ? "Akun staff berhasil diaktifkan kembali!" : "Akun staff dinonaktifkan.", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Gagal mengubah status keaktifan staff.", "error");
+    } finally {
+      setIsTogglingActive(false);
+    }
   };
 
   const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -309,7 +349,18 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
       {/* Staff Access Configuration Card */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="mb-6">
-          <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">Akses Staff Toko</h2>
+          <div className="flex items-start justify-between">
+            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight flex flex-wrap items-center gap-2">
+              Akses Staff Toko
+              {restaurant.staffUsername && (
+                restaurant.staffActive !== false ? (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">Aktif</span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-450 border border-rose-500/20 uppercase tracking-wider">Nonaktif</span>
+                )
+              )}
+            </h2>
+          </div>
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium font-sans">
             Atur kredensial staff tunggal agar karyawan di semua cabang dapat login dan menginput omzet harian.
           </p>
@@ -355,34 +406,61 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           </div>
 
           {/* Confirm Password */}
-          <div className="space-y-2 animate-in fade-in duration-200">
-            <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-              Konfirmasi Password Staff
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
-              <input
-                type="text"
-                required
-                disabled={!isEditingStaff || isSavingStaff}
-                value={staffPasswordConfirm}
-                onChange={(e) => setStaffPasswordConfirm(e.target.value)}
-                placeholder="Ulangi password staff"
-                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
-              />
+          {(isEditingStaff || restaurant.staffUsername) && (
+            <div className="space-y-2 animate-in fade-in duration-200">
+              <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+                Konfirmasi Password Staff
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
+                <input
+                  type="text"
+                  required
+                  disabled={!isEditingStaff || isSavingStaff}
+                  value={staffPasswordConfirm}
+                  onChange={(e) => setStaffPasswordConfirm(e.target.value)}
+                  placeholder="Ulangi password staff"
+                  className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Action Buttons Area */}
           {!isEditingStaff ? (
-            <button
-              type="button"
-              onClick={() => setIsEditingStaff(true)}
-              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-955 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm"
-            >
-              <Pencil className="w-4 h-4" />
-              <span>{restaurant.staffUsername ? "Ubah Akses Staff" : "Bikin Akun Staff"}</span>
-            </button>
+            restaurant.staffUsername ? (
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={isTogglingActive}
+                  onClick={handleToggleActive}
+                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-xs transition-all border cursor-pointer ${
+                    restaurant.staffActive !== false
+                      ? "bg-rose-50 hover:bg-rose-100/70 border-rose-200/60 dark:bg-rose-950/10 dark:hover:bg-rose-950/20 dark:border-rose-900/30 text-rose-600 dark:text-rose-450"
+                      : "bg-emerald-50 hover:bg-emerald-100/70 border-emerald-200/60 dark:bg-emerald-950/10 dark:hover:bg-emerald-950/20 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                  }`}
+                >
+                  {restaurant.staffActive !== false ? "Nonaktifkan Akun" : "Aktifkan Akun"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleStartEditStaff}
+                  className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  <span>Ubah Akses Staff</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditingStaff(true)}
+                className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-955 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm uppercase tracking-wider"
+              >
+                <Pencil className="w-4 h-4" />
+                <span>Bikin Akun Staff</span>
+              </button>
+            )
           ) : (
             <div className="grid grid-cols-2 gap-3 animate-in fade-in duration-200">
               <button

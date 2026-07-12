@@ -421,10 +421,14 @@ export const DataService = {
   },
 
   async saveStaffCredentials(userId: string, restaurantId: string, username: string, password: string): Promise<void> {
+    const updatedAtIso = new Date().toISOString();
+
     if (!userId || userId === "demo") {
       const rest = getLocal<Restaurant>("taskwai_restaurant") || DEFAULT_RESTAURANT("demo");
       rest.staffUsername = username;
       rest.staffPassword = password;
+      rest.staffActive = true;
+      rest.staffUpdatedAt = updatedAtIso;
       setLocal("taskwai_restaurant", rest);
       return;
     }
@@ -458,7 +462,23 @@ export const DataService = {
     await updateDoc(restDocRef, {
       staffUsername: username,
       staffPassword: password,
-      staffHash: hash
+      staffHash: hash,
+      staffActive: true,
+      staffUpdatedAt: updatedAtIso
+    });
+  },
+
+  async toggleStaffActive(userId: string, restaurantId: string, active: boolean): Promise<void> {
+    if (!userId || userId === "demo") {
+      const rest = getLocal<Restaurant>("taskwai_restaurant") || DEFAULT_RESTAURANT("demo");
+      rest.staffActive = active;
+      setLocal("taskwai_restaurant", rest);
+      return;
+    }
+
+    const restDocRef = doc(db, "restaurants", restaurantId);
+    await updateDoc(restDocRef, {
+      staffActive: active
     });
   },
 
@@ -471,6 +491,9 @@ export const DataService = {
     // Also check local storage for custom local credentials
     const localRest = getLocal<Restaurant>("taskwai_restaurant");
     if (localRest && localRest.staffUsername === username && localRest.staffPassword === password) {
+      if (localRest.staffActive === false) {
+        throw new Error("Akun staff telah dinonaktifkan oleh pemilik usaha.");
+      }
       return { restaurantId: localRest.id, ownerId: localRest.ownerId };
     }
 
@@ -485,6 +508,16 @@ export const DataService = {
     }
 
     const { restaurantId, ownerId } = accountSnap.data() as { restaurantId: string; ownerId: string };
+
+    // Fetch the restaurant document to verify if the account is active
+    const restDocRef = doc(db, "restaurants", restaurantId);
+    const restSnap = await getDoc(restDocRef);
+    if (restSnap.exists()) {
+      const restData = restSnap.data();
+      if (restData.staffActive === false) {
+        throw new Error("Akun staff telah dinonaktifkan oleh pemilik usaha.");
+      }
+    }
 
     // Authenticate anonymously in Firebase Auth
     const userCredential = await signInAnonymously(auth);

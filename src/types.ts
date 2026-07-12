@@ -15,6 +15,8 @@ export interface Restaurant {
   staffUsername?: string;
   staffPassword?: string;
   staffHash?: string;
+  staffActive?: boolean;
+  staffUpdatedAt?: string;
   branches?: string[];
 }
 

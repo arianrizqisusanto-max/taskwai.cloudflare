@@ -171,7 +171,26 @@ function MainApp() {
     try {
       await DataService.saveStaffCredentials(userId, restaurant.id, username, password);
       // Update local state
-      setRestaurant(prev => prev ? { ...prev, staffUsername: username, staffPassword: password } : null);
+      setRestaurant(prev => prev ? { 
+        ...prev, 
+        staffUsername: username, 
+        staffPassword: password,
+        staffActive: true,
+        staffUpdatedAt: new Date().toISOString()
+      } : null);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const handleToggleStaffActive = async (active: boolean) => {
+    if (!restaurant) return;
+    const userId = user ? user.uid : "demo";
+    try {
+      await DataService.toggleStaffActive(userId, restaurant.id, active);
+      // Update local state
+      setRestaurant(prev => prev ? { ...prev, staffActive: active } : null);
     } catch (err) {
       console.error(err);
       throw err;
@@ -256,6 +275,7 @@ function MainApp() {
             restaurant={restaurant}
             onSaveRestaurant={handleSaveRestaurant}
             onSaveStaffCredentials={handleSaveStaffCredentials}
+            onToggleStaffActive={handleToggleStaffActive}
             userEmail={user ? user.email : null}
           />
         );
