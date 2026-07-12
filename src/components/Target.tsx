@@ -28,6 +28,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   const [staffUsername, setStaffUsername] = useState(restaurant.staffUsername || "");
   const [staffPassword, setStaffPassword] = useState(restaurant.staffPassword || "");
   const [isSavingStaff, setIsSavingStaff] = useState(false);
+  const [isEditingStaff, setIsEditingStaff] = useState(false);
 
   const handleStaffSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,16 +43,33 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
       return;
     }
 
+    if (staffUsername.trim().length < 6) {
+      showToast("Username staff minimal harus 6 karakter.", "warning");
+      return;
+    }
+
+    if (staffPassword.trim().length < 6) {
+      showToast("Password staff minimal harus 6 karakter.", "warning");
+      return;
+    }
+
     setIsSavingStaff(true);
     try {
       await onSaveStaffCredentials(staffUsername.trim(), staffPassword.trim());
       showToast("Kredensial akses staff berhasil diperbarui!", "success");
+      setIsEditingStaff(false);
     } catch (err) {
       console.error(err);
       showToast("Gagal memperbarui kredensial staff.", "error");
     } finally {
       setIsSavingStaff(false);
     }
+  };
+
+  const handleStaffCancel = () => {
+    setStaffUsername(restaurant.staffUsername || "");
+    setStaffPassword(restaurant.staffPassword || "");
+    setIsEditingStaff(false);
   };
 
   const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -290,21 +308,22 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           </p>
         </div>
 
-        <form onSubmit={handleStaffSubmit} className="space-y-4">
+        <form onSubmit={handleStaffSubmit} className="space-y-5">
           {/* Username */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-              Username Staff
+              Username Staff <span className="text-[10px] font-normal lowercase">(min. 6 karakter)</span>
             </label>
             <div className="relative">
               <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
               <input
                 type="text"
                 required
+                disabled={!isEditingStaff || isSavingStaff}
                 value={staffUsername}
                 onChange={(e) => setStaffUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
                 placeholder="e.g. staff_senja"
-                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
               />
             </div>
           </div>
@@ -312,30 +331,53 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           {/* Password */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-              Password Staff
+              Password Staff <span className="text-[10px] font-normal lowercase">(min. 6 karakter)</span>
             </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
               <input
                 type="password"
                 required
+                disabled={!isEditingStaff || isSavingStaff}
                 value={staffPassword}
                 onChange={(e) => setStaffPassword(e.target.value)}
                 placeholder="Masukkan password staff"
-                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
               />
             </div>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSavingStaff}
-            className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-955 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm disabled:opacity-50 uppercase tracking-wider"
-          >
-            <Save className="w-4 h-4" />
-            <span>{isSavingStaff ? "Menyimpan..." : "Simpan Akses Karyawan"}</span>
-          </button>
+          {/* Action Buttons Area */}
+          {!isEditingStaff ? (
+            <button
+              type="button"
+              onClick={() => setIsEditingStaff(true)}
+              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-955 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm"
+            >
+              <Pencil className="w-4 h-4" />
+              <span>{restaurant.staffUsername ? "Ubah Akses Staff" : "Bikin Akun Staff"}</span>
+            </button>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 animate-in fade-in duration-200">
+              <button
+                type="button"
+                onClick={handleStaffCancel}
+                disabled={isSavingStaff}
+                className="flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-zinc-750 dark:text-zinc-300 font-bold py-3 px-4 rounded-xl transition-all border border-zinc-200/50 dark:border-zinc-800 cursor-pointer text-sm disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+                <span>Batal</span>
+              </button>
+              <button
+                type="submit"
+                disabled={isSavingStaff}
+                className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm disabled:opacity-50 cursor-pointer text-sm"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isSavingStaff ? "Menyimpan..." : "Simpan"}</span>
+              </button>
+            </div>
+          )}
         </form>
       </div>
 
