@@ -183,5 +183,7 @@ export const enTranslations: Record<string, string> = {
   "target.formulaTitle": "Targeting Formula",
   "target.formulaText": "\"A successful business is built on clear daily targets. By setting a monthly target, Taskwai guides you to realize it step-by-step every single day.\"",
   "target.success": "Settings updated successfully!",
-  "target.error": "Failed to update settings."
+  "target.error": "Failed to update settings.",
+  "target.edit": "Edit Settings",
+  "target.saveShort": "Save"
 };

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Restaurant } from "../types";
 import { formatRupiah } from "../lib/utils";
-import { Save, User, Store, Target as TargetIcon, ShieldCheck } from "lucide-react";
+import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X } from "lucide-react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
 
@@ -21,6 +21,7 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
 
   const [targetInput, setTargetInput] = useState(new Intl.NumberFormat(formatLocale).format(restaurant.monthlyTargetProfit));
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/[^0-9]/g, "");
@@ -46,6 +47,12 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
     }
   };
 
+  const handleCancel = () => {
+    setName(restaurant.name);
+    setTargetInput(new Intl.NumberFormat(formatLocale).format(restaurant.monthlyTargetProfit));
+    setIsEditing(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanStr = targetInput.replace(/[^0-9]/g, "");
@@ -59,6 +66,7 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
     try {
       await onSaveRestaurant(name, targetVal);
       showToast(t("target.success", "Konfigurasi usaha dan target berhasil disimpan!"), "success");
+      setIsEditing(false);
     } catch (err) {
       console.error(err);
       showToast(t("target.error", "Gagal menyimpan konfigurasi."), "error");
@@ -88,8 +96,9 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                disabled={!isEditing}
                 placeholder="e.g. Warung Rasa"
-                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -108,8 +117,9 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
                 value={targetInput}
                 onChange={handleTargetChange}
                 required
+                disabled={!isEditing}
                 placeholder={isDollar ? "e.g. 5,000" : "e.g. 50.000.000"}
-                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
             <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium leading-relaxed">
@@ -126,7 +136,10 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
               <button
                 type="button"
                 onClick={() => setLang("id")}
-                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
+                disabled={!isEditing}
+                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${
+                  !isEditing ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                } ${
                   lang === "id"
                     ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 border-transparent font-black shadow-sm"
                     : "bg-zinc-50 dark:bg-zinc-950 text-zinc-500 border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
@@ -137,7 +150,10 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
               <button
                 type="button"
                 onClick={() => setLang("en")}
-                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
+                disabled={!isEditing}
+                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${
+                  !isEditing ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                } ${
                   lang === "en"
                     ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 border-transparent font-black shadow-sm"
                     : "bg-zinc-50 dark:bg-zinc-950 text-zinc-500 border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
@@ -157,7 +173,10 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
               <button
                 type="button"
                 onClick={() => handleCurrencyToggle("rupiah")}
-                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
+                disabled={!isEditing}
+                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${
+                  !isEditing ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                } ${
                   currency === "rupiah"
                     ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 border-transparent font-black shadow-sm"
                     : "bg-zinc-50 dark:bg-zinc-950 text-zinc-500 border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
@@ -168,7 +187,10 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
               <button
                 type="button"
                 onClick={() => handleCurrencyToggle("dollar")}
-                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 cursor-pointer ${
+                disabled={!isEditing}
+                className={`px-4 py-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${
+                  !isEditing ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                } ${
                   currency === "dollar"
                     ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 border-transparent font-black shadow-sm"
                     : "bg-zinc-50 dark:bg-zinc-950 text-zinc-500 border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
@@ -194,15 +216,37 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
             </div>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm disabled:opacity-50 cursor-pointer text-sm"
-          >
-            <Save className="w-4 h-4" />
-            <span>{isSaving ? t("target.saving", "Menyimpan...") : t("target.save", "Simpan Konfigurasi")}</span>
-          </button>
+          {/* Action Buttons */}
+          {!isEditing ? (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm"
+            >
+              <Pencil className="w-4 h-4" />
+              <span>{t("target.edit", "Ubah Pengaturan")}</span>
+            </button>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={handleCancel}
+                disabled={isSaving}
+                className="flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 font-bold py-3 px-4 rounded-xl transition-all border border-zinc-200/50 dark:border-zinc-700/80 cursor-pointer text-sm disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+                <span>{t("nav.cancel", "Batal")}</span>
+              </button>
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm disabled:opacity-50 cursor-pointer text-sm"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isSaving ? t("target.saving", "Menyimpan...") : t("target.saveShort", "Simpan")}</span>
+              </button>
+            </div>
+          )}
         </form>
       </div>
 
