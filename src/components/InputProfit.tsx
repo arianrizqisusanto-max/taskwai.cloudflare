@@ -170,32 +170,28 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
 
   return (
     <div className={isStaffMode ? "max-w-2xl mx-auto space-y-6" : "grid grid-cols-1 lg:grid-cols-3 gap-8"}>
-      {/* Staff Mode Header Branding */}
-      {isStaffMode && restaurant && (
-        <div className="bg-emerald-50/70 dark:bg-emerald-950/10 border border-emerald-200/50 dark:border-emerald-900/30 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_20px_-8px_rgba(16,185,129,0.05)] text-center animate-in fade-in slide-in-from-top-3 duration-300">
-          <div className="w-10 h-10 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-2.5">
-            <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-450 animate-pulse" />
-          </div>
-          <h1 className="text-xl font-black text-zinc-950 dark:text-zinc-50 tracking-tight">
-            {restaurant.name}
-          </h1>
-          <p className="text-xs text-zinc-450 dark:text-zinc-400 mt-1 font-semibold uppercase tracking-widest text-[9px]">
-            Sesi Akses Karyawan / Cabang
-          </p>
-        </div>
-      )}
-
       {/* Input Form Column */}
       <div className={isStaffMode ? "space-y-6" : "lg:col-span-1 space-y-6"}>
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
-          <div className="mb-6">
-            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("profit.title", "Pencatatan Laba Baru")}</h2>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
-              {useHpp 
-                ? t("profit.subtitleFormulaWithHpp", "Berdasarkan rumus ringkas: Omzet - HPP - Pengeluaran Lain")
-                : t("profit.subtitleFormulaWithoutHpp", "Berdasarkan rumus ringkas: Omzet - Pengeluaran Lain")}
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800/60">
+            <div>
+              <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">
+                {t("profit.title", "Pencatatan Laba Baru")}
+              </h2>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
+                {useHpp 
+                  ? t("profit.subtitleFormulaWithHpp", "Berdasarkan rumus ringkas: Omzet - HPP - Pengeluaran Lain")
+                  : t("profit.subtitleFormulaWithoutHpp", "Berdasarkan rumus ringkas: Omzet - Pengeluaran Lain")}
+              </p>
+            </div>
+            {isStaffMode && restaurant && (
+              <div className="flex items-center gap-2 bg-emerald-500/10 dark:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-xl border border-emerald-500/10 self-start sm:self-auto shrink-0 animate-in fade-in duration-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-black tracking-tight">{restaurant.name} <span className="font-semibold text-emerald-600/80 dark:text-emerald-400/80 text-[10px] ml-0.5">(Akun Staff)</span></span>
+              </div>
+            )}
           </div>
+
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Date Field */}
