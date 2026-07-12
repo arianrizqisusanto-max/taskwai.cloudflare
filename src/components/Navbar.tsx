@@ -156,7 +156,7 @@ export default function Navbar({
                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                      isActive
                        ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 shadow-sm font-black"
-                       : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-55 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                       : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                    }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -192,7 +192,7 @@ export default function Navbar({
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-955 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
               title={t("nav.refresh", "Muat Ulang")}
             >
               <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} />
@@ -201,7 +201,7 @@ export default function Navbar({
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-955 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
               title={isDark ? t("nav.lightMode", "Mode Terang") : t("nav.darkMode", "Mode Gelap")}
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
@@ -235,7 +235,7 @@ export default function Navbar({
                 )}
                 <button
                   onClick={handleLogoutClick}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-955 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span className="hidden xs:inline">{t("nav.logout", "Keluar")}</span>
@@ -463,7 +463,7 @@ export default function Navbar({
               <h3 className="text-xl font-black text-zinc-950 dark:text-zinc-50">
                 Masuk ke taskwai
               </h3>
-              <p className="text-[10px] text-zinc-450 dark:text-zinc-55 font-black tracking-widest uppercase mt-0.5">
+              <p className="text-[10px] text-zinc-400 dark:text-zinc-300 font-black tracking-widest uppercase mt-0.5">
                 Dashboard & Laporan Finansial Usaha
               </p>
             </div>
@@ -499,7 +499,7 @@ export default function Navbar({
             {/* Login Body */}
             {loginTab === "owner" ? (
               <div className="flex flex-col items-center text-center space-y-4 py-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                <p className="text-xs text-zinc-550 dark:text-zinc-400 leading-relaxed max-w-[280px]">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
                 <button

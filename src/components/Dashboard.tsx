@@ -408,7 +408,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
               </ResponsiveContainer>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-zinc-400 dark:text-zinc-500 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800/80">
-                <HelpCircle className="w-8 h-8 text-zinc-350 dark:text-zinc-600 mb-2" />
+                <HelpCircle className="w-8 h-8 text-zinc-300 dark:text-zinc-600 mb-2" />
                 <p className="text-xs font-semibold text-zinc-500">{t("dashboard.noChartData", "Belum ada data grafik untuk bulan ini.")}</p>
                 <p className="text-[10px] mt-1 text-zinc-400">{t("dashboard.noChartDataDesc", "Silakan tambahkan profit harian terlebih dahulu.")}</p>
               </div>

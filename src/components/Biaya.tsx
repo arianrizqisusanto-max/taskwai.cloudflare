@@ -311,8 +311,8 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex flex-col items-center text-zinc-400 bg-zinc-50/50 dark:bg-zinc-905 dark:bg-zinc-950/20 border border-dashed border-zinc-200 dark:border-zinc-800/80 w-full h-full justify-center rounded-xl">
-                  <Landmark className="w-8 h-8 text-zinc-350 dark:text-zinc-600 mb-2" />
+                <div className="flex flex-col items-center text-zinc-400 bg-zinc-50/50 dark:bg-zinc-900 dark:bg-zinc-950/20 border border-dashed border-zinc-200 dark:border-zinc-800/80 w-full h-full justify-center rounded-xl">
+                  <Landmark className="w-8 h-8 text-zinc-300 dark:text-zinc-600 mb-2" />
                   <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">{t("biaya.noData", "Belum ada pengeluaran diisi")}</span>
                 </div>
               )}

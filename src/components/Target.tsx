@@ -303,7 +303,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
             <User className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5" />
             <div className="text-xs space-y-1">
               <span className="font-bold text-zinc-800 dark:text-zinc-300 block uppercase tracking-wider text-[10px]">{t("target.accountConnection", "Koneksi Akun")}</span>
-              <p className="text-zinc-500 dark:text-zinc-450 leading-relaxed font-medium">
+              <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
                 {userEmail ? (
                   t("target.connectedAs", "Terhubung sebagai {email}. Data tersimpan aman di cloud database Firestore.").replace("{email}", userEmail)
                 ) : (
@@ -486,7 +486,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
               <button
                 type="button"
                 onClick={() => setIsEditingStaff(true)}
-                className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-955 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm uppercase tracking-wider"
+                className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm uppercase tracking-wider"
               >
                 <Pencil className="w-4 h-4" />
                 <span>Bikin Akun Staff</span>
