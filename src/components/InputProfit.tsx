@@ -170,6 +170,21 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
 
   return (
     <div className={isStaffMode ? "max-w-2xl mx-auto space-y-6" : "grid grid-cols-1 lg:grid-cols-3 gap-8"}>
+      {/* Staff Mode Header Branding */}
+      {isStaffMode && restaurant && (
+        <div className="bg-emerald-50/70 dark:bg-emerald-950/10 border border-emerald-200/50 dark:border-emerald-900/30 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_20px_-8px_rgba(16,185,129,0.05)] text-center animate-in fade-in slide-in-from-top-3 duration-300">
+          <div className="w-10 h-10 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-2.5">
+            <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-450 animate-pulse" />
+          </div>
+          <h1 className="text-xl font-black text-zinc-950 dark:text-zinc-50 tracking-tight">
+            {restaurant.name}
+          </h1>
+          <p className="text-xs text-zinc-450 dark:text-zinc-400 mt-1 font-semibold uppercase tracking-widest text-[9px]">
+            Sesi Akses Karyawan / Cabang
+          </p>
+        </div>
+      )}
+
       {/* Input Form Column */}
       <div className={isStaffMode ? "space-y-6" : "lg:col-span-1 space-y-6"}>
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
