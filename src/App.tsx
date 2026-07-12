@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User, signInAnonymously } from "firebase/auth";
 import { auth } from "./lib/firebase";
 import { DataService } from "./lib/dataService";
 import { Restaurant, DailyProfit, Expenses } from "./types";
@@ -85,12 +85,25 @@ function MainApp() {
 
     const fetchData = async () => {
       setLoading(true);
-      const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
+      
+      let currentUser = user;
+      if (staffSession && !currentUser) {
+        try {
+          console.log("Restoring anonymous staff auth session...");
+          const userCredential = await signInAnonymously(auth);
+          currentUser = userCredential.user;
+          setUser(currentUser);
+        } catch (authErr) {
+          console.error("Failed to restore anonymous staff auth:", authErr);
+        }
+      }
+
+      const userId = staffSession ? staffSession.ownerId : (currentUser ? currentUser.uid : "demo");
 
       try {
         // If staff session is active locally but the Firestore session document is missing, restore it.
-        if (staffSession && user && user.isAnonymous) {
-          await DataService.ensureStaffSession(user.uid, staffSession.restaurantId, staffSession.ownerId);
+        if (staffSession && currentUser && currentUser.isAnonymous) {
+          await DataService.ensureStaffSession(currentUser.uid, staffSession.restaurantId, staffSession.ownerId);
         }
 
         // Fetch restaurant config
