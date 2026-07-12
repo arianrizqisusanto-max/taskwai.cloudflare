@@ -109,6 +109,13 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
       }
     }
 
+    if (isStaffMode) {
+      const confirmMsg = `Apakah Anda yakin ingin mengirim laporan ini?\n\nMohon periksa kembali:\n- Tanggal Operasional: ${formatIndoDate(date, lang)}\n- Nominal Omzet: ${formatRupiah(omzetVal)}\n- Nama Cabang: ${branchInput.trim() || "(Belum diisi)"}\n\nPastikan data di atas sudah benar ya, agar tidak terjadi kesalahan pencatatan dan menghindari teguran dari bos/atasan Anda. 😊`;
+      if (!confirm(confirmMsg)) {
+        return;
+      }
+    }
+
     setIsSaving(true);
     try {
       await onSaveProfit(
