@@ -185,5 +185,20 @@ export const enTranslations: Record<string, string> = {
   "target.success": "Settings updated successfully!",
   "target.error": "Failed to update settings.",
   "target.edit": "Edit Settings",
-  "target.saveShort": "Save"
+  "target.saveShort": "Save",
+
+  // --- About Modal ---
+  "about.title": "About Taskwai",
+  "about.subtitle": "The Owner's Financial Partner",
+  "about.tagline": "Control your business performance easily. Staff updates are supported too!",
+  "about.feat1.title": "Real-Time Dashboard",
+  "about.feat1.desc": "Monitor net profits, daily performance targets, and automatic estimations instantly.",
+  "about.feat2.title": "Staff Daily Input",
+  "about.feat2.desc": "Staff can enter daily turnover and costs directly from the store without seeing your dashboard.",
+  "about.feat3.title": "HPP & Cost Calculations",
+  "about.feat3.desc": "Calculate realistic net profit by deducting fixed costs and COGS (HPP) automatically.",
+  "about.feat4.title": "Secure Cloud Sync",
+  "about.feat4.desc": "Your data is stored safely in Firestore cloud database, synced automatically.",
+  "about.close": "Close"
 };
+

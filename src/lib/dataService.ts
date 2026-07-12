@@ -1,4 +1,5 @@
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
+import { signInAnonymously } from "firebase/auth";
 import { 
   doc, 
   getDoc, 
@@ -15,13 +16,25 @@ import {
 } from "firebase/firestore";
 import { Restaurant, DailyProfit, Expenses } from "../types";
 
+// Helper for secure client-side hashing
+async function hashCredentials(username: string, password: string): Promise<string> {
+  const msgBuffer = new TextEncoder().encode(`${username.trim().toLowerCase()}:${password}`);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // Default Initial Data for Demo/Guest mode or new users
 const DEFAULT_RESTAURANT = (userId: string): Restaurant => ({
   id: `rest_${userId}`,
   ownerId: userId,
   name: "Warung Kopi Senja",
   monthlyTargetProfit: 35000000,
-  createdAt: new Date().toISOString()
+  createdAt: new Date().toISOString(),
+  staffUsername: "",
+  staffPassword: "",
+  staffHash: "",
+  branches: []
 });
 
 const DEFAULT_EXPENSES = (userId: string, restaurantId: string): Expenses => ({
@@ -269,6 +282,8 @@ export const DataService = {
       hppType?: "nominal" | "percentage";
       hppVal?: number;
       otherExpenses?: number;
+      branchName?: string;
+      inputterName?: string;
     }
   ): Promise<DailyProfit> {
     const id = `dp_${restaurantId}_${entry.date}_${Math.random().toString(36).substring(2, 7)}`;
@@ -282,8 +297,37 @@ export const DataService = {
       omzet: entry.omzet,
       hppType: entry.hppType,
       hppVal: entry.hppVal,
-      otherExpenses: entry.otherExpenses
+      otherExpenses: entry.otherExpenses,
+      branchName: entry.branchName,
+      inputterName: entry.inputterName
     };
+
+    // Update branches autocomplete list
+    if (entry.branchName && entry.branchName.trim()) {
+      const cleanedBranch = entry.branchName.trim();
+      if (!userId || userId === "demo") {
+        const rest = getLocal<Restaurant>("taskwai_restaurant") || DEFAULT_RESTAURANT("demo");
+        const currentBranches = rest.branches || [];
+        if (!currentBranches.includes(cleanedBranch)) {
+          rest.branches = [...currentBranches, cleanedBranch];
+          setLocal("taskwai_restaurant", rest);
+        }
+      } else {
+        try {
+          const restDocRef = doc(db, "restaurants", restaurantId);
+          const restSnap = await getDoc(restDocRef);
+          if (restSnap.exists()) {
+            const restData = restSnap.data() as Restaurant;
+            const currentBranches = restData.branches || [];
+            if (!currentBranches.includes(cleanedBranch)) {
+              await updateDoc(restDocRef, { branches: [...currentBranches, cleanedBranch] });
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to update branches list in Firestore:", e);
+        }
+      }
+    }
 
     if (!userId || userId === "demo") {
       const profits = await this.getDailyProfits("demo", restaurantId);
@@ -313,7 +357,9 @@ export const DataService = {
           omzet: entry.omzet ?? null,
           hppType: entry.hppType ?? null,
           hppVal: entry.hppVal ?? null,
-          otherExpenses: entry.otherExpenses ?? null
+          otherExpenses: entry.otherExpenses ?? null,
+          branchName: entry.branchName ?? null,
+          inputterName: entry.inputterName ?? null
         };
         await updateDoc(doc(db, "daily_profit", existingId), updateData);
         return {
@@ -326,7 +372,9 @@ export const DataService = {
           omzet: entry.omzet,
           hppType: entry.hppType,
           hppVal: entry.hppVal,
-          otherExpenses: entry.otherExpenses
+          otherExpenses: entry.otherExpenses,
+          branchName: entry.branchName,
+          inputterName: entry.inputterName
         };
       } else {
         await setDoc(doc(db, "daily_profit", id), {
@@ -338,7 +386,9 @@ export const DataService = {
           omzet: entry.omzet ?? null,
           hppType: entry.hppType ?? null,
           hppVal: entry.hppVal ?? null,
-          otherExpenses: entry.otherExpenses ?? null
+          otherExpenses: entry.otherExpenses ?? null,
+          branchName: entry.branchName ?? null,
+          inputterName: entry.inputterName ?? null
         });
         return newProfit;
       }
@@ -368,5 +418,85 @@ export const DataService = {
       const filtered = profits.filter((p) => p.id !== id);
       setLocal(`taskwai_daily_profits_${userId}`, filtered);
     }
+  },
+
+  async saveStaffCredentials(userId: string, restaurantId: string, username: string, password: string): Promise<void> {
+    if (!userId || userId === "demo") {
+      const rest = getLocal<Restaurant>("taskwai_restaurant") || DEFAULT_RESTAURANT("demo");
+      rest.staffUsername = username;
+      rest.staffPassword = password;
+      setLocal("taskwai_restaurant", rest);
+      return;
+    }
+
+    const hash = await hashCredentials(username, password);
+
+    // Get the current restaurant doc to check for an existing hash
+    const restDocRef = doc(db, "restaurants", restaurantId);
+    const restSnap = await getDoc(restDocRef);
+    let oldHash = "";
+    if (restSnap.exists()) {
+      oldHash = restSnap.data().staffHash || "";
+    }
+
+    // Delete old hash mapping if it changed
+    if (oldHash && oldHash !== hash) {
+      try {
+        await deleteDoc(doc(db, "staff_accounts", oldHash));
+      } catch (err) {
+        console.warn("Failed to delete old staff hash doc:", err);
+      }
+    }
+
+    // Write new mapping
+    await setDoc(doc(db, "staff_accounts", hash), {
+      restaurantId,
+      ownerId: userId
+    });
+
+    // Update restaurant doc
+    await updateDoc(restDocRef, {
+      staffUsername: username,
+      staffPassword: password,
+      staffHash: hash
+    });
+  },
+
+  async loginStaff(username: string, password: string): Promise<{ restaurantId: string; ownerId: string }> {
+    // Demo Mode fallback
+    if (username === "demo_staff" && password === "demo123") {
+      return { restaurantId: "rest_demo", ownerId: "demo" };
+    }
+
+    // Also check local storage for custom local credentials
+    const localRest = getLocal<Restaurant>("taskwai_restaurant");
+    if (localRest && localRest.staffUsername === username && localRest.staffPassword === password) {
+      return { restaurantId: localRest.id, ownerId: localRest.ownerId };
+    }
+
+    const hash = await hashCredentials(username, password);
+
+    // Read staff account credentials hash document
+    const accountRef = doc(db, "staff_accounts", hash);
+    const accountSnap = await getDoc(accountRef);
+
+    if (!accountSnap.exists()) {
+      throw new Error("Username atau Password staff salah.");
+    }
+
+    const { restaurantId, ownerId } = accountSnap.data() as { restaurantId: string; ownerId: string };
+
+    // Authenticate anonymously in Firebase Auth
+    const userCredential = await signInAnonymously(auth);
+    const anonymousUid = userCredential.user.uid;
+
+    // Write temporary active staff session
+    await setDoc(doc(db, "staff_sessions", anonymousUid), {
+      restaurantId,
+      ownerId,
+      createdAt: new Date().toISOString()
+    });
+
+    return { restaurantId, ownerId };
   }
 };

@@ -1,19 +1,22 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { auth, googleProvider } from "../lib/firebase";
-import { signInWithPopup, signOut, User } from "firebase/auth";
-import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle, RotateCw } from "lucide-react";
+import { signInWithPopup, signOut, User as FirebaseUser } from "firebase/auth";
+import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle, RotateCw, Sparkles, X, TrendingUp, Users, Coins, Cloud, Lock, User as UserIcon, UserCheck } from "lucide-react";
 import { useToast } from "./Toast";
 import TaskwaiLogo from "./TaskwaiLogo";
 import { useTranslation } from "../lib/LanguageContext";
+import { DataService } from "../lib/dataService";
 
 interface NavbarProps {
-  user: User | null;
+  user: FirebaseUser | null;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   restaurantName: string;
   isDark: boolean;
   toggleDark: () => void;
   authInitialized: boolean;
+  staffSession: { restaurantId: string; ownerId: string; role: "staff" } | null;
+  setStaffSession: (session: { restaurantId: string; ownerId: string; role: "staff" } | null) => void;
 }
 
 export default function Navbar({
@@ -24,11 +27,21 @@ export default function Navbar({
   isDark,
   toggleDark,
   authInitialized,
+  staffSession,
+  setStaffSession,
 }: NavbarProps) {
   const { showToast } = useToast();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { t } = useTranslation();
+
+  // Staff Login Form States
+  const [loginTab, setLoginTab] = useState<"owner" | "staff">("owner");
+  const [staffUsernameInput, setStaffUsernameInput] = useState("");
+  const [staffPasswordInput, setStaffPasswordInput] = useState("");
+  const [isLoggingInStaff, setIsLoggingInStaff] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -41,9 +54,37 @@ export default function Navbar({
     try {
       await signInWithPopup(auth, googleProvider);
       showToast(t("nav.loginSuccess", "Berhasil masuk menggunakan akun Google!"), "success");
+      setShowLoginModal(false);
     } catch (error: any) {
       console.error("Login error:", error);
       showToast(t("nav.loginError", "Gagal masuk dengan Google. Anda tetap dapat menggunakan Mode Demo Offline."), "warning");
+    }
+  };
+
+  const handleStaffLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!staffUsernameInput.trim() || !staffPasswordInput.trim()) {
+      showToast("Harap isi username dan password staff.", "warning");
+      return;
+    }
+
+    setIsLoggingInStaff(true);
+    try {
+      const session = await DataService.loginStaff(staffUsernameInput.trim(), staffPasswordInput.trim());
+      const sessionData = { ...session, role: "staff" as const };
+      
+      setStaffSession(sessionData);
+      localStorage.setItem("taskwai_staff_session", JSON.stringify(sessionData));
+      
+      showToast("Berhasil masuk sebagai Staff!", "success");
+      setShowLoginModal(false);
+      setStaffUsernameInput("");
+      setStaffPasswordInput("");
+    } catch (error: any) {
+      console.error(error);
+      showToast(error.message || "Gagal masuk. Periksa kembali username dan password.", "error");
+    } finally {
+      setIsLoggingInStaff(false);
     }
   };
 
@@ -54,33 +95,54 @@ export default function Navbar({
   const handleConfirmLogout = async () => {
     setShowLogoutConfirm(false);
     try {
-      await signOut(auth);
-      showToast(t("nav.logoutSuccess", "Berhasil keluar."), "info");
+      if (staffSession) {
+        setStaffSession(null);
+        localStorage.removeItem("taskwai_staff_session");
+        await signOut(auth); // Sign out Firebase anonymous user
+        showToast("Sesi staff telah berakhir.", "info");
+      } else {
+        await signOut(auth);
+        showToast(t("nav.logoutSuccess", "Berhasil keluar."), "info");
+      }
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
-  const menuItems = [
-    { id: "dashboard", label: t("nav.dashboard", "Dashboard"), icon: LayoutDashboard },
-    { id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign },
-    { id: "biaya", label: t("nav.biaya", "Biaya Operasional"), icon: Landmark },
-    { id: "laporan", label: t("nav.laporan", "Laporan"), icon: FileText },
-    { id: "target", label: t("nav.target", "Pengaturan"), icon: Settings },
-  ];
+  const menuItems = staffSession
+    ? [{ id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign }]
+    : [
+        { id: "dashboard", label: t("nav.dashboard", "Dashboard"), icon: LayoutDashboard },
+        { id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign },
+        { id: "biaya", label: t("nav.biaya", "Biaya Operasional"), icon: Landmark },
+        { id: "laporan", label: t("nav.laporan", "Laporan"), icon: FileText },
+        { id: "target", label: t("nav.target", "Pengaturan"), icon: Settings },
+      ];
 
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-zinc-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md transition-colors duration-300">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Logo */}
-          <div className="flex items-center gap-3">
-            <TaskwaiLogo size={36} />
+          <button
+            onClick={() => setShowAboutModal(true)}
+            className="flex items-center gap-3 text-left focus:outline-none hover:opacity-85 active:scale-95 transition-all cursor-pointer group"
+          >
+            <div className="relative">
+              <TaskwaiLogo size={36} />
+              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+            </div>
             <div className="flex flex-col">
-              <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50">taskwai</span>
+              <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                taskwai
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 animate-pulse" />
+              </span>
               <span className="hidden sm:inline text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">{t("nav.profitDashboard", "Profit Dashboard")}</span>
             </div>
-          </div>
+          </button>
 
           {/* Navigation Menu - Desktop */}
           <nav className="hidden lg:flex space-x-1">
@@ -109,6 +171,11 @@ export default function Navbar({
             {/* Status Badge */}
             {!authInitialized ? (
               <div className="hidden sm:block h-6 w-24 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-full animate-pulse" />
+            ) : staffSession ? (
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>Mode Karyawan</span>
+              </div>
             ) : user ? (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -134,7 +201,7 @@ export default function Navbar({
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-955 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
               title={isDark ? t("nav.lightMode", "Mode Terang") : t("nav.darkMode", "Mode Gelap")}
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
@@ -142,6 +209,20 @@ export default function Navbar({
 
             {!authInitialized ? (
               <div className="h-9 w-20 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-xl animate-pulse" />
+            ) : staffSession ? (
+              <div className="flex items-center gap-2 pl-1.5">
+                <div className="hidden xs:flex flex-col items-end leading-none">
+                  <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Akses</span>
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Staff</span>
+                </div>
+                <button
+                  onClick={handleLogoutClick}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900/40 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden xs:inline">{t("nav.logout", "Keluar")}</span>
+                </button>
+              </div>
             ) : user ? (
               <div className="flex items-center gap-2 pl-1.5">
                 {user.photoURL && (
@@ -154,7 +235,7 @@ export default function Navbar({
                 )}
                 <button
                   onClick={handleLogoutClick}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-955 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span className="hidden xs:inline">{t("nav.logout", "Keluar")}</span>
@@ -162,7 +243,7 @@ export default function Navbar({
               </div>
             ) : (
               <button
-                onClick={handleLogin}
+                onClick={() => setShowLoginModal(true)}
                 className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white dark:text-zinc-950 bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-950 dark:hover:bg-white rounded-xl transition-all shadow-sm cursor-pointer"
               >
                 <LogIn className="w-4 h-4" />
@@ -174,34 +255,36 @@ export default function Navbar({
       </header>
 
       {/* Navigation Menu - Mobile (Premium Fixed Bottom Bar) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-lg pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)] transition-colors duration-300">
-        <div className="flex h-16 w-full items-center justify-around px-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full rounded-xl transition-all cursor-pointer ${
-                  isActive
-                    ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
-                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
-                }`}
-              >
-                <div className={`p-1.5 rounded-xl transition-all duration-300 ${
-                  isActive 
-                    ? "bg-emerald-50 dark:bg-emerald-950/40 scale-110" 
-                    : "bg-transparent"
-                }`}>
-                  <Icon className="w-5 h-5 stroke-[2.25]" />
-                </div>
-                <span className="text-[9px] font-bold tracking-tight uppercase">{item.label.split(" ")[0]}</span>
-              </button>
-            );
-          })}
+      {!staffSession && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-lg pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)] transition-colors duration-300">
+          <div className="flex h-16 w-full items-center justify-around px-2">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex flex-col items-center justify-center gap-1 flex-1 h-full rounded-xl transition-all cursor-pointer ${
+                    isActive
+                      ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
+                      : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  <div className={`p-1.5 rounded-xl transition-all duration-300 ${
+                    isActive 
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 scale-110" 
+                      : "bg-transparent"
+                  }`}>
+                    <Icon className="w-5 h-5 stroke-[2.25]" />
+                  </div>
+                  <span className="text-[9px] font-bold tracking-tight uppercase">{item.label.split(" ")[0]}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Premium Confirmation Dialog / Modal */}
       {showLogoutConfirm && (
@@ -246,6 +329,242 @@ export default function Navbar({
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium About Taskwai Modal */}
+      {showAboutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop Overlay with blur */}
+          <div 
+            className="absolute inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity duration-300"
+            onClick={() => setShowAboutModal(false)}
+          />
+
+          {/* Modal Container */}
+          <div className="relative w-full max-w-lg overflow-hidden rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80 animate-in fade-in zoom-in-95 duration-200">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowAboutModal(false)}
+              className="absolute top-4 right-4 p-2 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Content */}
+            <div className="flex flex-col">
+              {/* Header with gradient badge and icon */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-lg shadow-emerald-500/20">
+                  <TaskwaiLogo size={40} className="filter invert brightness-0 dark:brightness-100 dark:invert-0" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+                    taskwai
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/40 dark:border-emerald-800/60 uppercase tracking-widest">v1.2.0</span>
+                  </h3>
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mt-0.5">
+                    {t("about.subtitle", "Sahabat Finansial Owner")}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tagline / Description */}
+              <div className="bg-emerald-50/50 dark:bg-emerald-950/15 border border-emerald-100/50 dark:border-emerald-900/30 rounded-2xl p-4 mb-6">
+                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                  ✨ {t("about.tagline", "Taskwai adalah Sahabat Owner, membantu Anda mengontrol performa usaha secara real-time. Update laporan harian lewat staff di toko juga bisa dilakukan dengan sangat mudah!")}
+                </p>
+              </div>
+
+              {/* Features List */}
+              <h4 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-3.5">
+                Fitur Utama & Kegunaan
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                {/* Feat 1 */}
+                <div className="flex gap-3 p-3.5 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30">
+                  <TrendingUp className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-50">{t("about.feat1.title", "Dashboard Real-Time")}</span>
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat1.desc", "Pantau estimasi profit bersih bulanan & target harian secara otomatis.")}</span>
+                  </div>
+                </div>
+
+                {/* Feat 2 */}
+                <div className="flex gap-3 p-3.5 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30">
+                  <Users className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-50">{t("about.feat2.title", "Input Harian lewat Staff")}</span>
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat2.desc", "Staff di toko bisa input omzet harian menggunakan kode khusus tanpa melihat dashboard utama.")}</span>
+                  </div>
+                </div>
+
+                {/* Feat 3 */}
+                <div className="flex gap-3 p-3.5 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30">
+                  <Coins className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-50">{t("about.feat3.title", "HPP & Biaya Otomatis")}</span>
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat3.desc", "Kalkulasi margin kotor secara instan dengan input persentase HPP & biaya lainnya.")}</span>
+                  </div>
+                </div>
+
+                {/* Feat 4 */}
+                <div className="flex gap-3 p-3.5 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30">
+                  <Cloud className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-50">{t("about.feat4.title", "Penyimpanan Aman Cloud")}</span>
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat4.desc", "Sinkronisasi otomatis ke cloud Firestore atau simpan secara lokal jika mode demo.")}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button
+                onClick={() => setShowAboutModal(false)}
+                className="w-full py-3 rounded-2xl bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-900 dark:hover:bg-white text-white dark:text-zinc-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
+              >
+                {t("about.close", "Tutup")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Unified Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          {/* Backdrop Overlay with blur */}
+          <div 
+            className="absolute inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity duration-300"
+            onClick={() => {
+              if (!isLoggingInStaff) setShowLoginModal(false);
+            }}
+          />
+
+          {/* Modal Container */}
+          <div className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80 animate-in fade-in zoom-in-95 duration-200">
+            {/* Close Button */}
+            {!isLoggingInStaff && (
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="absolute top-4 right-4 p-2 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer animate-in"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+
+            {/* Modal Header */}
+            <div className="flex flex-col items-center mb-6 mt-2 text-center animate-in">
+              <div className="p-3 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-lg mb-3">
+                <TaskwaiLogo size={36} className="filter invert brightness-0 dark:brightness-100 dark:invert-0" />
+              </div>
+              <h3 className="text-xl font-black text-zinc-950 dark:text-zinc-50">
+                Masuk ke taskwai
+              </h3>
+              <p className="text-[10px] text-zinc-450 dark:text-zinc-55 font-black tracking-widest uppercase mt-0.5">
+                Dashboard & Laporan Finansial Usaha
+              </p>
+            </div>
+
+            {/* Login Tabs */}
+            <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl mb-6">
+              <button
+                type="button"
+                onClick={() => setLoginTab("owner")}
+                disabled={isLoggingInStaff}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+                  loginTab === "owner"
+                    ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-300"
+                }`}
+              >
+                Owner Restoran
+              </button>
+              <button
+                type="button"
+                onClick={() => setLoginTab("staff")}
+                disabled={isLoggingInStaff}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+                  loginTab === "staff"
+                    ? "bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-300"
+                }`}
+              >
+                Staff Cabang
+              </button>
+            </div>
+
+            {/* Login Body */}
+            {loginTab === "owner" ? (
+              <div className="flex flex-col items-center text-center space-y-4 py-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <p className="text-xs text-zinc-550 dark:text-zinc-400 leading-relaxed max-w-[280px]">
+                  Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
+                </p>
+                <button
+                  onClick={handleLogin}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-zinc-200/80 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 bg-white dark:bg-zinc-900 rounded-2xl transition-all shadow-sm font-bold text-xs uppercase tracking-wider text-zinc-700 dark:text-zinc-200 cursor-pointer"
+                >
+                  <img
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                    alt="Google Logo"
+                    className="w-4 h-4"
+                  />
+                  <span>Masuk dengan Google</span>
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleStaffLoginSubmit} className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                {/* Username */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">
+                    Username Akses Staff
+                  </label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                    <input
+                      type="text"
+                      required
+                      disabled={isLoggingInStaff}
+                      value={staffUsernameInput}
+                      onChange={(e) => setStaffUsernameInput(e.target.value)}
+                      placeholder="Masukkan username staff"
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs font-semibold text-zinc-900 dark:text-zinc-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">
+                    Password Akses Staff
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                    <input
+                      type="password"
+                      required
+                      disabled={isLoggingInStaff}
+                      value={staffPasswordInput}
+                      onChange={(e) => setStaffPasswordInput(e.target.value)}
+                      placeholder="Masukkan password staff"
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs font-semibold text-zinc-900 dark:text-zinc-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  disabled={isLoggingInStaff}
+                  className="w-full py-3 rounded-2xl bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-900 dark:hover:bg-white text-white dark:text-zinc-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
+                >
+                  <LogIn className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>{isLoggingInStaff ? "Memverifikasi..." : "Masuk Sesi Karyawan"}</span>
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

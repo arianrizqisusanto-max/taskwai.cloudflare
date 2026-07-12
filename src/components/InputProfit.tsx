@@ -6,6 +6,8 @@ import { motion } from "motion/react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
 
+import { Restaurant } from "../types";
+
 interface InputProfitProps {
   profits: DailyProfit[];
   onSaveProfit: (
@@ -15,12 +17,16 @@ interface InputProfitProps {
     omzet?: number,
     hppType?: "nominal" | "percentage",
     hppVal?: number,
-    otherExpenses?: number
+    otherExpenses?: number,
+    branchName?: string,
+    inputterName?: string
   ) => Promise<void>;
   onDeleteProfit: (id: string) => Promise<void>;
+  isStaffMode?: boolean;
+  restaurant?: Restaurant | null;
 }
 
-export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: InputProfitProps) {
+export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isStaffMode = false, restaurant }: InputProfitProps) {
   const { showToast } = useToast();
   const { lang, t, currency, currencySymbol } = useTranslation();
   
@@ -41,6 +47,16 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
   const [hppNominalInput, setHppNominalInput] = useState("");
   const [hppPercentInput, setHppPercentInput] = useState("35"); // Default standard HPP is often around 35%
   const [otherExpensesInput, setOtherExpensesInput] = useState("");
+
+  // Staff Mode specific fields
+  const [branchInput, setBranchInput] = useState(() => {
+    return localStorage.getItem("taskwai_last_branch") || "";
+  });
+  const [inputterInput, setInputterInput] = useState(() => {
+    return localStorage.getItem("taskwai_last_inputter") || "";
+  });
+  const [showBranchSuggestions, setShowBranchSuggestions] = useState(false);
+
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -102,10 +118,20 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
         omzetVal, 
         useHpp ? hppType : undefined, 
         useHpp ? hppValForDb : undefined, 
-        otherExpensesVal
+        otherExpensesVal,
+        branchInput.trim() || undefined,
+        inputterInput.trim() || undefined
       );
       showToast(t("profit.saveSuccess", "Profit tanggal {date} berhasil disimpan!").replace("{date}", formatIndoDate(date, lang)), "success");
       
+      // Cache branch and name for staff auto-fill next time
+      if (branchInput.trim()) {
+        localStorage.setItem("taskwai_last_branch", branchInput.trim());
+      }
+      if (inputterInput.trim()) {
+        localStorage.setItem("taskwai_last_inputter", inputterInput.trim());
+      }
+
       // Keep state clean but preserve HPP percentage for easier repetitive daily entry
       setOmzetInput("");
       setHppNominalInput("");
@@ -143,9 +169,9 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className={isStaffMode ? "max-w-2xl mx-auto space-y-6" : "grid grid-cols-1 lg:grid-cols-3 gap-8"}>
       {/* Input Form Column */}
-      <div className="lg:col-span-1 space-y-6">
+      <div className={isStaffMode ? "space-y-6" : "lg:col-span-1 space-y-6"}>
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
           <div className="mb-6">
             <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("profit.title", "Pencatatan Laba Baru")}</h2>
@@ -307,6 +333,70 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
               </div>
             </div>
 
+            {/* Cabang Input */}
+            <div className="space-y-2 relative">
+              <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+                Cabang Restoran / Outlet <span className="text-zinc-400 dark:text-zinc-500 font-normal lowercase">{t("profit.optional", "(opsional)")}</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 pointer-events-none select-none font-mono">
+                  🏢
+                </span>
+                <input
+                  type="text"
+                  value={branchInput}
+                  onChange={(e) => {
+                    setBranchInput(e.target.value);
+                    setShowBranchSuggestions(true);
+                  }}
+                  onFocus={() => setShowBranchSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowBranchSuggestions(false), 200)}
+                  placeholder="e.g. Cabang Sudirman"
+                  className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all"
+                />
+              </div>
+              
+              {/* Autocomplete branch suggestions */}
+              {showBranchSuggestions && restaurant && restaurant.branches && restaurant.branches.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-xl shadow-lg max-h-40 overflow-y-auto pr-1">
+                  {restaurant.branches
+                    .filter(b => b.toLowerCase().includes(branchInput.toLowerCase()))
+                    .map((branch, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onMouseDown={() => {
+                          setBranchInput(branch);
+                          setShowBranchSuggestions(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border-b border-zinc-100 dark:border-zinc-800 last:border-b-0"
+                      >
+                        {branch}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            {/* Nama Penginput */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+                Nama Penginput / Karyawan <span className="text-zinc-400 dark:text-zinc-500 font-normal lowercase">{t("profit.optional", "(opsional)")}</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 pointer-events-none select-none font-mono">
+                  👤
+                </span>
+                <input
+                  type="text"
+                  value={inputterInput}
+                  onChange={(e) => setInputterInput(e.target.value)}
+                  placeholder="e.g. Andi"
+                  className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all"
+                />
+              </div>
+            </div>
+
             {/* Live Profit Calculation Panel */}
             <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/60 space-y-3 shadow-xs">
               <div className="flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800 pb-2">
@@ -396,7 +486,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
       </div>
 
       {/* History Log Column */}
-      <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
+      {!isStaffMode && (
+        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("profit.history", "Riwayat Profit Masuk")}</h2>
@@ -499,6 +590,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit }: I
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

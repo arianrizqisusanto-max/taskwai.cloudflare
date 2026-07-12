@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { Restaurant } from "../types";
 import { formatRupiah } from "../lib/utils";
-import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X } from "lucide-react";
+import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X, Lock } from "lucide-react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
 
 interface TargetProps {
   restaurant: Restaurant;
   onSaveRestaurant: (name: string, target: number) => Promise<void>;
+  onSaveStaffCredentials: (username: string, password: string) => Promise<void>;
   userEmail: string | null;
 }
 
-export default function Target({ restaurant, onSaveRestaurant, userEmail }: TargetProps) {
+export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCredentials, userEmail }: TargetProps) {
   const { showToast } = useToast();
   const { lang, setLang, t, currency, setCurrency, currencySymbol } = useTranslation();
   const [name, setName] = useState(restaurant.name);
@@ -22,6 +23,36 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
   const [targetInput, setTargetInput] = useState(new Intl.NumberFormat(formatLocale).format(restaurant.monthlyTargetProfit));
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Staff Credentials states
+  const [staffUsername, setStaffUsername] = useState(restaurant.staffUsername || "");
+  const [staffPassword, setStaffPassword] = useState(restaurant.staffPassword || "");
+  const [isSavingStaff, setIsSavingStaff] = useState(false);
+
+  const handleStaffSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!staffUsername.trim() || !staffPassword.trim()) {
+      showToast("Username dan password staff tidak boleh kosong.", "warning");
+      return;
+    }
+
+    const usernameRegex = /^[a-z0-9_]+$/;
+    if (!usernameRegex.test(staffUsername.trim())) {
+      showToast("Username staff hanya boleh berisi huruf kecil, angka, dan garis bawah (_).", "warning");
+      return;
+    }
+
+    setIsSavingStaff(true);
+    try {
+      await onSaveStaffCredentials(staffUsername.trim(), staffPassword.trim());
+      showToast("Kredensial akses staff berhasil diperbarui!", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Gagal memperbarui kredensial staff.", "error");
+    } finally {
+      setIsSavingStaff(false);
+    }
+  };
 
   const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/[^0-9]/g, "");
@@ -247,6 +278,64 @@ export default function Target({ restaurant, onSaveRestaurant, userEmail }: Targ
               </button>
             </div>
           )}
+        </form>
+      </div>
+
+      {/* Staff Access Configuration Card */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
+        <div className="mb-6">
+          <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">Akses Staff Toko</h2>
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium font-sans">
+            Atur kredensial staff tunggal agar karyawan di semua cabang dapat login dan menginput omzet harian.
+          </p>
+        </div>
+
+        <form onSubmit={handleStaffSubmit} className="space-y-4">
+          {/* Username */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+              Username Staff
+            </label>
+            <div className="relative">
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
+              <input
+                type="text"
+                required
+                value={staffUsername}
+                onChange={(e) => setStaffUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
+                placeholder="e.g. staff_senja"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+              Password Staff
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
+              <input
+                type="password"
+                required
+                value={staffPassword}
+                onChange={(e) => setStaffPassword(e.target.value)}
+                placeholder="Masukkan password staff"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSavingStaff}
+            className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-955 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm disabled:opacity-50 uppercase tracking-wider"
+          >
+            <Save className="w-4 h-4" />
+            <span>{isSavingStaff ? "Menyimpan..." : "Simpan Akses Karyawan"}</span>
+          </button>
         </form>
       </div>
 

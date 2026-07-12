@@ -19,6 +19,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
   const { showToast } = useToast();
   const { lang, t } = useTranslation();
   const [filter, setFilter] = useState<FilterType>("bulan");
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
 
   const todayStr = new Date().toISOString().split("T")[0];
 
@@ -33,20 +34,24 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
     return diffDays >= 0 && diffDays < days;
   };
 
-  // Filtered profits
+  // Filtered profits by Date and selected Branch
   const filteredProfits = profits.filter((p) => {
+    let matchesDate = true;
     if (filter === "hari") {
-      return p.date === todayStr;
-    }
-    if (filter === "minggu") {
-      return isWithinPastDays(p.date, 7);
-    }
-    if (filter === "bulan") {
-      // Just filter current month
+      matchesDate = p.date === todayStr;
+    } else if (filter === "minggu") {
+      matchesDate = isWithinPastDays(p.date, 7);
+    } else if (filter === "bulan") {
       const currentMonthPrefix = todayStr.substring(0, 7);
-      return p.date.startsWith(currentMonthPrefix);
+      matchesDate = p.date.startsWith(currentMonthPrefix);
     }
-    return true;
+
+    let matchesBranch = true;
+    if (selectedBranch) {
+      matchesBranch = p.branchName === selectedBranch;
+    }
+
+    return matchesDate && matchesBranch;
   });
 
   // Calculate statistics
@@ -149,6 +154,8 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
             t("laporan.tableDate", "Tanggal"), 
             t("laporan.tableDay", "Hari"), 
             t("laporan.tableGrossProfit", "Laba Kotor / Profit"), 
+            "Cabang",
+            "Penginput",
             t("laporan.tableNotes", "Catatan")
           ]];
           const tableData = filteredProfits.map((p, index) => {
@@ -159,6 +166,8 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
               p.date,
               weekday,
               formatRupiah(p.profit),
+              p.branchName || "-",
+              p.inputterName || "-",
               p.notes || "-"
             ];
           });
@@ -179,11 +188,13 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
               cellPadding: 3
             },
             columnStyles: {
-              0: { cellWidth: 12, halign: "center" },
-              1: { cellWidth: 32 },
-              2: { cellWidth: 32 },
-              3: { cellWidth: 45, halign: "right" },
-              4: { cellWidth: "auto" }
+              0: { cellWidth: 10, halign: "center" },
+              1: { cellWidth: 24 },
+              2: { cellWidth: 24 },
+              3: { cellWidth: 35, halign: "right" },
+              4: { cellWidth: 30 },
+              5: { cellWidth: 25 },
+              6: { cellWidth: "auto" }
             },
             alternateRowStyles: {
               fillColor: [248, 250, 252] // Slate-50
@@ -228,14 +239,16 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
           csvContent += `"${t("laporan.lowestProfit", "Profit Terendah")}";"${minProfitEntry ? minProfitEntry.profit : 0}"\r\n\r\n`;
 
           // Table Headers
-          csvContent += `"${t("laporan.tableNo", "No")}";"${t("laporan.tableDate", "Tanggal")}";"${t("laporan.tableDay", "Hari")}";"${t("laporan.tableGrossProfit", "Laba Kotor / Profit")}";"${t("laporan.tableNotes", "Catatan")}"\r\n`;
+          csvContent += `"${t("laporan.tableNo", "No")}";"${t("laporan.tableDate", "Tanggal")}";"${t("laporan.tableDay", "Hari")}";"${t("laporan.tableGrossProfit", "Laba Kotor / Profit")}";"Cabang";"Penginput";"${t("laporan.tableNotes", "Catatan")}"\r\n`;
           
           // Table Rows
           filteredProfits.forEach((p, index) => {
             const dateObj = new Date(p.date);
             const weekday = dateObj.toLocaleDateString(lang === "en" ? "en-US" : "id-ID", { weekday: "long" });
             const note = p.notes ? p.notes.replace(/"/g, '""') : "";
-            csvContent += `"${index + 1}";"${p.date}";"${weekday}";"${p.profit}";"${note}"\r\n`;
+            const branch = p.branchName ? p.branchName.replace(/"/g, '""') : "";
+            const inputter = p.inputterName ? p.inputterName.replace(/"/g, '""') : "";
+            csvContent += `"${index + 1}";"${p.date}";"${weekday}";"${p.profit}";"${branch}";"${inputter}";"${note}"\r\n`;
           });
 
           // Download Action
@@ -261,27 +274,46 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
     <div className="space-y-6">
       {/* Upper bar: Filters and Exports */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
-        {/* Left: filter toggle */}
-        <div className="flex items-center gap-3">
-          <Filter className="w-4 h-4 text-zinc-400 dark:text-zinc-500 shrink-0" />
-          <div className="flex bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/80 p-1 rounded-xl">
-            {(["hari", "minggu", "bulan"] as FilterType[]).map((type) => {
-              let label = type === "hari" ? t("laporan.filterHari", "Harian") : type === "minggu" ? t("laporan.filterMinggu", "Mingguan") : t("laporan.filterBulan", "Bulanan");
-              return (
-                <button
-                  key={type}
-                  onClick={() => setFilter(type)}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                    filter === type
-                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-zinc-100 shadow-sm"
-                      : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-650 dark:hover:text-zinc-300"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
+        {/* Left: filter toggle & branch selector */}
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-zinc-400 dark:text-zinc-500 shrink-0" />
+            <div className="flex bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/80 p-1 rounded-xl">
+              {(["hari", "minggu", "bulan"] as FilterType[]).map((type) => {
+                let label = type === "hari" ? t("laporan.filterHari", "Harian") : type === "minggu" ? t("laporan.filterMinggu", "Mingguan") : t("laporan.filterBulan", "Bulanan");
+                return (
+                  <button
+                    key={type}
+                    onClick={() => setFilter(type)}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                      filter === type
+                        ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-zinc-100 shadow-sm"
+                        : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-650 dark:hover:text-zinc-300"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
+          {/* Branch filter dropdown */}
+          {restaurant && restaurant.branches && restaurant.branches.length > 0 && (
+            <div className="flex items-center bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/80 px-3 py-1.5 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-350">
+              <span className="mr-2 opacity-50 uppercase tracking-widest text-[9px] font-black">Cabang:</span>
+              <select
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value)}
+                className="bg-transparent border-none outline-none cursor-pointer pr-1 font-bold text-zinc-800 dark:text-zinc-200 focus:ring-0 focus:outline-none"
+              >
+                <option value="" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-250">Semua Cabang</option>
+                {restaurant.branches.map((b) => (
+                  <option key={b} value={b} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-250">{b}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Right: Export buttons */}
@@ -352,6 +384,8 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
                   <th className="py-3 px-4">{t("laporan.tableDate", "Tanggal")}</th>
                   <th className="py-3 px-4">{t("laporan.tableDay", "Hari")}</th>
                   <th className="py-3 px-4">{t("laporan.tableGrossProfitShort", "Laba Kotor")}</th>
+                  <th className="py-3 px-4">Cabang</th>
+                  <th className="py-3 px-4">Penginput</th>
                   <th className="py-3 px-4">{t("laporan.tableNotes", "Catatan")}</th>
                 </tr>
               </thead>
@@ -369,6 +403,8 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
                       <td className="py-3.5 px-4 font-mono font-bold text-zinc-500 dark:text-zinc-400 text-xs">{p.date}</td>
                       <td className="py-3.5 px-4 font-bold text-zinc-800 dark:text-zinc-200">{weekday}</td>
                       <td className="py-3.5 px-4 font-mono font-black text-zinc-950 dark:text-zinc-50">{formatRupiah(p.profit)}</td>
+                      <td className="py-3.5 px-4 text-xs font-semibold text-zinc-700 dark:text-zinc-300">{p.branchName || "-"}</td>
+                      <td className="py-3.5 px-4 text-xs font-semibold text-zinc-500 dark:text-zinc-400">{p.inputterName || "-"}</td>
                       <td className="py-3.5 px-4 text-xs text-zinc-500 dark:text-zinc-400 max-w-xs truncate italic font-medium">
                         {p.notes ? `"${p.notes}"` : "-"}
                       </td>

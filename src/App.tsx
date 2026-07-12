@@ -26,6 +26,15 @@ function MainApp() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
 
+  // Staff Mode Session State
+  const [staffSession, setStaffSession] = useState<{ restaurantId: string; ownerId: string; role: "staff" } | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("taskwai_staff_session");
+      return saved ? JSON.parse(saved) : null;
+    }
+    return null;
+  });
+
   // Dark Mode state with persistence in localStorage
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
@@ -64,13 +73,13 @@ function MainApp() {
     return () => unsubscribe();
   }, []);
 
-  // 2. Fetch data based on User Session (Real Firebase vs Demo)
+  // 2. Fetch data based on User Session (Real Firebase vs Demo vs Staff)
   useEffect(() => {
     if (!authInitialized) return;
 
     const fetchData = async () => {
       setLoading(true);
-      const userId = user ? user.uid : "demo";
+      const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
 
       try {
         // Fetch restaurant config
@@ -97,7 +106,12 @@ function MainApp() {
     };
 
     fetchData();
-  }, [user, authInitialized]);
+
+    // If staff session is active, lock tab to "input"
+    if (staffSession) {
+      setActiveTab("input");
+    }
+  }, [user, authInitialized, staffSession]);
 
   // 3. Handlers for database updates (with automatic instant state update, NO reload)
   const handleSaveProfit = async (
@@ -107,10 +121,12 @@ function MainApp() {
     omzet?: number,
     hppType?: "nominal" | "percentage",
     hppVal?: number,
-    otherExpenses?: number
+    otherExpenses?: number,
+    branchName?: string,
+    inputterName?: string
   ) => {
     if (!restaurant) return;
-    const userId = user ? user.uid : "demo";
+    const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
 
     try {
       const newEntry = await DataService.addDailyProfit(userId, restaurant.id, { 
@@ -120,7 +136,9 @@ function MainApp() {
         omzet,
         hppType,
         hppVal,
-        otherExpenses
+        otherExpenses,
+        branchName,
+        inputterName
       });
       
       // Update profits list state instantly without page reload
@@ -128,6 +146,32 @@ function MainApp() {
         const filtered = prev.filter((p) => p.date !== date);
         return [newEntry, ...filtered].sort((a, b) => b.date.localeCompare(a.date));
       });
+
+      // Instantly update the restaurant branches cache locally
+      if (branchName && branchName.trim()) {
+        const cleaned = branchName.trim();
+        setRestaurant(prev => {
+          if (!prev) return null;
+          const current = prev.branches || [];
+          if (!current.includes(cleaned)) {
+            return { ...prev, branches: [...current, cleaned] };
+          }
+          return prev;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const handleSaveStaffCredentials = async (username: string, password: string) => {
+    if (!restaurant) return;
+    const userId = user ? user.uid : "demo";
+    try {
+      await DataService.saveStaffCredentials(userId, restaurant.id, username, password);
+      // Update local state
+      setRestaurant(prev => prev ? { ...prev, staffUsername: username, staffPassword: password } : null);
     } catch (err) {
       console.error(err);
       throw err;
@@ -193,6 +237,8 @@ function MainApp() {
             profits={profits}
             onSaveProfit={handleSaveProfit}
             onDeleteProfit={handleDeleteProfit}
+            isStaffMode={!!staffSession}
+            restaurant={restaurant}
           />
         );
       case "biaya":
@@ -209,6 +255,7 @@ function MainApp() {
           <Target
             restaurant={restaurant}
             onSaveRestaurant={handleSaveRestaurant}
+            onSaveStaffCredentials={handleSaveStaffCredentials}
             userEmail={user ? user.email : null}
           />
         );
@@ -235,6 +282,8 @@ function MainApp() {
         isDark={isDark}
         toggleDark={toggleDark}
         authInitialized={authInitialized}
+        staffSession={staffSession}
+        setStaffSession={setStaffSession}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">

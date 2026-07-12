@@ -12,6 +12,10 @@ export interface Restaurant {
   name: string;
   monthlyTargetProfit: number;
   createdAt: string;
+  staffUsername?: string;
+  staffPassword?: string;
+  staffHash?: string;
+  branches?: string[];
 }
 
 export interface DailyProfit {
@@ -25,6 +29,8 @@ export interface DailyProfit {
   hppType?: "nominal" | "percentage";
   hppVal?: number;
   otherExpenses?: number;
+  branchName?: string;
+  inputterName?: string;
 }
 
 export interface Expenses {
