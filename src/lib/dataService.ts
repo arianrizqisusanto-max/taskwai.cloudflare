@@ -562,5 +562,23 @@ export const DataService = {
     });
 
     return { restaurantId, ownerId };
+  },
+
+  async ensureStaffSession(anonymousUid: string, restaurantId: string, ownerId: string): Promise<void> {
+    if (!anonymousUid || anonymousUid === "demo") return;
+    try {
+      const sessionRef = doc(db, "staff_sessions", anonymousUid);
+      const sessionSnap = await getDoc(sessionRef);
+      if (!sessionSnap.exists()) {
+        console.log("Restoring missing staff session doc in Firestore for UID:", anonymousUid);
+        await setDoc(sessionRef, {
+          restaurantId,
+          ownerId,
+          createdAt: new Date().toISOString()
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to check/restore staff session in Firestore:", e);
+    }
   }
 };

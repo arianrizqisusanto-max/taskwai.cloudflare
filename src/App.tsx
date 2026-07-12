@@ -88,6 +88,11 @@ function MainApp() {
       const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
 
       try {
+        // If staff session is active locally but the Firestore session document is missing, restore it.
+        if (staffSession && user && user.isAnonymous) {
+          await DataService.ensureStaffSession(user.uid, staffSession.restaurantId, staffSession.ownerId);
+        }
+
         // Fetch restaurant config
         const restData = await DataService.getRestaurant(userId);
         setRestaurant(restData);

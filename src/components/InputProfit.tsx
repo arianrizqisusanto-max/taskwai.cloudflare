@@ -187,9 +187,10 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
       setHppNominalInput("");
       setOtherExpensesInput("");
       setNotes("");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      showToast(t("profit.saveError", "Gagal menyimpan profit harian."), "error");
+      const errMsg = err?.message || err?.toString() || "";
+      showToast(`${t("profit.saveError", "Gagal menyimpan profit harian.")} (${errMsg})`, "error");
     } finally {
       setIsSaving(false);
     }
