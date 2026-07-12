@@ -397,7 +397,7 @@ export default function Navbar({
                   <Users className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-zinc-900 dark:text-zinc-50">{t("about.feat2.title", "Input Harian lewat Staff")}</span>
-                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat2.desc", "Staff di toko bisa input omzet harian menggunakan kode khusus tanpa melihat dashboard utama.")}</span>
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat2.desc", "Staff di toko bisa login & input omzet harian langsung dari cabang tanpa melihat dashboard utama.")}</span>
                   </div>
                 </div>
 
