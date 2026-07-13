@@ -566,5 +566,58 @@ export const DataService = {
     } catch (e) {
       console.warn("Failed to check/restore staff session in Firestore:", e);
     }
+  },
+
+  async resetAllData(userId: string, restaurantId: string): Promise<void> {
+    if (!userId || userId === "demo") {
+      localStorage.removeItem("taskwai_restaurant");
+      localStorage.removeItem("taskwai_daily_profits");
+      localStorage.removeItem("taskwai_expenses");
+      localStorage.removeItem("taskwai_staff_local_history");
+      localStorage.removeItem("taskwai_last_branch");
+      localStorage.removeItem("taskwai_last_inputter");
+      localStorage.removeItem(`taskwai_restaurant_${userId}`);
+      localStorage.removeItem(`taskwai_daily_profits_${userId}`);
+      localStorage.removeItem(`taskwai_expenses_${userId}`);
+      return;
+    }
+
+    try {
+      const q = query(
+        collection(db, "daily_profit"),
+        where("restaurantId", "==", restaurantId)
+      );
+      const querySnapshot = await getDocs(q);
+      const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+
+      const expDocRef = doc(db, "expenses", `exp_${userId}`);
+      await setDoc(expDocRef, {
+        restaurantId,
+        sewaTempat: 0,
+        gajiKaryawan: 0,
+        royaltiFranchise: 0,
+        listrik: 0,
+        air: 0,
+        internet: 0,
+        marketing: 0,
+        pajak: 0,
+        biayaLain: 0,
+        updatedAt: new Date().toISOString()
+      });
+
+      const restDocRef = doc(db, "restaurants", restaurantId);
+      await updateDoc(restDocRef, {
+        name: "Nama Usaha Baru",
+        monthlyTargetProfit: 0,
+        staffUsername: "",
+        staffPassword: "",
+        staffHash: "",
+        branches: []
+      });
+    } catch (error) {
+      console.error("Error resetting all data in Firestore:", error);
+      throw error;
+    }
   }
 };

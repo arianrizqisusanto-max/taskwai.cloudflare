@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Restaurant } from "../types";
 import { formatRupiah } from "../lib/utils";
-import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X, Lock } from "lucide-react";
+import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X, Lock, Trash2, AlertTriangle } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
 
@@ -11,9 +12,10 @@ interface TargetProps {
   onSaveStaffCredentials: (username: string, password: string) => Promise<void>;
   onToggleStaffActive: (active: boolean) => Promise<void>;
   userEmail: string | null;
+  onResetAll: () => Promise<void>;
 }
 
-export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCredentials, onToggleStaffActive, userEmail }: TargetProps) {
+export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCredentials, onToggleStaffActive, userEmail, onResetAll }: TargetProps) {
   const { showToast } = useToast();
   const { lang, setLang, t, currency, setCurrency, currencySymbol } = useTranslation();
   const [name, setName] = useState(restaurant.name);
@@ -24,6 +26,10 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   const [targetInput, setTargetInput] = useState(new Intl.NumberFormat(formatLocale).format(restaurant.monthlyTargetProfit));
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Reset confirmation states
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Staff Credentials states
   const [staffUsername, setStaffUsername] = useState(restaurant.staffUsername || "");
@@ -531,6 +537,85 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           {t("target.formulaText", "\"Bisnis yang sukses dibangun dari kejelasan target harian. Dengan mengeset target bulanan, Taskwai memandu Anda merealisasikannya langkah demi langkah setiap hari.\"")}
         </p>
       </div>
+
+      {/* Danger Zone: Reset All Data */}
+      <div className="bg-red-50/50 dark:bg-rose-950/10 border border-red-200/65 dark:border-rose-900/30 rounded-2xl p-6 shadow-[0_1px_3px_rgba(239,68,68,0.02)]">
+        <div className="flex items-center gap-2 mb-3">
+          <Trash2 className="w-5 h-5 text-red-600 dark:text-rose-400 animate-pulse" />
+          <h3 className="text-sm font-black uppercase tracking-wider text-red-800 dark:text-rose-400">{t("target.dangerZone", "Danger Zone")}</h3>
+        </div>
+        <p className="text-xs text-zinc-550 dark:text-zinc-400 mb-5 leading-relaxed font-semibold">
+          {t("target.resetWarning", "Mereset semua data akan menghapus profil usaha, target bulanan, rincian biaya operasional tetap, dan seluruh riwayat pencatatan profit secara permanen. Anda akan mulai dari nol lagi.")}
+        </p>
+        <button
+          type="button"
+          onClick={() => setShowResetConfirm(true)}
+          className="w-full flex items-center justify-center gap-2 bg-red-650 hover:bg-red-750 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0"
+        >
+          <Trash2 className="w-4 h-4" />
+          <span>{t("target.resetButton", "Reset Semua Data")}</span>
+        </button>
+      </div>
+
+      {/* Reset Confirmation Modal */}
+      <AnimatePresence>
+        {showResetConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div 
+              className="absolute inset-0 bg-zinc-950/70 backdrop-blur-md transition-opacity duration-300"
+              onClick={() => setShowResetConfirm(false)}
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.15 }}
+              className="relative w-full max-w-sm rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="p-3.5 rounded-full bg-red-50 dark:bg-rose-950/20 border border-red-100 dark:border-rose-900/35 text-red-600 dark:text-rose-450 mb-4 animate-bounce">
+                  <AlertTriangle className="w-6 h-6 stroke-[2.25]" />
+                </div>
+                
+                <h3 className="text-base font-black text-zinc-950 dark:text-zinc-50 tracking-tight">
+                  {t("target.resetConfirmTitle", "Konfirmasi Reset Total")}
+                </h3>
+                
+                <p className="text-xs text-zinc-550 dark:text-zinc-400 mt-2 leading-relaxed font-semibold">
+                  {t("target.resetConfirmDesc", "Apakah Anda benar-benar yakin ingin menghapus seluruh data usaha ini? Semua riwayat profit dan pengaturan akan hilang selamanya.")}
+                </p>
+                
+                <div className="flex gap-2.5 w-full mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setShowResetConfirm(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/65 font-bold text-xs transition-colors cursor-pointer bg-transparent"
+                  >
+                    {t("nav.cancel", "Batal")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setShowResetConfirm(false);
+                      setIsResetting(true);
+                      try {
+                        await onResetAll();
+                      } catch (e) {
+                        setIsResetting(false);
+                      }
+                    }}
+                    disabled={isResetting}
+                    className="flex-1 py-2.5 rounded-xl bg-red-650 hover:bg-red-750 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm shadow-red-600/10 disabled:opacity-50"
+                  >
+                    {isResetting ? "Mereset..." : t("target.resetConfirmButton", "Ya, Reset Total")}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

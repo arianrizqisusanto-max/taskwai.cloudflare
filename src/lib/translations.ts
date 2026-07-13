@@ -189,6 +189,14 @@ export const enTranslations: Record<string, string> = {
   "target.error": "Failed to update settings.",
   "target.edit": "Edit Settings",
   "target.saveShort": "Save",
+  "target.dangerZone": "Danger Zone",
+  "target.resetWarning": "Resetting all data will permanently delete your business profile, monthly target, fixed monthly operating costs details, and entire daily profit history logs. You will start from scratch.",
+  "target.resetButton": "Reset All Data",
+  "target.resetConfirmTitle": "Confirm Total Reset",
+  "target.resetConfirmDesc": "Are you sure you want to delete all business data? All profit history and configuration settings will be lost forever.",
+  "target.resetConfirmButton": "Yes, Reset Total",
+  "target.resetSuccess": "All data has been successfully reset. Starting your business from scratch!",
+  "target.resetError": "Failed to reset data.",
 
   // --- About Modal ---
   "about.title": "About Taskwai",

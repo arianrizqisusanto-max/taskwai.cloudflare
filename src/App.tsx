@@ -268,6 +268,22 @@ function MainApp() {
     }
   };
 
+  const handleResetAll = async () => {
+    if (!restaurant) return;
+    const userId = user ? user.uid : "demo";
+    try {
+      await DataService.resetAllData(userId, restaurant.id);
+      showToast(t("target.resetSuccess", "Semua data berhasil direset. Mulai usaha dari nol lagi!"), "success");
+      // Delay slightly for toast visibility, then reload to restore clean guest/fresh setup
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (err) {
+      console.error(err);
+      showToast(t("target.resetError", "Gagal mereset data."), "error");
+    }
+  };
+
   // Render correct tab view dynamically
   const renderView = () => {
     if (!authInitialized || loading || !restaurant || !expenses) {
@@ -310,6 +326,7 @@ function MainApp() {
             onSaveStaffCredentials={handleSaveStaffCredentials}
             onToggleStaffActive={handleToggleStaffActive}
             userEmail={user ? user.email : null}
+            onResetAll={handleResetAll}
           />
         );
       default:
