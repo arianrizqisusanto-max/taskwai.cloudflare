@@ -357,9 +357,7 @@ export default function Navbar({
             <div className="flex flex-col">
               {/* Header with gradient badge and icon */}
               <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-lg shadow-emerald-500/20">
-                  <TaskwaiLogo size={40} className="filter invert brightness-0 dark:brightness-100 dark:invert-0" />
-                </div>
+                <TaskwaiLogo size={48} />
                 <div>
                   <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                     taskwai
