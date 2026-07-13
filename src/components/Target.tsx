@@ -550,7 +550,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
         <button
           type="button"
           onClick={() => setShowResetConfirm(true)}
-          className="w-full flex items-center justify-center gap-2 bg-red-650 hover:bg-red-750 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0"
+          className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0"
         >
           <Trash2 className="w-4 h-4" />
           <span>{t("target.resetButton", "Reset Semua Data")}</span>
@@ -606,7 +606,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                       }
                     }}
                     disabled={isResetting}
-                    className="flex-1 py-2.5 rounded-xl bg-red-650 hover:bg-red-750 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm shadow-red-600/10 disabled:opacity-50"
+                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm shadow-red-600/10 disabled:opacity-50"
                   >
                     {isResetting ? "Mereset..." : t("target.resetConfirmButton", "Ya, Reset Total")}
                   </button>

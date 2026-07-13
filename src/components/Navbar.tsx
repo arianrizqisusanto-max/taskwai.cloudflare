@@ -218,7 +218,7 @@ export default function Navbar({
                 </div>
                 <button
                   onClick={handleLogoutClick}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900/40 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900/40 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span className="hidden xs:inline">{t("nav.logout", "Keluar")}</span>
