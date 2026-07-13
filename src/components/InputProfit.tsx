@@ -209,15 +209,28 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
     setter(formatted);
   };
 
-  const handleDelete = async (id: string, logDate: string) => {
-    if (confirm(t("profit.deleteConfirm", "Apakah Anda yakin ingin menghapus data profit tanggal {date}?").replace("{date}", formatIndoDate(logDate, lang)))) {
-      try {
-        await onDeleteProfit(id);
-        showToast(t("profit.deleteSuccess", "Data profit berhasil dihapus."), "info");
-      } catch (err) {
-        console.error(err);
-        showToast(t("profit.deleteError", "Gagal menghapus data profit."), "error");
-      }
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteTargetDate, setDeleteTargetDate] = useState<string | null>(null);
+
+  const handleDelete = (id: string, logDate: string) => {
+    setDeleteTargetId(id);
+    setDeleteTargetDate(logDate);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) return;
+    try {
+      await onDeleteProfit(deleteTargetId);
+      showToast(t("profit.deleteSuccess", "Data profit berhasil dihapus."), "info");
+    } catch (err) {
+      console.error(err);
+      showToast(t("profit.deleteError", "Gagal menghapus data profit."), "error");
+    } finally {
+      setShowDeleteConfirm(false);
+      setDeleteTargetId(null);
+      setDeleteTargetDate(null);
     }
   };
 
@@ -807,6 +820,62 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                 >
                   Kirim Data
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div 
+              className="absolute inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity duration-300"
+              onClick={() => setShowDeleteConfirm(false)}
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.15 }}
+              className="relative w-full max-w-sm rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80"
+            >
+              <div className="flex flex-col items-center text-center">
+                {/* Warning Icon with soft red background */}
+                <div className="p-3.5 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/35 text-rose-600 dark:text-rose-450 mb-4 animate-bounce">
+                  <Trash2 className="w-6 h-6 stroke-[2.25]" />
+                </div>
+                
+                <h3 className="text-base font-black text-zinc-950 dark:text-zinc-50 tracking-tight">
+                  {t("profit.deleteTitle", "Hapus Riwayat Profit")}
+                </h3>
+                
+                <p className="text-xs text-zinc-550 dark:text-zinc-400 mt-2 leading-relaxed font-semibold">
+                  {t("profit.deleteConfirmCustom", "Apakah Anda benar-benar yakin ingin menghapus data profit tanggal {date}?").replace("{date}", deleteTargetDate ? formatIndoDate(deleteTargetDate, lang) : "")}
+                </p>
+                
+                <p className="text-[10px] text-rose-500/90 dark:text-rose-450/90 font-bold mt-2.5 leading-normal">
+                  ⚠️ Tindakan ini permanen dan tidak dapat dibatalkan.
+                </p>
+                
+                <div className="flex gap-2.5 w-full mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/65 font-bold text-xs transition-colors cursor-pointer bg-transparent"
+                  >
+                    {t("nav.cancel", "Batal")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmDelete}
+                    className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm shadow-rose-600/10"
+                  >
+                    {t("profit.deleteButton", "Hapus Data")}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>

@@ -104,6 +104,9 @@ export const enTranslations: Record<string, string> = {
   "profit.deleteConfirm": "Are you sure you want to delete profit data for {date}?",
   "profit.deleteSuccess": "Profit data successfully deleted.",
   "profit.deleteError": "Failed to delete profit data.",
+  "profit.deleteTitle": "Delete Profit History",
+  "profit.deleteConfirmCustom": "Are you sure you want to delete the profit data for {date}?",
+  "profit.deleteButton": "Delete Data",
 
   // --- Biaya Operasional (Biaya) ---
   "biaya.title": "Set Fixed Monthly Operating Costs",
