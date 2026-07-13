@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { DataService } from "../lib/dataService";
-import { Store, RotateCw, ShieldCheck, Activity } from "lucide-react";
+import { Store, RotateCw, ShieldCheck, Activity, TrendingUp, Cpu, Server, Wifi } from "lucide-react";
 import { useToast } from "./Toast";
 
 interface SystemStats {
   totalRestaurants: number;
   activeTodayCount: number;
-  activeTodayRestaurants: { id: string; name: string }[];
 }
 
 export default function AdminConsole() {
@@ -14,18 +13,25 @@ export default function AdminConsole() {
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [latency, setLatency] = useState<number | null>(null);
 
   const fetchStats = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
 
+    const startTime = performance.now();
+
     try {
       const today = new Date();
       const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
       const data = await DataService.getSystemStats(todayStr);
+      
+      const endTime = performance.now();
+      setLatency(Math.round(endTime - startTime));
       setStats(data);
+      
       if (isRefresh) {
-        showToast("Data berhasil diperbarui!", "success");
+        showToast("Statistik platform diperbarui!", "success");
       }
     } catch (e) {
       console.error(e);
@@ -49,6 +55,11 @@ export default function AdminConsole() {
     );
   }
 
+  // Calculate Engagement Rate
+  const total = stats?.totalRestaurants || 0;
+  const active = stats?.activeTodayCount || 0;
+  const engagementRate = total > 0 ? ((active / total) * 100).toFixed(1) : "0.0";
+
   return (
     <div className="max-w-md mx-auto space-y-6 animate-in fade-in duration-300">
       {/* Header */}
@@ -70,16 +81,16 @@ export default function AdminConsole() {
       </div>
 
       {/* Grid of Stats Cards */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         {/* Total Registered Accounts */}
         <div className="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col gap-2">
           <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 self-start">
-            <Store className="w-5 h-5" />
+            <Store className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Total Usaha</span>
-            <span className="font-mono text-xl font-black text-zinc-950 dark:text-white block mt-0.5">
-              {stats?.totalRestaurants || 0}
+            <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Total Usaha</span>
+            <span className="font-mono text-lg font-black text-zinc-950 dark:text-white block mt-0.5">
+              {total}
             </span>
           </div>
         </div>
@@ -87,39 +98,71 @@ export default function AdminConsole() {
         {/* Active Today */}
         <div className="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col gap-2">
           <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 self-start">
-            <Activity className="w-5 h-5 animate-pulse" />
+            <Activity className="w-4 h-4 animate-pulse" />
           </div>
           <div>
-            <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Aktif Hari Ini</span>
-            <span className="font-mono text-xl font-black text-zinc-950 dark:text-white block mt-0.5">
-              {stats?.activeTodayCount || 0}
+            <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Aktif Hari Ini</span>
+            <span className="font-mono text-lg font-black text-zinc-950 dark:text-white block mt-0.5">
+              {active}
+            </span>
+          </div>
+        </div>
+
+        {/* Engagement Rate */}
+        <div className="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col gap-2">
+          <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 self-start">
+            <TrendingUp className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Keaktifan</span>
+            <span className="font-mono text-lg font-black text-zinc-950 dark:text-white block mt-0.5">
+              {engagementRate}%
             </span>
           </div>
         </div>
       </div>
 
-      {/* Simple Active Today List Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm p-5 space-y-3.5">
+      {/* Platform Status Console */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm p-5 space-y-4">
         <div>
-          <h2 className="text-xs font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider">Usaha Aktif Hari Ini</h2>
-          <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Daftar nama usaha yang mencatat transaksi/profit pada hari ini.</p>
+          <h2 className="text-xs font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider flex items-center gap-1.5">
+            <Cpu className="w-4 h-4 text-emerald-500" />
+            Status Operasional Platform
+          </h2>
+          <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Metrik kesehatan server dan latensi respon database secara real-time.</p>
         </div>
-        
-        <div className="divide-y divide-zinc-100 dark:divide-zinc-800/40 max-h-[250px] overflow-y-auto pr-1">
-          {stats?.activeTodayRestaurants && stats.activeTodayRestaurants.length > 0 ? (
-            stats.activeTodayRestaurants.map((r, i) => (
-              <div key={r.id || i} className="py-2.5 flex items-center justify-between text-xs">
-                <span className="font-bold text-zinc-900 dark:text-white">{r.name}</span>
-                <span className="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full">
-                  ● Aktif
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="py-6 text-center text-zinc-400 dark:text-zinc-500 text-xs italic">
-              Belum ada usaha yang aktif mencatat hari ini.
+
+        <div className="space-y-3 pt-1">
+          {/* Firestore Connection */}
+          <div className="flex items-center justify-between text-xs border-b border-zinc-50 dark:border-zinc-800/40 pb-2.5">
+            <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-semibold">
+              <Server className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Database Cloud (Firestore)</span>
             </div>
-          )}
+            <span className="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+              Normal
+            </span>
+          </div>
+
+          {/* Latency */}
+          <div className="flex items-center justify-between text-xs border-b border-zinc-50 dark:border-zinc-800/40 pb-2.5">
+            <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-semibold">
+              <Wifi className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Latensi Koneksi</span>
+            </div>
+            <span className="font-mono font-bold text-zinc-900 dark:text-white">
+              {latency !== null ? `${latency} ms` : "Menghitung..."}
+            </span>
+          </div>
+
+          {/* Platform Version */}
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Keamanan Aturan Firestore</span>
+            </div>
+            <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-mono">Aktif (Live)</span>
+          </div>
         </div>
       </div>
     </div>

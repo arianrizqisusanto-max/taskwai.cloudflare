@@ -624,11 +624,10 @@ export const DataService = {
   async getSystemStats(todayStr: string): Promise<{
     totalRestaurants: number;
     activeTodayCount: number;
-    activeTodayRestaurants: { id: string; name: string }[];
   }> {
     try {
       const restSnap = await getDocs(collection(db, "restaurants"));
-      const restaurants = restSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+      const totalRestaurants = restSnap.size;
 
       const profitSnap = await getDocs(query(
         collection(db, "daily_profit"),
@@ -636,15 +635,11 @@ export const DataService = {
       ));
       
       const activeRestIds = Array.from(new Set(profitSnap.docs.map(doc => doc.data().restaurantId)));
-
-      const activeTodayRestaurants = restaurants
-        .filter(r => activeRestIds.includes(r.id))
-        .map(r => ({ id: r.id, name: r.name }));
+      const activeTodayCount = activeRestIds.length;
 
       return {
-        totalRestaurants: restaurants.length,
-        activeTodayCount: activeTodayRestaurants.length,
-        activeTodayRestaurants
+        totalRestaurants,
+        activeTodayCount
       };
     } catch (e) {
       console.error("Error getting system stats:", e);
@@ -654,8 +649,7 @@ export const DataService = {
 
       return {
         totalRestaurants: localRest ? 1 : 0,
-        activeTodayCount: (localRest && hasToday) ? 1 : 0,
-        activeTodayRestaurants: (localRest && hasToday) ? [{ id: localRest.id, name: localRest.name }] : []
+        activeTodayCount: (localRest && hasToday) ? 1 : 0
       };
     }
   }
