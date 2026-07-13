@@ -110,11 +110,7 @@ export default function Navbar({
     }
   };
 
-  const isAdmin = user && (
-    user.email === "arian.susanto@shopee.com" || 
-    user.email === "arianrizqisusanto@gmail.com" || 
-    user.email?.endsWith("@taskwai.com")
-  );
+  const isAdmin = user && user.email === "arianrisqi@gmail.com";
 
   const menuItems = staffSession
     ? [{ id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign }]
