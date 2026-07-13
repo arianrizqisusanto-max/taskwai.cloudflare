@@ -238,7 +238,6 @@ export default function Navbar({
                         showToast(`${user.email} (${t("nav.copied", "Tersalin")})`, "success");
                       }
                     }}
-                    title={user.email || ""}
                     className="relative group cursor-pointer"
                   >
                     <img
