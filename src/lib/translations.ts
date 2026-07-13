@@ -15,6 +15,13 @@ export const enTranslations: Record<string, string> = {
   "nav.confirm": "Yes, Logout",
   "nav.profitDashboard": "Profit Dashboard",
 
+  "dashboard.statusActive": "Active",
+  "dashboard.messageNoTarget": "Restaurant is active. You have not set a monthly profit target.",
+  "dashboard.setTargetTipTitle": "Want to track monthly target progress?",
+  "dashboard.setTargetTipDesc": "Set your monthly net profit target in the Settings menu to enable the progress bar and target analysis.",
+  "dashboard.noTargetDailyDesc": "Daily target is not set.",
+  "dashboard.targetNotSet": "Not Set",
+  "dashboard.targetNotSetDesc": "Set in Settings menu",
   // --- Dashboard ---
   "dashboard.hello": "Hello",
   "dashboard.welcome": "Welcome back to your financial dashboard.",
@@ -173,7 +180,7 @@ export const enTranslations: Record<string, string> = {
   "target.title": "Profile & Target Settings",
   "target.subtitle": "Configure your business name and monthly net profit target.",
   "target.restaurantName": "Your Business Name",
-  "target.monthlyTarget": "Monthly Net Profit Target",
+  "target.monthlyTarget": "Monthly Net Profit Target (Optional)",
   "target.targetHelp": "This number will be the main reference for progress bars and daily targets.",
   "target.accountConnection": "Account Connection",
   "target.connectedAs": "Connected as {email}. Data is securely synced to Firestore cloud database.",

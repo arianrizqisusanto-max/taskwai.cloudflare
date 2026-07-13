@@ -109,7 +109,15 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
     }
   };
 
-  const currentStatus = statusConfigs[businessStatus];
+  const hasTarget = targetProfit > 0;
+  const currentStatus = !hasTarget ? {
+    label: t("dashboard.statusActive", "Aktif"),
+    bgClass: "bg-zinc-50/50 dark:bg-zinc-950/10 border-zinc-200/60 dark:border-zinc-800/30 text-zinc-900 dark:text-zinc-100 shadow-[0_1px_3px_rgba(0,0,0,0.01)]",
+    indicatorClass: "bg-zinc-400",
+    textClass: "text-zinc-500 dark:text-zinc-400",
+    icon: <CheckCircle className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />,
+    message: t("dashboard.messageNoTarget", "Restoran aktif. Anda belum menetapkan target laba bulanan.")
+  } : statusConfigs[businessStatus];
 
   // 4. Data for Chart (Daily logs grouped by date and sorted ascending)
   const groupedByDate = currentMonthProfits.reduce((acc, curr) => {
@@ -225,14 +233,20 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
             </span>
           </div>
           <div className="mt-4">
-            <span className="font-mono text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white block">
-              {formatRupiah(targetProfit)}
+            <span className={`tracking-tight block ${hasTarget ? "font-mono text-3xl font-extrabold text-zinc-950 dark:text-white" : "text-xl font-bold text-zinc-400 dark:text-zinc-500"}`}>
+              {hasTarget ? formatRupiah(targetProfit) : t("dashboard.targetNotSet", "Belum Diatur")}
             </span>
-            <div className="flex justify-between items-center mt-2 text-xs text-zinc-400 dark:text-zinc-500">
-              <span>{t("dashboard.remaining", "Sisa: ")}</span>
-              <span className="font-semibold text-zinc-700 dark:text-zinc-300 font-mono">
-                {formatRupiah(remainingTarget)}
-              </span>
+            <div className="flex justify-between items-center mt-2 text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+              {hasTarget ? (
+                <>
+                  <span>{t("dashboard.remaining", "Sisa: ")}</span>
+                  <span className="font-semibold text-zinc-700 dark:text-zinc-300 font-mono">
+                    {formatRupiah(remainingTarget)}
+                  </span>
+                </>
+              ) : (
+                <span>{t("dashboard.targetNotSetDesc", "Atur di menu Settings")}</span>
+              )}
             </div>
           </div>
         </motion.div>
@@ -266,54 +280,68 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         </motion.div>
       </div>
 
-      {/* 3. Progress Target Profit Card */}
-      <motion.div 
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="p-4 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]"
-      >
-        <div className="flex justify-between items-center mb-2.5">
-          <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">{t("dashboard.targetMet", "Progress Pencapaian Target")}</span>
-          <span className={`font-mono text-xs font-black px-2.5 py-0.5 rounded-full ${
-            businessStatus === "green" 
-              ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400" 
-              : businessStatus === "yellow"
-              ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400"
-              : "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400"
-          }`}>
-            {progressPercent}%
-          </span>
-        </div>
-        
-        {/* Sleek Progress Bar Track */}
-        <div className="w-full bg-zinc-100 dark:bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-200/30 dark:border-zinc-800/50">
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`h-full rounded-full ${
+            {/* 3. Progress Target Profit Card */}
+      {hasTarget ? (
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="p-4 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]"
+        >
+          <div className="flex justify-between items-center mb-2.5">
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">{t("dashboard.targetMet", "Progress Pencapaian Target")}</span>
+            <span className={`font-mono text-xs font-black px-2.5 py-0.5 rounded-full ${
               businessStatus === "green" 
-                ? "bg-gradient-to-r from-emerald-500 to-teal-400" 
+                ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400" 
                 : businessStatus === "yellow"
-                ? "bg-gradient-to-r from-amber-500 to-orange-400"
-                : "bg-gradient-to-r from-rose-500 to-red-400"
-            }`}
-          />
-        </div>
+                ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400"
+                : "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-450"
+            }`}>
+              {progressPercent}%
+            </span>
+          </div>
+          
+          {/* Sleek Progress Bar Track */}
+          <div className="w-full bg-zinc-100 dark:bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-200/30 dark:border-zinc-800/50">
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className={`h-full rounded-full ${
+                businessStatus === "green" 
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-400" 
+                  : businessStatus === "yellow"
+                  ? "bg-gradient-to-r from-amber-500 to-orange-400"
+                  : "bg-gradient-to-r from-rose-500 to-red-400"
+              }`}
+            />
+          </div>
 
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center mt-2.5 text-[11px] text-zinc-500 dark:text-zinc-400 gap-1">
-          <p className="font-medium">
-            {t("dashboard.targetProgressText", "Tercapai {actual} dari target {target}").replace("{actual}", formatRupiah(totalProfitMonth)).replace("{target}", formatRupiah(targetProfit))}
-          </p>
-          <p className="font-semibold text-zinc-400 dark:text-zinc-500">
-            {remainingTarget > 0 
-              ? t("dashboard.remainingTargetText", "{diff} lagi untuk mencapai target.").replace("{diff}", formatRupiah(remainingTarget)) 
-              : t("dashboard.targetAchieved", "Selamat! Target profit bulan ini telah tercapai! 🎉")
-            }
-          </p>
-        </div>
-      </motion.div>
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center mt-2.5 text-[11px] text-zinc-500 dark:text-zinc-400 gap-1">
+            <p className="font-medium">
+              {t("dashboard.targetProgressText", "Tercapai {actual} dari target {target}").replace("{actual}", formatRupiah(totalProfitMonth)).replace("{target}", formatRupiah(targetProfit))}
+            </p>
+            <p className="font-semibold text-zinc-400 dark:text-zinc-500">
+              {remainingTarget > 0 
+                ? t("dashboard.remainingTargetText", "{diff} lagi untuk mencapai target.").replace("{diff}", formatRupiah(remainingTarget)) 
+                : t("dashboard.targetAchieved", "Selamat! Target profit bulan ini telah tercapai! 🎉")
+              }
+            </p>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="p-4 sm:p-5 bg-zinc-50/50 dark:bg-zinc-950/15 rounded-2xl border border-dashed border-zinc-200/60 dark:border-zinc-800/50 flex items-center justify-between gap-4"
+        >
+          <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 leading-normal">
+            🎯 <strong>{t("dashboard.setTargetTipTitle", "Ingin memantau target pencapaian bulanan?")}</strong><br />
+            {t("dashboard.setTargetTipDesc", "Tentukan target laba bersih bulanan Anda di menu Settings untuk memantau progress bar dan status pencapaian.")}
+          </div>
+        </motion.div>
+      )}
 
       {/* 4. Analisis Detail: Sisa Hari, Target Besok, Prediksi */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -332,11 +360,14 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
           <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.targetDaily", "Minimal Profit Harian Mulai Besok")}</span>
           <div className="my-4">
-            <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
-              {formatRupiah(targetDailyProfitTomorrow)}
+            <span className={`font-mono block tracking-tight ${hasTarget ? "text-4xl font-black text-zinc-950 dark:text-white" : "text-xl font-bold text-zinc-400 dark:text-zinc-500"}`}>
+              {hasTarget ? formatRupiah(targetDailyProfitTomorrow) : t("dashboard.targetNotSet", "Belum Diatur")}
             </span>
             <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed font-medium">
-              {t("dashboard.targetDailyDesc", "Harus tercapai setiap hari agar target bulanan aman.")}
+              {hasTarget 
+                ? t("dashboard.targetDailyDesc", "Harus tercapai setiap hari agar target bulanan aman.")
+                : t("dashboard.noTargetDailyDesc", "Target harian belum ditentukan.")
+              }
             </span>
           </div>
         </div>
@@ -442,28 +473,33 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
               {/* Insight 1: Progress check */}
               <div className="flex items-start gap-3">
                 <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
-                  {businessStatus === "green" ? "✅" : "⚠️"}
+                  {hasTarget ? (businessStatus === "green" ? "✅" : "⚠️") : "💡"}
                 </div>
                 <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
-                  {businessStatus === "green" 
-                    ? t("dashboard.insightStatusSafe", "Target profit bulanan Anda dalam status aman dan sangat mungkin tercapai.") 
-                    : t("dashboard.insightStatusCaution", "Laju profit saat ini kurang optimal untuk mencapai target bulanan {target}.").replace("{target}", formatRupiah(targetProfit))
-                  }
+                  {hasTarget ? (
+                    businessStatus === "green" 
+                      ? t("dashboard.insightStatusSafe", "Target profit bulanan Anda dalam status aman dan sangat mungkin tercapai.") 
+                      : t("dashboard.insightStatusCaution", "Laju profit saat ini kurang optimal untuk mencapai target bulanan {target}.").replace("{target}", formatRupiah(targetProfit))
+                  ) : (
+                    t("dashboard.insightNoTarget", "Anda belum menetapkan target laba bulanan. Set target di Settings jika ingin memantau sisa pencapaian usaha.")
+                  )}
                 </div>
               </div>
 
               {/* Insight 2: Action step */}
-              <div className="flex items-start gap-3">
-                <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
-                  🎯
+              {hasTarget && (
+                <div className="flex items-start gap-3">
+                  <div className="p-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 mt-0.5 shrink-0">
+                    🎯
+                  </div>
+                  <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
+                    {remainingTarget > 0 
+                      ? t("dashboard.insightTargetDailyText", "Perlu mencapai minimal {daily} per hari selama sisa {days} hari ke depan.").replace("{daily}", formatRupiah(targetDailyProfitTomorrow)).replace("{days}", String(daysRemaining))
+                      : t("dashboard.insightTargetMetText", "Luar biasa! Seluruh target profit bulan ini sudah tercapai sepenuhnya. Semua profit berikutnya adalah bonus bersih.")
+                    }
+                  </div>
                 </div>
-                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
-                  {remainingTarget > 0 
-                    ? t("dashboard.insightTargetDailyText", "Perlu mencapai minimal {daily} per hari selama sisa {days} hari ke depan.").replace("{daily}", formatRupiah(targetDailyProfitTomorrow)).replace("{days}", String(daysRemaining))
-                    : t("dashboard.insightTargetMetText", "Luar biasa! Seluruh target profit bulan ini sudah tercapai sepenuhnya. Semua profit berikutnya adalah bonus bersih.")
-                  }
-                </div>
-              </div>
+              )}
 
               {/* Insight 3: Prediction projection */}
               <div className="flex items-start gap-3">
