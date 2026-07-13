@@ -78,6 +78,8 @@ function MainApp() {
       setAuthInitialized(true);
       if (currentUser?.email === "arianrisqi@gmail.com") {
         setActiveTab("admin");
+      } else {
+        setActiveTab((prev) => (prev === "admin" ? "dashboard" : prev));
       }
     });
     return () => unsubscribe();
