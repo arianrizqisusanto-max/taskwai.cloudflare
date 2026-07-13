@@ -22,6 +22,7 @@ export const enTranslations: Record<string, string> = {
   "dashboard.noTargetDailyDesc": "Daily target is not set.",
   "dashboard.targetNotSet": "Not Set",
   "dashboard.targetNotSetDesc": "Set in Settings menu",
+  "dashboard.insightNoTarget": "You have not set a monthly profit target. Set a target in Settings to track your business achievements.",
   // --- Dashboard ---
   "dashboard.hello": "Hello",
   "dashboard.welcome": "Welcome back to your financial dashboard.",
