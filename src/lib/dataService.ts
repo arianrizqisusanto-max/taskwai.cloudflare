@@ -619,5 +619,46 @@ export const DataService = {
       console.error("Error resetting all data in Firestore:", error);
       throw error;
     }
+  },
+
+  async getSystemStats(): Promise<{
+    totalRestaurants: number;
+    totalProfitLogs: number;
+    activeStaffSessions: number;
+    restaurants: { id: string; name: string; ownerId: string; monthlyTargetProfit: number; staffUsername?: string; staffActive?: boolean }[];
+  }> {
+    try {
+      const restSnap = await getDocs(collection(db, "restaurants"));
+      const restaurants = restSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+
+      const profitSnap = await getDocs(collection(db, "daily_profit"));
+      const totalProfitLogs = profitSnap.size;
+
+      const sessionsSnap = await getDocs(collection(db, "staff_sessions"));
+      const activeStaffSessions = sessionsSnap.size;
+
+      return {
+        totalRestaurants: restaurants.length,
+        totalProfitLogs,
+        activeStaffSessions,
+        restaurants
+      };
+    } catch (e) {
+      console.error("Error getting system stats:", e);
+      const localRest = getLocal<Restaurant>("taskwai_restaurant");
+      return {
+        totalRestaurants: localRest ? 1 : 0,
+        totalProfitLogs: (getLocal<any[]>("taskwai_daily_profits") || []).length,
+        activeStaffSessions: 0,
+        restaurants: localRest ? [{
+          id: localRest.id,
+          name: localRest.name,
+          ownerId: localRest.ownerId,
+          monthlyTargetProfit: localRest.monthlyTargetProfit,
+          staffUsername: localRest.staffUsername,
+          staffActive: localRest.staffActive
+        }] : []
+      };
+    }
   }
 };

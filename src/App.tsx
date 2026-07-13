@@ -15,6 +15,7 @@ import InputProfit from "./components/InputProfit";
 import Biaya from "./components/Biaya";
 import Laporan from "./components/Laporan";
 import Target from "./components/Target";
+import AdminConsole from "./components/AdminConsole";
 import SkeletonLoader from "./components/SkeletonLoader";
 import { ToastProvider, useToast } from "./components/Toast";
 import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
@@ -320,6 +321,8 @@ function MainApp() {
             onResetAll={handleResetAll}
           />
         );
+      case "admin":
+        return <AdminConsole />;
       default:
         return (
           <Dashboard 

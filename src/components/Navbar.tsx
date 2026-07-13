@@ -110,6 +110,12 @@ export default function Navbar({
     }
   };
 
+  const isAdmin = user && (
+    user.email === "arian.susanto@shopee.com" || 
+    user.email === "arianrizqisusanto@gmail.com" || 
+    user.email?.endsWith("@taskwai.com")
+  );
+
   const menuItems = staffSession
     ? [{ id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign }]
     : [
@@ -118,6 +124,7 @@ export default function Navbar({
         { id: "biaya", label: t("nav.biaya", "Biaya Operasional"), icon: Landmark },
         { id: "laporan", label: t("nav.laporan", "Laporan"), icon: FileText },
         { id: "target", label: t("nav.target", "Pengaturan"), icon: Settings },
+        ...(isAdmin ? [{ id: "admin", label: "Admin Console", icon: ShieldCheck }] : [])
       ];
 
   return (
