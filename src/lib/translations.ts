@@ -203,6 +203,7 @@ export const enTranslations: Record<string, string> = {
   "about.title": "About Taskwai",
   "about.subtitle": "The Owner's Financial Partner",
   "about.tagline": "Control your business performance easily. Staff updates are supported too!",
+  "about.privacyDisclaimer": "Taskwai does not identify or monitor your actual true business turnover. Your data remains strictly confidential. To maintain privacy, you are free to use a pseudonym (fake name) for your business profile. We are not affiliated with any tax authorities; this tool is purely designed to assist in monitoring your internal business finances.",
   "about.feat1.title": "Real-Time Dashboard",
   "about.feat1.desc": "Monitor net profits, daily performance targets, and automatic estimations instantly.",
   "about.feat2.title": "Staff Daily Input",
