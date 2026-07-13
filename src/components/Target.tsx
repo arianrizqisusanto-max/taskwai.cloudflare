@@ -43,40 +43,40 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   const handleStaffSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!staffUsername.trim() || !staffPassword.trim() || !staffPasswordConfirm.trim()) {
-      showToast("Username, password, dan konfirmasi password staff harus diisi.", "warning");
+      showToast(t("target.staffToastEmpty", "Username, password, dan konfirmasi password staff harus diisi."), "warning");
       return;
     }
 
     const usernameRegex = /^[a-z0-9_]+$/;
     if (!usernameRegex.test(staffUsername.trim())) {
-      showToast("Username staff hanya boleh berisi huruf kecil, angka, dan garis bawah (_).", "warning");
+      showToast(t("target.staffToastInvalidChars", "Username staff hanya boleh berisi huruf kecil, angka, dan garis bawah (_)."), "warning");
       return;
     }
 
     if (staffUsername.trim().length < 6) {
-      showToast("Username staff minimal harus 6 karakter.", "warning");
+      showToast(t("target.staffToastMinUsername", "Username staff minimal harus 6 karakter."), "warning");
       return;
     }
 
     if (staffPassword.trim().length < 6) {
-      showToast("Password staff minimal harus 6 karakter.", "warning");
+      showToast(t("target.staffToastMinPassword", "Password staff minimal harus 6 karakter."), "warning");
       return;
     }
 
     if (staffPassword.trim() !== staffPasswordConfirm.trim()) {
-      showToast("Password dan konfirmasi password tidak cocok.", "warning");
+      showToast(t("target.staffToastMismatch", "Password dan konfirmasi password tidak cocok."), "warning");
       return;
     }
 
     setIsSavingStaff(true);
     try {
       await onSaveStaffCredentials(staffUsername.trim(), staffPassword.trim());
-      showToast("Kredensial akses staff berhasil diperbarui!", "success");
+      showToast(t("target.staffToastSuccess", "Kredensial akses staff berhasil diperbarui!"), "success");
       setIsEditingStaff(false);
     } catch (err: any) {
       console.error(err);
-      const errMsg = err?.message || "Gagal memperbarui kredensial staff.";
-      showToast(`Gagal memperbarui kredensial staff: ${errMsg}`, "error");
+      const errMsg = err?.message || t("target.staffToastErrorDefault", "Gagal memperbarui kredensial staff.");
+      showToast(`${t("target.staffToastErrorPrefix", "Gagal memperbarui kredensial staff:")} ${errMsg}`, "error");
     } finally {
       setIsSavingStaff(false);
     }
@@ -99,7 +99,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
 
     if (diffDays < 60) {
       const remaining = 60 - diffDays;
-      showToast(`Perubahan akun staff hanya diperbolehkan minimal 60 hari sekali. Terakhir diubah ${diffDays} hari yang lalu (butuh ${remaining} hari lagi).`, "warning");
+      showToast(t("target.staffToast60DaysRule", "Perubahan akun staff hanya diperbolehkan minimal 60 hari sekali. Terakhir diubah {days} hari yang lalu (butuh {remaining} hari lagi).").replace("{days}", String(diffDays)).replace("{remaining}", String(remaining)), "warning");
       return false;
     }
 
@@ -118,11 +118,11 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
     setIsTogglingActive(true);
     try {
       await onToggleStaffActive(newStatus);
-      showToast(newStatus ? "Akun staff berhasil diaktifkan kembali!" : "Akun staff dinonaktifkan.", "success");
+      showToast(newStatus ? t("target.staffToastActivated", "Akun staff berhasil diaktifkan kembali!") : t("target.staffToastDeactivated", "Akun staff dinonaktifkan."), "success");
     } catch (err: any) {
       console.error(err);
-      const errMsg = err?.message || "Gagal mengubah status keaktifan staff.";
-      showToast(`Gagal mengubah status keaktifan staff: ${errMsg}`, "error");
+      const errMsg = err?.message || t("target.staffToastToggleErrorDefault", "Gagal mengubah status keaktifan staff.");
+      showToast(`${t("target.staffToastToggleErrorPrefix", "Gagal mengubah status keaktifan staff:")} ${errMsg}`, "error");
     } finally {
       setIsTogglingActive(false);
     }
@@ -359,18 +359,18 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
         <div className="mb-6">
           <div className="flex items-start justify-between">
             <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight flex flex-wrap items-center gap-2">
-              Akses Staff Toko
+              {t("target.staffAccessTitle", "Akses Staff Toko")}
               {restaurant.staffUsername && (
                 restaurant.staffActive !== false ? (
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">Aktif</span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">{t("target.staffActive", "Aktif")}</span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-450 border border-rose-500/20 uppercase tracking-wider">Nonaktif</span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-450 border border-rose-500/20 uppercase tracking-wider">{t("target.staffInactive", "Nonaktif")}</span>
                 )
               )}
             </h2>
           </div>
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium font-sans">
-            Atur kredensial staff tunggal agar karyawan di semua cabang dapat login dan menginput omzet harian.
+            {t("target.staffAccessDesc", "Atur kredensial staff tunggal agar karyawan di semua cabang dapat login dan menginput omzet harian.")}
           </p>
 
           <button
@@ -380,24 +380,26 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           >
             <span>💡</span>
             <span className="underline decoration-dotted underline-offset-4 font-bold">
-              {showStaffGuide ? "Sembunyikan Panduan Penggunaan" : "Cara Menggunakan Akun Staff"}
+              {showStaffGuide ? t("target.staffGuideHide", "Sembunyikan Panduan Penggunaan") : t("target.staffGuideShow", "Cara Menggunakan Akun Staff")}
             </span>
           </button>
           
           {showStaffGuide && (
             <div className="mt-3.5 p-4 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/80 rounded-2xl space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-200 text-left">
               <h4 className="text-xs font-black text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5 uppercase tracking-wider">
-                <span>📖</span> Panduan Akses Staff Toko
+                <span>📖</span> {t("target.staffGuideTitle", "Panduan Akses Staff Toko")}
               </h4>
               <ol className="text-[11px] text-zinc-500 dark:text-zinc-400 space-y-2 list-decimal pl-4 font-medium leading-relaxed">
                 <li>
-                  <strong>Bikin Akun Staff:</strong> Tentukan satu username & password di bawah ini, lalu klik Simpan.
+                  <strong>{t("target.staffGuideStep1Title", "Bikin Akun Staff:")}</strong> {t("target.staffGuideStep1Desc", "Tentukan satu username & password di bawah ini, lalu klik Simpan.")}
                 </li>
                 <li>
-                  <strong>Bisa Login di Perangkat Manapun:</strong> Berikan kredensial ini kepada karyawan Anda. Karyawan dapat login di perangkat/HP manapun melalui situs <span className="font-bold text-zinc-700 dark:text-zinc-200">taskwai.com</span>.
+                  <strong>{t("target.staffGuideStep2Title", "Bisa Login di Perangkat Manapun:")}</strong>{" "}
+                  {t("target.staffGuideStep2Desc", "Berikan kredensial ini kepada karyawan Anda. Karyawan dapat login di perangkat/HP manapun melalui situs")} <span className="font-bold text-zinc-700 dark:text-zinc-200">taskwai.com</span>.
                 </li>
                 <li>
-                  <strong>Khusus Input Omzet Saja:</strong> Demi keamanan data keuangan Anda, tampilan akun staff dibatasi secara penuh hanya untuk memasukkan data omzet harian cabang, tanpa bisa melihat riwayat profit ataupun dashboard performa utama owner.
+                  <strong>{t("target.staffGuideStep3Title", "Khusus Input Omzet Saja:")}</strong>{" "}
+                  {t("target.staffGuideStep3Desc", "Demi keamanan data keuangan Anda, tampilan akun staff dibatasi secara penuh hanya untuk memasukkan data omzet harian cabang, tanpa bisa melihat riwayat profit ataupun dashboard performa utama owner.")}
                 </li>
               </ol>
             </div>
@@ -408,7 +410,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           {/* Username */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-              Username Staff <span className="text-[10px] font-normal lowercase">(min. 6 karakter)</span>
+              {t("target.staffUsernameLabel", "Username Staff")} <span className="text-[10px] font-normal lowercase">{t("target.min6Chars", "(min. 6 karakter)")}</span>
             </label>
             <div className="relative">
               <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
@@ -427,7 +429,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           {/* Password */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-              Password Staff <span className="text-[10px] font-normal lowercase">(min. 6 karakter)</span>
+              {t("target.staffPasswordLabel", "Password Staff")} <span className="text-[10px] font-normal lowercase">{t("target.min6Chars", "(min. 6 karakter)")}</span>
             </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
@@ -437,7 +439,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                 disabled={!isEditingStaff || isSavingStaff}
                 value={staffPassword}
                 onChange={(e) => setStaffPassword(e.target.value)}
-                placeholder="Masukkan password staff"
+                placeholder={t("target.staffPasswordPlaceholder", "Masukkan password staff")}
                 className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
               />
             </div>
@@ -447,7 +449,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           {(isEditingStaff || restaurant.staffUsername) && (
             <div className="space-y-2 animate-in fade-in duration-200">
               <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Konfirmasi Password Staff
+                {t("target.staffPasswordConfirmLabel", "Konfirmasi Password Staff")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-zinc-400 pointer-events-none" />
@@ -457,7 +459,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                   disabled={!isEditingStaff || isSavingStaff}
                   value={staffPasswordConfirm}
                   onChange={(e) => setStaffPasswordConfirm(e.target.value)}
-                  placeholder="Ulangi password staff"
+                  placeholder={t("target.staffPasswordConfirmPlaceholder", "Ulangi password staff")}
                   className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 disabled:bg-zinc-100/50 dark:disabled:bg-zinc-950/40 disabled:text-zinc-400 dark:disabled:text-zinc-500 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all text-xs font-mono"
                 />
               </div>
@@ -478,7 +480,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                       : "bg-emerald-50 hover:bg-emerald-100/70 border-emerald-200/60 dark:bg-emerald-950/10 dark:hover:bg-emerald-950/20 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400"
                   }`}
                 >
-                  {restaurant.staffActive !== false ? "Nonaktifkan Akun" : "Aktifkan Akun"}
+                  {restaurant.staffActive !== false ? t("target.staffDeactivate", "Nonaktifkan Akun") : t("target.staffActivate", "Aktifkan Akun")}
                 </button>
                 <button
                   type="button"
@@ -486,7 +488,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                   className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider"
                 >
                   <Pencil className="w-3.5 h-3.5" />
-                  <span>Ubah Akses Staff</span>
+                  <span>{t("target.staffEditAccess", "Ubah Akses Staff")}</span>
                 </button>
               </div>
             ) : (
@@ -508,7 +510,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                 className="flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-zinc-750 dark:text-zinc-300 font-bold py-3 px-4 rounded-xl transition-all border border-zinc-200/50 dark:border-zinc-800 cursor-pointer text-sm disabled:opacity-50"
               >
                 <X className="w-4 h-4" />
-                <span>Batal</span>
+                <span>{t("target.cancel", "Batal")}</span>
               </button>
               <button
                 type="submit"
@@ -516,7 +518,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                 className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm disabled:opacity-50 cursor-pointer text-sm"
               >
                 <Save className="w-4 h-4" />
-                <span>{isSavingStaff ? "Menyimpan..." : "Simpan"}</span>
+                <span>{isSavingStaff ? t("target.saving", "Menyimpan...") : t("target.save", "Simpan")}</span>
               </button>
             </div>
           )}
