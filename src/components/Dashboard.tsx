@@ -367,11 +367,11 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="profitGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="currentColor" stopOpacity={0.08} className="text-zinc-900 dark:text-zinc-100" />
-                      <stop offset="95%" stopColor="currentColor" stopOpacity={0.0} className="text-zinc-900 dark:text-zinc-100" />
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-zinc-100 dark:text-zinc-800/30" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" className="dark:stroke-zinc-800/50" />
                   <XAxis 
                     dataKey="label" 
                     tickLine={false} 
@@ -405,9 +405,8 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                   <Area 
                     type="monotone" 
                     dataKey="Profit Harian" 
-                    stroke="currentColor" 
-                    className="text-zinc-950 dark:text-zinc-50"
-                    strokeWidth={2.5}
+                    stroke="#10B981" 
+                    strokeWidth={3}
                     fillOpacity={1} 
                     fill="url(#profitGrad)" 
                   />
