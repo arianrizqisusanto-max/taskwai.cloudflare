@@ -621,43 +621,41 @@ export const DataService = {
     }
   },
 
-  async getSystemStats(): Promise<{
+  async getSystemStats(todayStr: string): Promise<{
     totalRestaurants: number;
-    totalProfitLogs: number;
-    activeStaffSessions: number;
-    restaurants: { id: string; name: string; ownerId: string; monthlyTargetProfit: number; staffUsername?: string; staffActive?: boolean }[];
+    activeTodayCount: number;
+    activeTodayRestaurants: { id: string; name: string }[];
   }> {
     try {
       const restSnap = await getDocs(collection(db, "restaurants"));
       const restaurants = restSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 
-      const profitSnap = await getDocs(collection(db, "daily_profit"));
-      const totalProfitLogs = profitSnap.size;
+      const profitSnap = await getDocs(query(
+        collection(db, "daily_profit"),
+        where("date", "==", todayStr)
+      ));
+      
+      const activeRestIds = Array.from(new Set(profitSnap.docs.map(doc => doc.data().restaurantId)));
 
-      const sessionsSnap = await getDocs(collection(db, "staff_sessions"));
-      const activeStaffSessions = sessionsSnap.size;
+      const activeTodayRestaurants = restaurants
+        .filter(r => activeRestIds.includes(r.id))
+        .map(r => ({ id: r.id, name: r.name }));
 
       return {
         totalRestaurants: restaurants.length,
-        totalProfitLogs,
-        activeStaffSessions,
-        restaurants
+        activeTodayCount: activeTodayRestaurants.length,
+        activeTodayRestaurants
       };
     } catch (e) {
       console.error("Error getting system stats:", e);
       const localRest = getLocal<Restaurant>("taskwai_restaurant");
+      const localProfits = getLocal<any[]>("taskwai_daily_profits") || [];
+      const hasToday = localProfits.some(p => p.date === todayStr);
+
       return {
         totalRestaurants: localRest ? 1 : 0,
-        totalProfitLogs: (getLocal<any[]>("taskwai_daily_profits") || []).length,
-        activeStaffSessions: 0,
-        restaurants: localRest ? [{
-          id: localRest.id,
-          name: localRest.name,
-          ownerId: localRest.ownerId,
-          monthlyTargetProfit: localRest.monthlyTargetProfit,
-          staffUsername: localRest.staffUsername,
-          staffActive: localRest.staffActive
-        }] : []
+        activeTodayCount: (localRest && hasToday) ? 1 : 0,
+        activeTodayRestaurants: (localRest && hasToday) ? [{ id: localRest.id, name: localRest.name }] : []
       };
     }
   }
