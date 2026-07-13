@@ -19,7 +19,6 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
   const { showToast } = useToast();
   const { lang, t } = useTranslation();
   const [filter, setFilter] = useState<FilterType>("bulan");
-  const [selectedBranch, setSelectedBranch] = useState<string>("");
 
   const todayObj = new Date();
   const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
@@ -35,7 +34,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
     return diffDays >= 0 && diffDays < days;
   };
 
-  // Filtered profits by Date and selected Branch
+  // Filtered profits by Date
   const filteredProfits = profits.filter((p) => {
     let matchesDate = true;
     if (filter === "hari") {
@@ -46,13 +45,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
       const currentMonthPrefix = todayStr.substring(0, 7);
       matchesDate = p.date.startsWith(currentMonthPrefix);
     }
-
-    let matchesBranch = true;
-    if (selectedBranch) {
-      matchesBranch = p.branchName === selectedBranch;
-    }
-
-    return matchesDate && matchesBranch;
+    return matchesDate;
   });
 
   // Calculate statistics
@@ -238,7 +231,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
     <div className="space-y-6">
       {/* Upper bar: Filters and Exports */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
-        {/* Left: filter toggle & branch selector */}
+        {/* Left: filter toggle */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-zinc-400 dark:text-zinc-500 shrink-0" />
@@ -261,23 +254,6 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
               })}
             </div>
           </div>
-
-          {/* Branch filter dropdown */}
-          {restaurant && restaurant.branches && restaurant.branches.length > 0 && (
-            <div className="flex items-center bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/80 px-3 py-1.5 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300">
-              <span className="mr-2 opacity-50 uppercase tracking-widest text-[9px] font-black">Cabang:</span>
-              <select
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value)}
-                className="bg-transparent border-none outline-none cursor-pointer pr-1 font-bold text-zinc-800 dark:text-zinc-200 focus:ring-0 focus:outline-none"
-              >
-                <option value="" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-250">Semua Cabang</option>
-                {restaurant.branches.map((b) => (
-                  <option key={b} value={b} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-250">{b}</option>
-                ))}
-              </select>
-            </div>
-          )}
         </div>
 
         {/* Right: Export buttons */}
