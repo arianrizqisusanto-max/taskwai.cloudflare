@@ -111,6 +111,7 @@ export const enTranslations: Record<string, string> = {
   // --- Biaya Operasional (Biaya) ---
   "biaya.title": "Set Fixed Monthly Operating Costs",
   "biaya.subtitle": "Enter your business's estimated monthly fixed expenses.",
+  "biaya.rentNotice": "Note: All values below are monthly expenses. If rent or other costs are paid annually, please divide by 12 before inputting.",
   "biaya.total": "Total",
   "biaya.sewa": "Rent / Place",
   "biaya.gaji": "Employee Salaries",
