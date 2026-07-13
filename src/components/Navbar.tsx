@@ -382,7 +382,7 @@ export default function Navbar({
 
               {/* Features List */}
               <h4 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-3.5">
-                Fitur Utama & Kegunaan
+                {t("about.featuresTitle", "Fitur Utama & Kegunaan")}
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -427,7 +427,7 @@ export default function Navbar({
               <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/80 rounded-2xl p-4 mb-5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400 font-medium">
                 <div className="flex items-center gap-1.5 font-bold text-zinc-800 dark:text-zinc-200 mb-1">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                  <span>Kerahasiaan & Privasi Data</span>
+                  <span>{t("about.privacyTitle", "Kerahasiaan & Privasi Data")}</span>
                 </div>
                 <p>
                   {t("about.privacyDisclaimer", "Taskwai tidak mengetahui atau mencatat omzet sebenarnya secara teridentifikasi. Data usaha Anda sepenuhnya rahasia. Demi menjaga privasi, Anda bebas menggunakan nama samaran (bukan nama asli resto) untuk profil usaha Anda. Kami juga tidak terafiliasi dengan otoritas pajak mana pun; alat ini murni dirancang untuk membantu monitoring keuangan internal usaha Anda.")}

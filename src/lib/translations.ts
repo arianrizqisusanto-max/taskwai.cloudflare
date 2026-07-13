@@ -212,6 +212,8 @@ export const enTranslations: Record<string, string> = {
   "about.feat3.desc": "Calculate realistic net profit by deducting fixed costs and COGS (HPP) automatically.",
   "about.feat4.title": "Secure Cloud Sync",
   "about.feat4.desc": "Your data is stored safely in Firestore cloud database, synced automatically.",
-  "about.close": "Close"
+  "about.close": "Close",
+  "about.featuresTitle": "Main Features & Uses",
+  "about.privacyTitle": "Data Confidentiality & Privacy"
 };
 
