@@ -14,6 +14,7 @@ export const enTranslations: Record<string, string> = {
   "nav.cancel": "Cancel",
   "nav.confirm": "Yes, Logout",
   "nav.profitDashboard": "Profit Dashboard",
+  "nav.copied": "Copied",
 
   "dashboard.statusActive": "Active",
   "dashboard.messageNoTarget": "Restaurant is active. You have not set a monthly profit target.",

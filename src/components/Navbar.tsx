@@ -231,12 +231,27 @@ export default function Navbar({
             ) : user ? (
               <div className="flex items-center gap-2 pl-1.5">
                 {user.photoURL && (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName || "Owner"}
-                    referrerPolicy="no-referrer"
-                    className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800"
-                  />
+                  <div 
+                    onClick={() => {
+                      if (user.email) {
+                        navigator.clipboard.writeText(user.email);
+                        showToast(`${user.email} (${t("nav.copied", "Tersalin")})`, "success");
+                      }
+                    }}
+                    title={user.email || ""}
+                    className="relative group cursor-pointer"
+                  >
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName || "Owner"}
+                      referrerPolicy="no-referrer"
+                      className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all hover:ring-2 hover:ring-zinc-950/10 dark:hover:ring-white/10"
+                    />
+                    {/* Hover custom tooltip */}
+                    <div className="absolute right-0 top-full mt-2 hidden group-hover:block bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-md whitespace-nowrap z-50">
+                      {user.email}
+                    </div>
+                  </div>
                 )}
                 <button
                   onClick={handleLogoutClick}
