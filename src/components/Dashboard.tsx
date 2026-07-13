@@ -271,30 +271,38 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]"
+        className="p-4 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]"
       >
-        <div className="flex justify-between items-center mb-3.5">
-          <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 tracking-tight uppercase">{t("dashboard.targetMet", "Progress Pencapaian Target")}</span>
-          <span className="font-mono text-lg font-black text-zinc-950 dark:text-white">{progressPercent}%</span>
+        <div className="flex justify-between items-center mb-2.5">
+          <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">{t("dashboard.targetMet", "Progress Pencapaian Target")}</span>
+          <span className={`font-mono text-xs font-black px-2.5 py-0.5 rounded-full ${
+            businessStatus === "green" 
+              ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400" 
+              : businessStatus === "yellow"
+              ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400"
+              : "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400"
+          }`}>
+            {progressPercent}%
+          </span>
         </div>
         
-        {/* Progress Bar Track */}
-        <div className="w-full bg-zinc-100 dark:bg-zinc-950 rounded-full h-3.5 overflow-hidden p-0.5 border border-zinc-200/40 dark:border-zinc-800/80">
+        {/* Sleek Progress Bar Track */}
+        <div className="w-full bg-zinc-100 dark:bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-200/30 dark:border-zinc-800/50">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className={`h-full rounded-full ${
               businessStatus === "green" 
-                ? "bg-zinc-900 dark:bg-zinc-100" 
+                ? "bg-gradient-to-r from-emerald-500 to-teal-400" 
                 : businessStatus === "yellow"
-                ? "bg-amber-500"
-                : "bg-rose-500"
+                ? "bg-gradient-to-r from-amber-500 to-orange-400"
+                : "bg-gradient-to-r from-rose-500 to-red-400"
             }`}
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center mt-4 text-xs text-zinc-500 dark:text-zinc-400 gap-2">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center mt-2.5 text-[11px] text-zinc-500 dark:text-zinc-400 gap-1">
           <p className="font-medium">
             {t("dashboard.targetProgressText", "Tercapai {actual} dari target {target}").replace("{actual}", formatRupiah(totalProfitMonth)).replace("{target}", formatRupiah(targetProfit))}
           </p>
