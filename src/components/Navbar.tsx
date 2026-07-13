@@ -112,16 +112,17 @@ export default function Navbar({
 
   const isAdmin = user && user.email === "arianrisqi@gmail.com";
 
-  const menuItems = staffSession
-    ? [{ id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign }]
-    : [
-        { id: "dashboard", label: t("nav.dashboard", "Dashboard"), icon: LayoutDashboard },
-        { id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign },
-        { id: "biaya", label: t("nav.biaya", "Biaya Operasional"), icon: Landmark },
-        { id: "laporan", label: t("nav.laporan", "Laporan"), icon: FileText },
-        { id: "target", label: t("nav.target", "Pengaturan"), icon: Settings },
-        ...(isAdmin ? [{ id: "admin", label: "Admin Console", icon: ShieldCheck }] : [])
-      ];
+  const menuItems = isAdmin
+    ? [{ id: "admin", label: "Admin Console", icon: ShieldCheck }]
+    : staffSession
+      ? [{ id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign }]
+      : [
+          { id: "dashboard", label: t("nav.dashboard", "Dashboard"), icon: LayoutDashboard },
+          { id: "input", label: t("nav.input", "Catat Profit"), icon: DollarSign },
+          { id: "biaya", label: t("nav.biaya", "Biaya Operasional"), icon: Landmark },
+          { id: "laporan", label: t("nav.laporan", "Laporan"), icon: FileText },
+          { id: "target", label: t("nav.target", "Pengaturan"), icon: Settings },
+        ];
 
   return (
     <>

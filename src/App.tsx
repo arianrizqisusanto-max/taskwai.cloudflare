@@ -76,6 +76,9 @@ function MainApp() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthInitialized(true);
+      if (currentUser?.email === "arianrisqi@gmail.com") {
+        setActiveTab("admin");
+      }
     });
     return () => unsubscribe();
   }, []);
