@@ -8,13 +8,18 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/staff_sessions/$(request.auth.uid)).data.restaurantId == restaurantId;
     }
+
+    // Helper: check if request is from the master admin email
+    function isMasterAdmin() {
+      return request.auth != null && request.auth.token.email == 'arianrisqi@gmail.com';
+    }
     
     // Restaurants
     match /restaurants/{restaurantId} {
       allow read, update: if request.auth != null && (
-        restaurantId == 'rest_' + request.auth.uid || isStaffOf(restaurantId)
+        restaurantId == 'rest_' + request.auth.uid || isStaffOf(restaurantId) || isMasterAdmin()
       );
-      allow create, delete: if request.auth != null && restaurantId == 'rest_' + request.auth.uid;
+      allow create, delete: if request.auth != null && (restaurantId == 'rest_' + request.auth.uid || isMasterAdmin());
     }
     
     // Expenses
@@ -29,10 +34,11 @@ service cloud.firestore {
     
     // Daily profit logs — separated read/create/update/delete for clean query validation
     match /daily_profit/{profitId} {
-      // READ: owner can read their own restaurant's data, staff can read their assigned restaurant
+      // READ: owner can read their own restaurant's data, staff can read their assigned restaurant, admin can read all
       allow read: if request.auth != null && (
         resource.data.restaurantId == 'rest_' + request.auth.uid ||
-        isStaffOf(resource.data.restaurantId)
+        isStaffOf(resource.data.restaurantId) ||
+        isMasterAdmin()
       );
       
       // CREATE: owner or staff can create new entries for their restaurant
@@ -58,7 +64,7 @@ service cloud.firestore {
 
     // Staff sessions: users can only manage their own session
     match /staff_sessions/{sessionUid} {
-      allow read, write: if request.auth != null && request.auth.uid == sessionUid;
+      allow read, write: if request.auth != null && (request.auth.uid == sessionUid || isMasterAdmin());
     }
   }
 }
