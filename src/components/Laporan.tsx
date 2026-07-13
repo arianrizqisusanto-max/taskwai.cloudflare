@@ -222,8 +222,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
         const downloadDateStr = `${d}-${m}-${y}`;
 
         const periodName = filter === "hari" ? "harian" : filter === "minggu" ? "mingguan" : "bulanan";
-        const fileTitle = `laporan ${periodName}`;
-        const fileName = `${fileTitle} Taskwai.${periodName}.${downloadDateStr}.pdf`;
+        const fileName = `taskwai.${periodName}.${downloadDateStr}.pdf`;
 
         // Save File
         doc.save(fileName);
