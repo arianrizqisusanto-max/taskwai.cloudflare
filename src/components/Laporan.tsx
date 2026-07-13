@@ -214,8 +214,19 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
           }
         });
 
+        // Format download date as dd-mm-yyyy
+        const now = new Date();
+        const d = String(now.getDate()).padStart(2, "0");
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const y = now.getFullYear();
+        const downloadDateStr = `${d}-${m}-${y}`;
+
+        const periodName = filter === "hari" ? "harian" : filter === "minggu" ? "mingguan" : "bulanan";
+        const fileTitle = `laporan ${periodName}`;
+        const fileName = `${fileTitle} Taskwai.${periodName}.${downloadDateStr}.pdf`;
+
         // Save File
-        doc.save(`Laporan_Keuangan_${filter}_${todayStr}.pdf`);
+        doc.save(fileName);
         showToast(t("laporan.pdfExportSuccess", "Laporan PDF berhasil diunduh!"), "success");
       } catch (error) {
         console.error("Export Error:", error);
