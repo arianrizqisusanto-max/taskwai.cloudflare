@@ -653,29 +653,29 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col p-4 bg-white dark:bg-zinc-900/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800/60 hover:border-zinc-200 dark:hover:border-zinc-700 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800/60 hover:border-zinc-200 dark:hover:border-zinc-700 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0 pr-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 font-mono">
+                        <span className="text-xs sm:text-sm font-semibold text-zinc-400 dark:text-zinc-500 font-mono">
                           {p.date}
                         </span>
-                        <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
+                        <span className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100">
                           {formatIndoDate(p.date, lang).split(",")[1]} {/* Get just date and month */}
                         </span>
                       </div>
                       
                       {/* Meta information row: Cabang, Penginput, Jam */}
-                      <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-[9px] font-bold">
-                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-650 dark:text-zinc-400 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                      <div className="flex flex-wrap items-center gap-2 mt-2 text-[10px] sm:text-xs font-bold">
+                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm">
                           🏢 {p.branchName || "Pusat"}
                         </span>
-                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-650 dark:text-zinc-400 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm">
                           👤 {p.inputterName || "Owner"}
                         </span>
                         {timeStr && (
-                          <span className="bg-zinc-50 dark:bg-zinc-800/40 text-zinc-400 dark:text-zinc-500 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 font-mono">
+                          <span className="bg-zinc-50 dark:bg-zinc-800/40 text-zinc-400 dark:text-zinc-500 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 font-mono shadow-sm">
                             ⏰ {timeStr}
                           </span>
                         )}
@@ -683,29 +683,29 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                     </div>
 
                     <div className="flex items-center gap-4 shrink-0">
-                      <span className={`font-mono text-base font-extrabold ${p.profit >= 0 ? "text-zinc-950 dark:text-white" : "text-rose-600 dark:text-rose-450"}`}>
+                      <span className={`font-mono text-base sm:text-xl font-black tracking-tight ${p.profit >= 0 ? "text-zinc-950 dark:text-white" : "text-rose-600 dark:text-rose-450"}`}>
                         {formatRupiah(p.profit)}
                       </span>
                       <button
                         onClick={() => handleDelete(p.id, p.date)}
-                        className="p-1.5 rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-450 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                        className="p-2 rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-450 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                         title={t("profit.deleteTooltip", "Hapus log")}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                       </button>
                     </div>
                   </div>
 
                   {/* Notes Render */}
                   {p.notes ? (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 italic truncate max-w-sm">
+                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2 sm:mt-2.5 italic truncate max-w-sm sm:max-w-xl font-medium">
                       "{p.notes}"
                     </p>
                   ) : null}
 
                   {/* Profit breakdown fields if saved */}
                   {hasBreakdown ? (
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2.5 pt-2 border-t border-zinc-100 dark:border-zinc-800/40 text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold tracking-tight">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 pt-2.5 border-t border-zinc-100 dark:border-zinc-800/40 text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-semibold tracking-normal">
                       <div>
                         {t("laporan.tableTurnover", "Omzet")}: <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{formatRupiah(p.omzet || 0)}</span>
                       </div>
@@ -723,8 +723,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                       </div>
                     </div>
                   ) : (
-                    <div className="mt-1 pt-1.5 border-t border-dotted border-zinc-100 dark:border-zinc-800/40">
-                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">{t("profit.oldLogDesc", "Log tanpa rincian HPP (Pencatatan Lama)")}</span>
+                    <div className="mt-2 pt-2 border-t border-dotted border-zinc-100 dark:border-zinc-800/40">
+                      <span className="text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-medium">{t("profit.oldLogDesc", "Log tanpa rincian HPP (Pencatatan Lama)")}</span>
                     </div>
                   )}
                 </motion.div>
