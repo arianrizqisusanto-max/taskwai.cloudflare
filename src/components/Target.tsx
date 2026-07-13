@@ -498,7 +498,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                 className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-sm uppercase tracking-wider"
               >
                 <Pencil className="w-4 h-4" />
-                <span>Bikin Akun Staff</span>
+                <span>{t("target.staffCreateAccount", "Bikin Akun Staff")}</span>
               </button>
             )
           ) : (
