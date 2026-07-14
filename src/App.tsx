@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { onAuthStateChanged, User, signInAnonymously } from "firebase/auth";
 import { auth } from "./lib/firebase";
 import { DataService } from "./lib/dataService";
@@ -11,14 +11,16 @@ import { Restaurant, DailyProfit, Expenses } from "./types";
 
 import Navbar from "./components/Navbar";
 import Dashboard from "./components/Dashboard";
-import InputProfit from "./components/InputProfit";
-import Biaya from "./components/Biaya";
-import Laporan from "./components/Laporan";
-import Target from "./components/Target";
-import AdminConsole from "./components/AdminConsole";
 import SkeletonLoader from "./components/SkeletonLoader";
 import { ToastProvider, useToast } from "./components/Toast";
 import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
+
+// Lazy-loaded tab pages — only downloaded when the user navigates to them
+const InputProfit = lazy(() => import("./components/InputProfit"));
+const Biaya = lazy(() => import("./components/Biaya"));
+const Laporan = lazy(() => import("./components/Laporan"));
+const Target = lazy(() => import("./components/Target"));
+const AdminConsole = lazy(() => import("./components/AdminConsole"));
 
 function MainApp() {
   const { showToast } = useToast();
@@ -354,7 +356,9 @@ function MainApp() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">
-        {renderView()}
+        <Suspense fallback={<SkeletonLoader />}>
+          {renderView()}
+        </Suspense>
       </main>
 
       <footer className="py-8 pb-24 lg:pb-8 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 mt-12">
