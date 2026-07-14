@@ -68,6 +68,29 @@ function MainApp() {
 
   const toggleDark = () => setIsDark((prev) => !prev);
 
+  // Prefetch lazy-loaded tab components in the background when the browser is idle
+  useEffect(() => {
+    const prefetchTimer = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        const triggerPrefetch = () => {
+          import("./components/InputProfit").catch(() => {});
+          import("./components/Biaya").catch(() => {});
+          import("./components/Laporan").catch(() => {});
+          import("./components/Target").catch(() => {});
+          import("./components/AdminConsole").catch(() => {});
+        };
+
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(triggerPrefetch);
+        } else {
+          triggerPrefetch();
+        }
+      }
+    }, 2500); // Delay slightly so it doesn't compete with the initial load of Dashboard/Firebase
+
+    return () => clearTimeout(prefetchTimer);
+  }, []);
+
   // App States
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [profits, setProfits] = useState<DailyProfit[]>([]);
