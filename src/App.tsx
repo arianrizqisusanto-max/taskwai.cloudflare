@@ -95,6 +95,10 @@ function MainApp() {
       setLoading(true);
       
       let currentUser = user;
+      if (currentUser?.email === "arianrisqi@gmail.com") {
+        setLoading(false);
+        return;
+      }
       if (staffSession && !currentUser) {
         try {
           console.log("Restoring anonymous staff auth session...");
@@ -283,6 +287,11 @@ function MainApp() {
 
   // Render correct tab view dynamically
   const renderView = () => {
+    // Admin Console doesn't need restaurant/expenses data — render immediately
+    if (activeTab === "admin" && authInitialized) {
+      return <AdminConsole />;
+    }
+
     if (!authInitialized || loading || !restaurant || !expenses) {
       return <SkeletonLoader />;
     }
