@@ -116,22 +116,20 @@ function MainApp() {
         const restData = await DataService.getRestaurant(userId);
         setRestaurant(restData);
 
-        // Fetch operating expenses
-        const expData = await DataService.getExpenses(userId, restData.id);
-        setExpenses(expData);
+        // Fetch operating expenses and daily profits in parallel
+        const [expData, profitsData] = await Promise.all([
+          DataService.getExpenses(userId, restData.id),
+          DataService.getDailyProfits(userId, restData.id)
+        ]);
 
-        // Fetch daily profits logs
-        const profitsData = await DataService.getDailyProfits(userId, restData.id);
+        setExpenses(expData);
         setProfits(profitsData);
 
       } catch (err) {
         console.error("Error loading Taskwai data:", err);
         showToast("Ada masalah memuat data. Menggunakan cadangan lokal.", "warning");
       } finally {
-        // Small synthetic timeout to demonstrate beautiful premium loading experience
-        setTimeout(() => {
-          setLoading(false);
-        }, 600);
+        setLoading(false);
       }
     };
 
