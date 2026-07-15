@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { enTranslations } from "./translations";
 
 type Language = "id" | "en";
@@ -31,6 +31,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     return "rupiah";
   });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.title = lang === "en"
+        ? "Taskwai - Your Business Dashboard"
+        : "Taskwai - Dashboard Usaha Anda";
+    }
+  }, [lang]);
 
   const setLang = (newLang: Language) => {
     setLangState(newLang);

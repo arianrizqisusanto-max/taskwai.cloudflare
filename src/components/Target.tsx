@@ -181,8 +181,10 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-6">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 max-w-7xl mx-auto">
+      {/* Left Column - Main Settings */}
+      <div className="lg:col-span-3 space-y-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="mb-6">
           <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("target.title", "Pengaturan Profil & Target")}</h2>
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("target.subtitle", "Konfigurasikan nama usaha dan target laba bersih bulanan Anda.")}</p>
@@ -524,9 +526,12 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           )}
         </form>
       </div>
+      </div>
 
-      {/* Target calculation preview card */}
-      <div className="bg-zinc-950 text-white rounded-2xl p-6 shadow-md relative overflow-hidden border border-zinc-900 dark:border-zinc-800">
+      {/* Right Column - Info & Danger Zone */}
+      <div className="lg:col-span-2 space-y-6">
+        {/* Target calculation preview card */}
+        <div className="bg-zinc-950 text-white rounded-2xl p-6 shadow-md relative overflow-hidden border border-zinc-900 dark:border-zinc-800">
         <div className="absolute right-0 bottom-0 opacity-5 translate-y-1/3 translate-x-1/12 pointer-events-none">
           <TargetIcon className="w-48 h-48" />
         </div>
@@ -556,6 +561,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           <Trash2 className="w-4 h-4" />
           <span>{t("target.resetButton", "Reset Semua Data")}</span>
         </button>
+      </div>
       </div>
 
       {/* Reset Confirmation Modal */}
