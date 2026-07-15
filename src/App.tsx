@@ -375,7 +375,7 @@ function MainApp() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-zinc-950 flex flex-col font-sans text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-zinc-50 to-gray-50 dark:bg-zinc-950 dark:[background-image:none] flex flex-col font-sans text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
       <Navbar
         user={user}
         activeTab={activeTab}
@@ -394,9 +394,15 @@ function MainApp() {
         </Suspense>
       </main>
 
-      <footer className="py-8 pb-24 lg:pb-8 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/40 mt-12">
-        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-zinc-400 dark:text-zinc-500 font-bold tracking-wider uppercase">
-          Taskwai &copy; {new Date().getFullYear()} &bull; {t("nav.profitDashboard", "Dashboard Usaha Anda.")}
+      <footer className="py-6 pb-24 lg:pb-6 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm mt-12">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-2 text-center">
+          <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 tracking-widest uppercase">
+            Taskwai &copy; {new Date().getFullYear()}
+          </span>
+          <span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">·</span>
+          <span className="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wide">
+            {t("nav.profitDashboard", "Dashboard Usaha Anda.")}
+          </span>
         </div>
       </footer>
     </div>

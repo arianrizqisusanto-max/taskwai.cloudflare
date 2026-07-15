@@ -19,4 +19,55 @@
   --tooltip-text: #f4f4f5;
 }
 
+/* ── Smooth Scroll & Text Rendering ── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 
+/* ── Brand-colored Text Selection ── */
+::selection {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.dark ::selection {
+  background-color: #064e3b;
+  color: #6ee7b7;
+}
+
+/* ── Custom Premium Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* ── Focus Ring Override ── */
+:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+  border-radius: 6px;
+}

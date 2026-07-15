@@ -126,7 +126,7 @@ export default function Navbar({
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-zinc-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md transition-colors duration-300">
+      <header className="sticky top-0 z-40 w-full border-b border-zinc-100 dark:border-zinc-800/80 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.25)] transition-colors duration-300">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Logo */}
           <button
@@ -141,11 +141,11 @@ export default function Navbar({
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="font-sans font-bold text-base tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+              <span className="font-sans font-black text-base tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                 taskwai
-                <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 animate-pulse" />
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               </span>
-              <span className="hidden sm:inline text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase">{t("nav.profitDashboard", "Profit Dashboard")}</span>
+              <span className="hidden sm:inline text-[10px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">{t("nav.profitDashboard", "Profit Dashboard")}</span>
             </div>
           </button>
 
@@ -158,10 +158,10 @@ export default function Navbar({
                 <button
                    key={item.id}
                    onClick={() => setActiveTab(item.id)}
-                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                      isActive
-                       ? "bg-zinc-950 dark:bg-zinc-50 text-white dark:text-zinc-950 shadow-sm font-black"
-                       : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                       ? "bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/40 font-black"
+                       : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60"
                    }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -275,8 +275,8 @@ export default function Navbar({
 
       {/* Navigation Menu - Mobile (Premium Fixed Bottom Bar) */}
       {!staffSession && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-lg pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)] transition-colors duration-300">
-          <div className="flex h-16 w-full items-center justify-around px-2">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white/97 dark:bg-zinc-900/97 backdrop-blur-xl pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)] transition-colors duration-300">
+          <div className="flex h-[68px] w-full items-center justify-around px-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -284,7 +284,7 @@ export default function Navbar({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex flex-col items-center justify-center gap-1 flex-1 h-full rounded-xl transition-all cursor-pointer ${
+                  className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
                       : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
@@ -295,9 +295,12 @@ export default function Navbar({
                       ? "bg-emerald-50 dark:bg-emerald-950/40 scale-110" 
                       : "bg-transparent"
                   }`}>
-                    <Icon className="w-5 h-5 stroke-[2.25]" />
+                    <Icon className="w-[19px] h-[19px] stroke-[2.25]" />
                   </div>
-                  <span className="text-[9px] font-bold tracking-tight uppercase">{item.label.split(" ")[0]}</span>
+                  <span className="text-[9px] font-black tracking-tight uppercase leading-none">{item.label.split(" ")[0]}</span>
+                  {isActive && (
+                    <span className="absolute bottom-1.5 w-1 h-1 rounded-full bg-emerald-500" />
+                  )}
                 </button>
               );
             })}

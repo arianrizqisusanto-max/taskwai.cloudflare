@@ -147,16 +147,16 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   return (
     <div className="space-y-8">
       {/* 1. Greeting & Date Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800">
         <div>
-          <h1 className="font-sans font-bold text-3xl tracking-tight text-zinc-900 dark:text-zinc-50">
-            {t("dashboard.hello", "Halo")}, {restaurant.ownerId === "demo" ? "Owner " : ""}{restaurant.name}
+          <h1 className="font-sans font-black text-3xl sm:text-4xl tracking-tight text-zinc-900 dark:text-zinc-50">
+            {t("dashboard.hello", "Halo")}, {restaurant.ownerId === "demo" ? "Owner " : ""}{restaurant.name} 👋
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-0.5 font-medium">{t("dashboard.welcome", "Selamat datang kembali di dashboard keuangan Anda.")}</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1 font-medium">{t("dashboard.welcome", "Selamat datang kembali di dashboard keuangan Anda.")}</p>
         </div>
-        <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl px-4 py-2 text-right self-start sm:self-center">
-          <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500 block uppercase tracking-wider">{t("dashboard.todayDate", "Tanggal Hari Ini")}</span>
-          <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-mono">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-5 py-3 text-right self-start sm:self-center shadow-sm">
+          <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 block uppercase tracking-widest mb-0.5">{t("dashboard.todayDate", "Tanggal Hari Ini")}</span>
+          <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">
             {formatIndoDate(todayStr, lang)}
           </span>
         </div>
@@ -169,26 +169,28 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ y: -3 }}
-          className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:shadow-md dark:hover:border-zinc-700 transition-all duration-300 ease-out relative overflow-hidden"
+          whileHover={{ y: -4, scale: 1.01 }}
+          className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:shadow-lg dark:hover:border-zinc-700 transition-all duration-300 ease-out relative overflow-hidden"
         >
+          {/* Accent top border */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400 rounded-t-2xl" />
           <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.profitToday", "Profit Hari Ini")}</span>
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.profitToday", "Profit Hari Ini")}</span>
             {profitToday > 0 ? (
-              <span className="flex items-center gap-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-900/30">
+              <span className="flex items-center gap-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-900/30">
                 <ArrowUpRight className="w-3.5 h-3.5" /> {t("dashboard.filled", "Terisi")}
               </span>
             ) : (
-              <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-900/30">
+              <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-900/30">
                 {t("dashboard.empty", "Belum diisi")}
               </span>
             )}
           </div>
           <div className="mt-4">
-            <span className="font-mono text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white block">
+            <span className="font-mono text-3xl font-black tracking-tight text-zinc-950 dark:text-white block tabular-nums">
               {formatRupiah(profitToday)}
             </span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-2 block leading-relaxed">
               {t("dashboard.profitTodayDesc", "Laba kotor operasional harian usaha Anda")}
             </span>
           </div>
@@ -199,20 +201,22 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          whileHover={{ y: -3 }}
-          className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:shadow-md dark:hover:border-zinc-700 transition-all duration-300 ease-out"
+          whileHover={{ y: -4, scale: 1.01 }}
+          className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:shadow-lg dark:hover:border-zinc-700 transition-all duration-300 ease-out relative overflow-hidden"
         >
+          {/* Accent top border */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400 rounded-t-2xl" />
           <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.profitMonth", "Profit Bulan Ini")}</span>
-            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.profitMonth", "Profit Bulan Ini")}</span>
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
               {t("dashboard.daysEntered", "{count} entri hari").replace("{count}", String(currentMonthProfits.length))}
             </span>
           </div>
           <div className="mt-4">
-            <span className="font-mono text-3xl font-extrabold tracking-tight text-zinc-950 dark:text-white block">
+            <span className="font-mono text-3xl font-black tracking-tight text-zinc-950 dark:text-white block tabular-nums">
               {formatRupiah(totalProfitMonth)}
             </span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-2 block leading-relaxed">
               {t("dashboard.profitMonthDesc", "Akumulasi laba operasional bulan berjalan")}
             </span>
           </div>
@@ -223,24 +227,26 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          whileHover={{ y: -3 }}
-          className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:shadow-md dark:hover:border-zinc-700 transition-all duration-300 ease-out"
+          whileHover={{ y: -4, scale: 1.01 }}
+          className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:shadow-lg dark:hover:border-zinc-700 transition-all duration-300 ease-out relative overflow-hidden"
         >
+          {/* Accent top border */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-violet-500 to-purple-400 rounded-t-2xl" />
           <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.targetProfit", "Target Bulanan")}</span>
-            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.targetProfit", "Target Bulanan")}</span>
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
               {t("dashboard.goalOwner", "Goal Owner")}
             </span>
           </div>
           <div className="mt-4">
-            <span className={`tracking-tight block ${hasTarget ? "font-mono text-3xl font-extrabold text-zinc-950 dark:text-white" : "text-xl font-bold text-zinc-400 dark:text-zinc-500"}`}>
+            <span className={`tracking-tight block tabular-nums ${hasTarget ? "font-mono text-3xl font-black text-zinc-950 dark:text-white" : "text-xl font-bold text-zinc-400 dark:text-zinc-500"}`}>
               {hasTarget ? formatRupiah(targetProfit) : t("dashboard.targetNotSet", "Belum Diatur")}
             </span>
-            <div className="flex justify-between items-center mt-2 text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+            <div className="flex justify-between items-center mt-2 text-xs text-zinc-500 dark:text-zinc-400 font-semibold">
               {hasTarget ? (
                 <>
                   <span>{t("dashboard.remaining", "Sisa: ")}</span>
-                  <span className="font-semibold text-zinc-700 dark:text-zinc-300 font-mono">
+                  <span className="font-bold text-zinc-700 dark:text-zinc-300 font-mono tabular-nums">
                     {formatRupiah(remainingTarget)}
                   </span>
                 </>
@@ -256,14 +262,14 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          whileHover={{ y: -3 }}
-          className={`p-6 rounded-2xl border hover:shadow-md transition-all duration-300 ease-out ${currentStatus.bgClass} flex flex-col justify-between`}
+          whileHover={{ y: -4, scale: 1.01 }}
+          className={`p-6 rounded-2xl border hover:shadow-lg transition-all duration-300 ease-out ${currentStatus.bgClass} flex flex-col justify-between relative overflow-hidden`}
         >
           <div className="flex justify-between items-center">
-            <span className="text-xs font-bold uppercase tracking-wider">{t("dashboard.businessStatus", "Status Bisnis")}</span>
-            <span className="flex h-2 w-2 relative">
+            <span className="text-[11px] font-black uppercase tracking-widest">{t("dashboard.businessStatus", "Status Bisnis")}</span>
+            <span className="flex h-2.5 w-2.5 relative">
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${currentStatus.indicatorClass}`}></span>
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${currentStatus.indicatorClass}`}></span>
+              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${currentStatus.indicatorClass}`}></span>
             </span>
           </div>
           <div className="mt-4">
@@ -273,7 +279,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
                 {currentStatus.label}
               </span>
             </div>
-            <p className="text-[11px] leading-relaxed mt-2 opacity-90 font-medium">
+            <p className="text-xs leading-relaxed mt-2.5 opacity-90 font-semibold">
               {currentStatus.message}
             </p>
           </div>
@@ -286,27 +292,27 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="p-4 sm:p-5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]"
+          className="p-5 sm:p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)]"
         >
-          <div className="flex justify-between items-center mb-2.5">
-            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">{t("dashboard.targetMet", "Progress Pencapaian Target")}</span>
-            <span className={`font-mono text-xs font-black px-2.5 py-0.5 rounded-full ${
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-[11px] font-black text-zinc-600 dark:text-zinc-300 tracking-widest uppercase">{t("dashboard.targetMet", "Progress Pencapaian Target")}</span>
+            <span className={`font-mono text-sm font-black px-3 py-1 rounded-full ${
               businessStatus === "green" 
                 ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400" 
                 : businessStatus === "yellow"
                 ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400"
-                : "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-450"
+                : "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400"
             }`}>
               {progressPercent}%
             </span>
           </div>
           
-          {/* Sleek Progress Bar Track */}
-          <div className="w-full bg-zinc-100 dark:bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-200/30 dark:border-zinc-800/50">
+          {/* Progress Bar Track - taller, more visible */}
+          <div className="w-full bg-zinc-100 dark:bg-zinc-950 rounded-full h-3 overflow-hidden border border-zinc-200/30 dark:border-zinc-800/50">
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 1, ease: "easeOut" }}
               className={`h-full rounded-full ${
                 businessStatus === "green" 
                   ? "bg-gradient-to-r from-emerald-500 to-teal-400" 
@@ -317,11 +323,11 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center mt-2.5 text-[11px] text-zinc-500 dark:text-zinc-400 gap-1">
-            <p className="font-medium">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center mt-3 text-xs text-zinc-500 dark:text-zinc-400 gap-1">
+            <p className="font-semibold">
               {t("dashboard.targetProgressText", "Tercapai {actual} dari target {target}").replace("{actual}", formatRupiah(totalProfitMonth)).replace("{target}", formatRupiah(targetProfit))}
             </p>
-            <p className="font-semibold text-zinc-400 dark:text-zinc-500">
+            <p className="font-bold text-zinc-600 dark:text-zinc-300">
               {remainingTarget > 0 
                 ? t("dashboard.remainingTargetText", "{diff} lagi untuk mencapai target.").replace("{diff}", formatRupiah(remainingTarget)) 
                 : t("dashboard.targetAchieved", "Selamat! Target profit bulan ini telah tercapai! 🎉")
@@ -345,25 +351,25 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
 
       {/* 4. Analisis Detail: Sisa Hari, Target Besok, Prediksi */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
-          <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.daysRemaining", "Sisa Hari Bulan Ini")}</span>
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+          <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.daysRemaining", "Sisa Hari Bulan Ini")}</span>
           <div className="my-4">
-            <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
-              {daysRemaining} {t("dashboard.daysUnit", "Hari")}
+            <span className="font-mono text-5xl font-black text-zinc-950 dark:text-white block tracking-tight tabular-nums">
+              {daysRemaining}<span className="text-2xl ml-2 font-bold text-zinc-400 dark:text-zinc-500">{t("dashboard.daysUnit", "Hari")}</span>
             </span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed font-medium">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-2.5 block leading-relaxed">
               {t("dashboard.daysRemainingDesc", "Dari total {total} hari di bulan ini.").replace("{total}", String(totalDaysInMonth))}
             </span>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
-          <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.targetDaily", "Minimal Profit Harian Mulai Besok")}</span>
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+          <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.targetDaily", "Minimal Profit Harian Mulai Besok")}</span>
           <div className="my-4">
-            <span className={`font-mono block tracking-tight ${hasTarget ? "text-4xl font-black text-zinc-950 dark:text-white" : "text-xl font-bold text-zinc-400 dark:text-zinc-500"}`}>
+            <span className={`font-mono block tracking-tight tabular-nums ${hasTarget ? "text-4xl font-black text-zinc-950 dark:text-white" : "text-xl font-bold text-zinc-400 dark:text-zinc-500"}`}>
               {hasTarget ? formatRupiah(targetDailyProfitTomorrow) : t("dashboard.targetNotSet", "Belum Diatur")}
             </span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed font-medium">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-2.5 block leading-relaxed">
               {hasTarget 
                 ? t("dashboard.targetDailyDesc", "Harus tercapai setiap hari agar target bulanan aman.")
                 : t("dashboard.noTargetDailyDesc", "Target harian belum ditentukan.")
@@ -372,13 +378,13 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           </div>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 flex flex-col justify-between">
-          <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{t("dashboard.prediction", "Estimasi Profit Akhir Bulan")}</span>
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+          <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.prediction", "Estimasi Profit Akhir Bulan")}</span>
           <div className="my-4">
-            <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight">
+            <span className="font-mono text-4xl font-black text-zinc-950 dark:text-white block tracking-tight tabular-nums">
               {formatRupiah(predictionProfit)}
             </span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 block leading-relaxed font-medium">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-2.5 block leading-relaxed">
               {t("dashboard.predictionDesc", "Berdasarkan performa rata-rata harian saat ini ({average}/hari).").replace("{average}", formatRupiah(averageDailyProfit))}
             </span>
           </div>
@@ -388,11 +394,11 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
       {/* 5. Grafik Trend & Insight Otomatis */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trend Graph Card */}
-        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
+        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider">{t("dashboard.chartTitle", "Trend Profit Harian")}</h3>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 font-medium">{t("dashboard.chartTitleDesc", "Grafik pergerakan laba kotor harian bulan ini")}</p>
+              <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-widest">{t("dashboard.chartTitle", "Trend Profit Harian")}</h3>
+              <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-1">{t("dashboard.chartTitleDesc", "Grafik pergerakan laba kotor harian bulan ini")}</p>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1">
               <TrendingUp className="w-3.5 h-3.5 text-zinc-500" />
