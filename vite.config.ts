@@ -15,8 +15,6 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks: {
-            // Firebase SDK — loaded once, cached across visits
-            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
             // Charting library — only needed by Dashboard & Laporan
             recharts: ['recharts'],
             // PDF generation — only needed when user exports reports

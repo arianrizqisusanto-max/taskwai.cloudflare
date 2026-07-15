@@ -1,21 +1,6 @@
-import { db, auth } from "./firebase";
-import { signInAnonymously } from "firebase/auth";
-import { 
-  doc, 
-  getDoc, 
-  setDoc, 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc,
-  limit
-} from "firebase/firestore";
 import { Restaurant, DailyProfit, Expenses } from "../types";
 
-// Helper for secure client-side hashing
+// Helper for local hashing (for fallback or demo mode)
 async function hashCredentials(username: string, password: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(`${username.trim().toLowerCase()}:${password}`);
   const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
@@ -60,7 +45,6 @@ const generateDefaultDailyProfits = (restaurantId: string): DailyProfit[] => {
   const currentMonth = today.getMonth(); // 0-indexed
   const currentDateNum = today.getDate();
 
-  // Notes to make it feel super realistic and high-fidelity
   const notesPreset = [
     "Ramai pesanan katering makan siang",
     "Hujan lebat di sore hari, sepi pengunjung malam",
@@ -71,22 +55,15 @@ const generateDefaultDailyProfits = (restaurantId: string): DailyProfit[] => {
     "Hari biasa, traffic stabil"
   ];
 
-  // We generate data from 1st of this month to today (or at least up to 5 days if today is early)
-  // Let's generate for at least the last 15 days or up to today, whichever is larger, 
-  // but all inside the current month
   const daysToGenerate = Math.max(5, currentDateNum);
   
   for (let i = 1; i <= daysToGenerate; i++) {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
     
-    // Skip today if we want the owner to input it, but let's pre-fill up to yesterday
     if (i === currentDateNum && today.getHours() < 18) {
-      // If today is early, don't pre-fill today, let them fill it
       continue;
     }
 
-    // Profit between 1,200,000 and 2,800,000
-    // Weekends (Friday, Saturday, Sunday) get higher profits
     const dateObj = new Date(currentYear, currentMonth, i);
     const dayOfWeek = dateObj.getDay();
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6;
@@ -107,7 +84,6 @@ const generateDefaultDailyProfits = (restaurantId: string): DailyProfit[] => {
     });
   }
 
-  // Sort by date ascending
   return profits.sort((a, b) => a.date.localeCompare(b.date));
 };
 
@@ -121,8 +97,70 @@ const setLocal = <T>(key: string, value: T): void => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
+// Helper for API request headers
+function getHeaders() {
+  const token = localStorage.getItem('taskwai_session_token');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export const DataService = {
-  // Get entire restaurant data
+  // --- CUSTOM CLOUDFLARE AUTHENTICATION ---
+  async loginGoogle(idToken: string): Promise<any> {
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken })
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal login dengan Google');
+    }
+    const data = await res.json() as any;
+    if (data.token) {
+      localStorage.setItem('taskwai_session_token', data.token);
+    }
+    return data;
+  },
+
+  async getMe(): Promise<any> {
+    const token = localStorage.getItem('taskwai_session_token');
+    if (!token) return { user: null };
+
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: getHeaders()
+      });
+      if (!res.ok) {
+        localStorage.removeItem('taskwai_session_token');
+        return { user: null };
+      }
+      return await res.json();
+    } catch (e) {
+      console.error('Error fetching auth state:', e);
+      return { user: null };
+    }
+  },
+
+  async logout(): Promise<void> {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: getHeaders()
+      });
+    } catch (e) {
+      console.error('Error calling logout api:', e);
+    } finally {
+      localStorage.removeItem('taskwai_session_token');
+    }
+  },
+
+  // --- RESTAURANT ENDPOINTS ---
   async getRestaurant(userId: string): Promise<Restaurant> {
     if (!userId || userId === "demo") {
       let rest = getLocal<Restaurant>("taskwai_restaurant");
@@ -134,18 +172,11 @@ export const DataService = {
     }
 
     try {
-      const docRef = doc(db, "restaurants", `rest_${userId}`);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        return docSnap.data() as Restaurant;
-      } else {
-        const newRest = DEFAULT_RESTAURANT(userId);
-        await setDoc(docRef, newRest);
-        return newRest;
-      }
+      const res = await fetch('/api/restaurant', { headers: getHeaders() });
+      if (!res.ok) throw new Error('Failed to fetch restaurant');
+      return await res.json() as Restaurant;
     } catch (error) {
-      console.error("Error getting restaurant from Firestore:", error);
-      // Fallback to local
+      console.error("Error getting restaurant from Cloudflare API:", error);
       let rest = getLocal<Restaurant>(`taskwai_restaurant_${userId}`);
       if (!rest) rest = DEFAULT_RESTAURANT(userId);
       return rest;
@@ -161,22 +192,23 @@ export const DataService = {
     }
 
     try {
-      const docRef = doc(db, "restaurants", `rest_${userId}`);
-      await setDoc(docRef, data, { merge: true });
-      return await this.getRestaurant(userId);
+      const res = await fetch('/api/restaurant', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('Failed to update restaurant');
+      return await res.json() as Restaurant;
     } catch (error) {
       console.error("Error updating restaurant:", error);
-      if (!userId || userId === "demo") {
-        const rest = getLocal<Restaurant>(`taskwai_restaurant_${userId}`) || DEFAULT_RESTAURANT(userId);
-        const updated = { ...rest, ...data };
-        setLocal(`taskwai_restaurant_${userId}`, updated);
-        return updated;
-      }
-      throw error;
+      const rest = getLocal<Restaurant>(`taskwai_restaurant_${userId}`) || DEFAULT_RESTAURANT(userId);
+      const updated = { ...rest, ...data };
+      setLocal(`taskwai_restaurant_${userId}`, updated);
+      return updated;
     }
   },
 
-  // Get fixed expenses
+  // --- EXPENSES ENDPOINTS ---
   async getExpenses(userId: string, restaurantId: string): Promise<Expenses> {
     if (!userId || userId === "demo") {
       let exp = getLocal<Expenses>("taskwai_expenses");
@@ -188,15 +220,9 @@ export const DataService = {
     }
 
     try {
-      const docRef = doc(db, "expenses", `exp_${userId}`);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        return docSnap.data() as Expenses;
-      } else {
-        const newExp = DEFAULT_EXPENSES(userId, restaurantId);
-        await setDoc(docRef, newExp);
-        return newExp;
-      }
+      const res = await fetch('/api/expenses', { headers: getHeaders() });
+      if (!res.ok) throw new Error('Failed to fetch expenses');
+      return await res.json() as Expenses;
     } catch (error) {
       console.error("Error getting expenses:", error);
       let exp = getLocal<Expenses>(`taskwai_expenses_${userId}`);
@@ -214,22 +240,23 @@ export const DataService = {
     }
 
     try {
-      const docRef = doc(db, "expenses", `exp_${userId}`);
-      await setDoc(docRef, { ...data, updatedAt: new Date().toISOString() }, { merge: true });
-      return await this.getExpenses(userId, restaurantId);
+      const res = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('Failed to update expenses');
+      return await res.json() as Expenses;
     } catch (error) {
       console.error("Error updating expenses:", error);
-      if (!userId || userId === "demo") {
-        const exp = getLocal<Expenses>(`taskwai_expenses_${userId}`) || DEFAULT_EXPENSES(userId, restaurantId);
-        const updated = { ...exp, ...data, updatedAt: new Date().toISOString() };
-        setLocal(`taskwai_expenses_${userId}`, updated);
-        return updated;
-      }
-      throw error;
+      const exp = getLocal<Expenses>(`taskwai_expenses_${userId}`) || DEFAULT_EXPENSES(userId, restaurantId);
+      const updated = { ...exp, ...data, updatedAt: new Date().toISOString() };
+      setLocal(`taskwai_expenses_${userId}`, updated);
+      return updated;
     }
   },
 
-  // Daily profit logs
+  // --- DAILY PROFITS ENDPOINTS ---
   async getDailyProfits(userId: string, restaurantId: string): Promise<DailyProfit[]> {
     if (!userId || userId === "demo") {
       let profits = getLocal<DailyProfit[]>("taskwai_daily_profits");
@@ -237,21 +264,13 @@ export const DataService = {
         profits = generateDefaultDailyProfits(restaurantId);
         setLocal("taskwai_daily_profits", profits);
       }
-      return profits.sort((a, b) => b.date.localeCompare(a.date)); // descending date
+      return profits.sort((a, b) => b.date.localeCompare(a.date));
     }
 
     try {
-      const q = query(
-        collection(db, "daily_profit"),
-        where("restaurantId", "==", restaurantId)
-      );
-      const querySnapshot = await getDocs(q);
-      const profits: DailyProfit[] = [];
-      querySnapshot.forEach((doc) => {
-        profits.push({ id: doc.id, ...doc.data() } as DailyProfit);
-      });
-
-      return profits.sort((a, b) => b.date.localeCompare(a.date));
+      const res = await fetch('/api/profits', { headers: getHeaders() });
+      if (!res.ok) throw new Error('Failed to fetch profits');
+      return await res.json() as DailyProfit[];
     } catch (error) {
       console.error("Error getting daily profits:", error);
       let profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`);
@@ -278,133 +297,55 @@ export const DataService = {
       inputterName?: string;
     }
   ): Promise<DailyProfit> {
-    const id = `dp_${restaurantId}_${entry.date}_${Math.random().toString(36).substring(2, 7)}`;
-    const newProfit: DailyProfit = {
-      id,
-      restaurantId,
-      date: entry.date,
-      profit: entry.profit,
-      notes: entry.notes || "",
-      createdAt: new Date().toISOString(),
-      omzet: entry.omzet,
-      hppType: entry.hppType,
-      hppVal: entry.hppVal,
-      otherExpenses: entry.otherExpenses,
-      branchName: entry.branchName,
-      inputterName: entry.inputterName
-    };
-
-    // Update branches autocomplete list
-    if (entry.branchName && entry.branchName.trim()) {
-      const cleanedBranch = entry.branchName.trim();
-      if (!userId || userId === "demo") {
-        const rest = getLocal<Restaurant>("taskwai_restaurant") || DEFAULT_RESTAURANT("demo");
-        const currentBranches = rest.branches || [];
-        if (!currentBranches.includes(cleanedBranch)) {
-          rest.branches = [...currentBranches, cleanedBranch];
-          setLocal("taskwai_restaurant", rest);
-        }
-      } else {
-        try {
-          const restDocRef = doc(db, "restaurants", restaurantId);
-          const restSnap = await getDoc(restDocRef);
-          if (restSnap.exists()) {
-            const restData = restSnap.data() as Restaurant;
-            const currentBranches = restData.branches || [];
-            if (!currentBranches.includes(cleanedBranch)) {
-              await updateDoc(restDocRef, { branches: [...currentBranches, cleanedBranch] });
-            }
-          }
-        } catch (e) {
-          console.warn("Failed to update branches list in Firestore:", e);
-        }
-      }
-    }
-
     if (!userId || userId === "demo") {
+      const id = `dp_${restaurantId}_${entry.date}_${Math.random().toString(36).substring(2, 7)}`;
+      const newProfit: DailyProfit = {
+        id,
+        restaurantId,
+        date: entry.date,
+        profit: entry.profit,
+        notes: entry.notes || "",
+        createdAt: new Date().toISOString(),
+        omzet: entry.omzet,
+        hppType: entry.hppType,
+        hppVal: entry.hppVal,
+        otherExpenses: entry.otherExpenses,
+        branchName: entry.branchName,
+        inputterName: entry.inputterName
+      };
+
       const profits = await this.getDailyProfits("demo", restaurantId);
       const targetBranch = entry.branchName || "";
-      // Remove duplicate for same date AND same branchName
       const filtered = profits.filter((p) => {
         const pBranch = p.branchName || "";
         return !(p.date === entry.date && pBranch.trim().toLowerCase() === targetBranch.trim().toLowerCase());
       });
       const updated = [newProfit, ...filtered];
       setLocal("taskwai_daily_profits", updated);
+
+      if (entry.branchName && entry.branchName.trim()) {
+        const cleanedBranch = entry.branchName.trim();
+        const rest = getLocal<Restaurant>("taskwai_restaurant") || DEFAULT_RESTAURANT("demo");
+        const currentBranches = rest.branches || [];
+        if (!currentBranches.includes(cleanedBranch)) {
+          rest.branches = [...currentBranches, cleanedBranch];
+          setLocal("taskwai_restaurant", rest);
+        }
+      }
+
       return newProfit;
     }
 
     try {
-      // Check if entry for this date AND branch already exists, update or allow multiple.
-      const q = query(
-        collection(db, "daily_profit"),
-        where("restaurantId", "==", restaurantId),
-        where("date", "==", entry.date)
-      );
-      const snapshot = await getDocs(q);
-      
-      const targetBranch = entry.branchName || "";
-      const existingDoc = snapshot.docs.find(doc => {
-        const data = doc.data();
-        const docBranch = data.branchName || "";
-        return docBranch.trim().toLowerCase() === targetBranch.trim().toLowerCase();
+      const res = await fetch('/api/profits', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(entry)
       });
-
-      if (existingDoc) {
-        // Update existing date for this specific branch
-        const existingId = existingDoc.id;
-        const updateData: any = {
-          restaurantId,
-          profit: entry.profit,
-          notes: entry.notes || "",
-          createdAt: new Date().toISOString(),
-          omzet: entry.omzet ?? null,
-          hppType: entry.hppType ?? null,
-          hppVal: entry.hppVal ?? null,
-          otherExpenses: entry.otherExpenses ?? null,
-          branchName: entry.branchName ?? null,
-          inputterName: entry.inputterName ?? null
-        };
-        await updateDoc(doc(db, "daily_profit", existingId), updateData);
-        return {
-          id: existingId,
-          restaurantId,
-          date: entry.date,
-          profit: entry.profit,
-          notes: entry.notes || "",
-          createdAt: new Date().toISOString(),
-          omzet: entry.omzet,
-          hppType: entry.hppType,
-          hppVal: entry.hppVal,
-          otherExpenses: entry.otherExpenses,
-          branchName: entry.branchName,
-          inputterName: entry.inputterName
-        };
-      } else {
-        await setDoc(doc(db, "daily_profit", id), {
-          restaurantId,
-          date: entry.date,
-          profit: entry.profit,
-          notes: entry.notes || "",
-          createdAt: new Date().toISOString(),
-          omzet: entry.omzet ?? null,
-          hppType: entry.hppType ?? null,
-          hppVal: entry.hppVal ?? null,
-          otherExpenses: entry.otherExpenses ?? null,
-          branchName: entry.branchName ?? null,
-          inputterName: entry.inputterName ?? null
-        });
-        return newProfit;
-      }
+      if (!res.ok) throw new Error('Failed to add daily profit');
+      return await res.json() as DailyProfit;
     } catch (error) {
       console.error("Error adding daily profit:", error);
-      if (!userId || userId === "demo") {
-        const profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`) || [];
-        const filtered = profits.filter((p) => p.date !== entry.date);
-        const updated = [newProfit, ...filtered];
-        setLocal(`taskwai_daily_profits_${userId}`, updated);
-        return newProfit;
-      }
       throw error;
     }
   },
@@ -418,66 +359,40 @@ export const DataService = {
     }
 
     try {
-      await deleteDoc(doc(db, "daily_profit", id));
+      const res = await fetch(`/api/profits?id=${id}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      if (!res.ok) throw new Error('Failed to delete daily profit');
     } catch (error) {
       console.error("Error deleting daily profit:", error);
-      if (!userId || userId === "demo") {
-        const profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`) || [];
-        const filtered = profits.filter((p) => p.id !== id);
-        setLocal(`taskwai_daily_profits_${userId}`, filtered);
-        return;
-      }
       throw error;
     }
   },
 
+  // --- STAFF ENDPOINTS ---
   async saveStaffCredentials(userId: string, restaurantId: string, username: string, password: string): Promise<void> {
-    const updatedAtIso = new Date().toISOString();
-
     if (!userId || userId === "demo") {
       const rest = getLocal<Restaurant>("taskwai_restaurant") || DEFAULT_RESTAURANT("demo");
       rest.staffUsername = username;
       rest.staffPassword = password;
       rest.staffActive = true;
-      rest.staffUpdatedAt = updatedAtIso;
+      rest.staffUpdatedAt = new Date().toISOString();
       setLocal("taskwai_restaurant", rest);
       return;
     }
 
-    const hash = await hashCredentials(username, password);
-
-    // Get the current restaurant doc to check for an existing hash
-    const restDocRef = doc(db, "restaurants", restaurantId);
-    const restSnap = await getDoc(restDocRef);
-    let oldHash = "";
-    if (restSnap.exists()) {
-      oldHash = restSnap.data().staffHash || "";
+    try {
+      const res = await fetch('/api/staff/setup', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ username, password })
+      });
+      if (!res.ok) throw new Error('Failed to save staff credentials');
+    } catch (error) {
+      console.error("Error saving staff credentials:", error);
+      throw error;
     }
-
-    // Delete old hash mapping if it changed
-    if (oldHash && oldHash !== hash) {
-      try {
-        await deleteDoc(doc(db, "staff_accounts", oldHash));
-      } catch (err) {
-        console.warn("Failed to delete old staff hash doc:", err);
-      }
-    }
-
-    // Write new mapping
-    await setDoc(doc(db, "staff_accounts", hash), {
-      restaurantId,
-      ownerId: userId,
-      staffActive: true
-    });
-
-    // Update restaurant doc
-    await updateDoc(restDocRef, {
-      staffUsername: username,
-      staffPassword: password,
-      staffHash: hash,
-      staffActive: true,
-      staffUpdatedAt: updatedAtIso
-    });
   },
 
   async toggleStaffActive(userId: string, restaurantId: string, active: boolean): Promise<void> {
@@ -488,31 +403,24 @@ export const DataService = {
       return;
     }
 
-    const restDocRef = doc(db, "restaurants", restaurantId);
-    
-    // Also update staffActive status in staff_accounts mapping
-    const restSnap = await getDoc(restDocRef);
-    if (restSnap.exists()) {
-      const hash = restSnap.data().staffHash || "";
-      if (hash) {
-        await updateDoc(doc(db, "staff_accounts", hash), {
-          staffActive: active
-        });
-      }
+    try {
+      const res = await fetch('/api/staff/toggle', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ active })
+      });
+      if (!res.ok) throw new Error('Failed to toggle staff status');
+    } catch (error) {
+      console.error("Error toggling staff status:", error);
+      throw error;
     }
-
-    await updateDoc(restDocRef, {
-      staffActive: active
-    });
   },
 
   async loginStaff(username: string, password: string): Promise<{ restaurantId: string; ownerId: string }> {
-    // Demo Mode fallback
     if (username === "demo_staff" && password === "demo123") {
       return { restaurantId: "rest_demo", ownerId: "demo" };
     }
 
-    // Also check local storage for custom local credentials
     const localRest = getLocal<Restaurant>("taskwai_restaurant");
     if (localRest && localRest.staffUsername === username && localRest.staffPassword === password) {
       if (localRest.staffActive === false) {
@@ -521,54 +429,32 @@ export const DataService = {
       return { restaurantId: localRest.id, ownerId: localRest.ownerId };
     }
 
-    const hash = await hashCredentials(username, password);
-
-    // Read staff account credentials hash document
-    const accountRef = doc(db, "staff_accounts", hash);
-    const accountSnap = await getDoc(accountRef);
-
-    if (!accountSnap.exists()) {
-      throw new Error("Username atau Password staff salah.");
+    try {
+      const res = await fetch('/api/staff/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      if (!res.ok) {
+        const err = await res.json() as any;
+        throw new Error(err.error || 'Username atau password staff salah.');
+      }
+      const data = await res.json() as any;
+      if (data.token) {
+        localStorage.setItem('taskwai_session_token', data.token);
+      }
+      return { restaurantId: data.restaurantId, ownerId: data.ownerId };
+    } catch (error: any) {
+      console.error("Staff login error:", error);
+      throw error;
     }
-
-    const { restaurantId, ownerId, staffActive } = accountSnap.data() as { restaurantId: string; ownerId: string; staffActive?: boolean };
-
-    if (staffActive === false) {
-      throw new Error("Akun staff telah dinonaktifkan oleh pemilik usaha.");
-    }
-
-    // Authenticate anonymously in Firebase Auth
-    const userCredential = await signInAnonymously(auth);
-    const anonymousUid = userCredential.user.uid;
-
-    // Write temporary active staff session
-    await setDoc(doc(db, "staff_sessions", anonymousUid), {
-      restaurantId,
-      ownerId,
-      createdAt: new Date().toISOString()
-    });
-
-    return { restaurantId, ownerId };
   },
 
   async ensureStaffSession(anonymousUid: string, restaurantId: string, ownerId: string): Promise<void> {
-    if (!anonymousUid || anonymousUid === "demo") return;
-    try {
-      const sessionRef = doc(db, "staff_sessions", anonymousUid);
-      const sessionSnap = await getDoc(sessionRef);
-      if (!sessionSnap.exists()) {
-        console.log("Restoring missing staff session doc in Firestore for UID:", anonymousUid);
-        await setDoc(sessionRef, {
-          restaurantId,
-          ownerId,
-          createdAt: new Date().toISOString()
-        });
-      }
-    } catch (e) {
-      console.warn("Failed to check/restore staff session in Firestore:", e);
-    }
+    // No-op in Cloudflare setup
   },
 
+  // --- GENERAL SYSTEM ENDPOINTS ---
   async resetAllData(userId: string, restaurantId: string): Promise<void> {
     if (!userId || userId === "demo") {
       localStorage.removeItem("taskwai_restaurant");
@@ -584,41 +470,13 @@ export const DataService = {
     }
 
     try {
-      const q = query(
-        collection(db, "daily_profit"),
-        where("restaurantId", "==", restaurantId)
-      );
-      const querySnapshot = await getDocs(q);
-      const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
-      await Promise.all(deletePromises);
-
-      const expDocRef = doc(db, "expenses", `exp_${userId}`);
-      await setDoc(expDocRef, {
-        restaurantId,
-        sewaTempat: 0,
-        gajiKaryawan: 0,
-        royaltiFranchise: 0,
-        listrik: 0,
-        air: 0,
-        internet: 0,
-        marketing: 0,
-        pajak: 0,
-        biayaLain: 0,
-        cicilanBank: 0,
-        updatedAt: new Date().toISOString()
+      const res = await fetch('/api/restaurant/reset', {
+        method: 'POST',
+        headers: getHeaders()
       });
-
-      const restDocRef = doc(db, "restaurants", restaurantId);
-      await updateDoc(restDocRef, {
-        name: "Nama Usaha Baru",
-        monthlyTargetProfit: 0,
-        staffUsername: "",
-        staffPassword: "",
-        staffHash: "",
-        branches: []
-      });
+      if (!res.ok) throw new Error('Failed to reset all data');
     } catch (error) {
-      console.error("Error resetting all data in Firestore:", error);
+      console.error("Error resetting all data:", error);
       throw error;
     }
   },
@@ -628,21 +486,9 @@ export const DataService = {
     activeTodayCount: number;
   }> {
     try {
-      const restSnap = await getDocs(collection(db, "restaurants"));
-      const totalRestaurants = restSnap.size;
-
-      const profitSnap = await getDocs(query(
-        collection(db, "daily_profit"),
-        where("date", "==", todayStr)
-      ));
-      
-      const activeRestIds = Array.from(new Set(profitSnap.docs.map(doc => doc.data().restaurantId)));
-      const activeTodayCount = activeRestIds.length;
-
-      return {
-        totalRestaurants,
-        activeTodayCount
-      };
+      const res = await fetch(`/api/restaurant/stats?today=${todayStr}`);
+      if (!res.ok) throw new Error('Failed to fetch stats');
+      return await res.json() as any;
     } catch (e) {
       console.error("Error getting system stats:", e);
       const localRest = getLocal<Restaurant>("taskwai_restaurant");

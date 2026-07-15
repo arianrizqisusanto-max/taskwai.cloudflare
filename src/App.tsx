@@ -4,8 +4,6 @@
  */
 
 import { useState, useEffect, lazy, Suspense } from "react";
-import { onAuthStateChanged, User, signInAnonymously } from "firebase/auth";
-import { auth } from "./lib/firebase";
 import { DataService } from "./lib/dataService";
 import { Restaurant, DailyProfit, Expenses } from "./types";
 
@@ -24,7 +22,7 @@ const AdminConsole = lazy(() => import("./components/AdminConsole"));
 
 function MainApp() {
   const { showToast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [authInitialized, setAuthInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(() => {
@@ -97,51 +95,45 @@ function MainApp() {
   const [profits, setProfits] = useState<DailyProfit[]>([]);
   const [expenses, setExpenses] = useState<Expenses | null>(null);
 
-  // 1. Listen to Firebase Auth
+  // 1. Fetch Auth State from Cloudflare D1 Backend on startup
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setAuthInitialized(true);
-      if (currentUser?.email === "arianrisqi@gmail.com") {
-        setActiveTab("admin");
-      } else {
-        setActiveTab((prev) => (prev === "admin" ? "dashboard" : prev));
+    const checkAuth = async () => {
+      try {
+        const data = await DataService.getMe();
+        if (data.user) {
+          setUser(data.user);
+          if (data.user.email === "arianrisqi@gmail.com") {
+            setActiveTab("admin");
+          }
+        } else if (data.staffSession) {
+          setStaffSession(data.staffSession);
+          localStorage.setItem("taskwai_staff_session", JSON.stringify(data.staffSession));
+          setActiveTab("input");
+        }
+      } catch (err) {
+        console.error("Auth initialization failed:", err);
+      } finally {
+        setAuthInitialized(true);
       }
-    });
-    return () => unsubscribe();
+    };
+    checkAuth();
   }, []);
 
-  // 2. Fetch data based on User Session (Real Firebase vs Demo vs Staff)
+  // 2. Fetch data based on User Session (Real D1 vs Demo vs Staff)
   useEffect(() => {
     if (!authInitialized) return;
 
     const fetchData = async () => {
       setLoading(true);
       
-      let currentUser = user;
-      if (currentUser?.email === "arianrisqi@gmail.com") {
+      if (user?.email === "arianrisqi@gmail.com") {
         setLoading(false);
         return;
       }
-      if (staffSession && !currentUser) {
-        try {
-          console.log("Restoring anonymous staff auth session...");
-          const userCredential = await signInAnonymously(auth);
-          currentUser = userCredential.user;
-          setUser(currentUser);
-        } catch (authErr) {
-          console.error("Failed to restore anonymous staff auth:", authErr);
-        }
-      }
 
-      const userId = staffSession ? staffSession.ownerId : (currentUser ? currentUser.uid : "demo");
+      const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
 
       try {
-        // If staff session is active locally but the Firestore session document is missing, restore it.
-        if (staffSession && currentUser && currentUser.isAnonymous) {
-          await DataService.ensureStaffSession(currentUser.uid, staffSession.restaurantId, staffSession.ownerId);
-        }
-
         // Fetch restaurant config
         const restData = await DataService.getRestaurant(userId);
         setRestaurant(restData);
@@ -171,7 +163,7 @@ function MainApp() {
     }
   }, [user, authInitialized, staffSession]);
 
-  // 3. Handlers for database updates (with automatic instant state update, NO reload)
+  // 3. Handlers for database updates
   const handleSaveProfit = async (
     date: string, 
     profit: number, 
@@ -299,7 +291,6 @@ function MainApp() {
     try {
       await DataService.resetAllData(userId, restaurant.id);
       showToast(t("target.resetSuccess", "Semua data berhasil direset. Mulai usaha dari nol lagi!"), "success");
-      // Delay slightly for toast visibility, then reload to restore clean guest/fresh setup
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -311,7 +302,6 @@ function MainApp() {
 
   // Render correct tab view dynamically
   const renderView = () => {
-    // Admin Console doesn't need restaurant/expenses data — render immediately
     if (activeTab === "admin" && authInitialized) {
       return <AdminConsole />;
     }
@@ -378,6 +368,7 @@ function MainApp() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-zinc-50 to-gray-50 dark:bg-zinc-950 dark:[background-image:none] flex flex-col font-sans text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
       <Navbar
         user={user}
+        setUser={setUser}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         restaurantName={restaurant ? restaurant.name : "taskwai"}

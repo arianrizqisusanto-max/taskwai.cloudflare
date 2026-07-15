@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { auth, googleProvider } from "../lib/firebase";
-import { signInWithPopup, signOut, User as FirebaseUser } from "firebase/auth";
+import React, { useState, useEffect } from "react";
 import { LogIn, LogOut, LayoutDashboard, DollarSign, Settings, FileText, Landmark, ShieldCheck, Sun, Moon, AlertTriangle, RotateCw, Sparkles, X, TrendingUp, Users, Coins, Cloud, Lock, User as UserIcon, UserCheck, Eye, EyeOff } from "lucide-react";
 import { useToast } from "./Toast";
 import TaskwaiLogo from "./TaskwaiLogo";
@@ -8,7 +6,8 @@ import { useTranslation } from "../lib/LanguageContext";
 import { DataService } from "../lib/dataService";
 
 interface NavbarProps {
-  user: FirebaseUser | null;
+  user: any | null;
+  setUser: (user: any | null) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   restaurantName: string;
@@ -21,6 +20,7 @@ interface NavbarProps {
 
 export default function Navbar({
   user,
+  setUser,
   activeTab,
   setActiveTab,
   restaurantName,
@@ -44,6 +44,31 @@ export default function Navbar({
   const [isLoggingInStaff, setIsLoggingInStaff] = useState(false);
   const [showStaffPassword, setShowStaffPassword] = useState(false);
 
+  // Google GSI Sign-In Button rendering when modal is visible
+  useEffect(() => {
+    if (showLoginModal && loginTab === "owner") {
+      const timer = setTimeout(() => {
+        const google = (window as any).google;
+        if (google) {
+          google.accounts.id.initialize({
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "888780289762-bnd08vbfkspqg2o9iif8bcr91a92jsh5.apps.googleusercontent.com",
+            callback: handleGoogleLoginResponse
+          });
+          google.accounts.id.renderButton(
+            document.getElementById("google-signin-button"),
+            { 
+              theme: isDark ? "dark" : "outline", 
+              size: "large", 
+              width: 280,
+              shape: "pill"
+            }
+          );
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [showLoginModal, loginTab, isDark]);
+
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => {
@@ -51,14 +76,22 @@ export default function Navbar({
     }, 400);
   };
 
-  const handleLogin = async () => {
+  const handleGoogleLoginResponse = async (response: any) => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const idToken = response.credential;
+      const data = await DataService.loginGoogle(idToken);
+      setUser(data.user);
       showToast(t("nav.loginSuccess", "Berhasil masuk menggunakan akun Google!"), "success");
       setShowLoginModal(false);
+
+      if (data.user.email === "arianrisqi@gmail.com") {
+        setActiveTab("admin");
+      } else {
+        setActiveTab("dashboard");
+      }
     } catch (error: any) {
       console.error("Login error:", error);
-      showToast(t("nav.loginError", "Gagal masuk dengan Google. Anda tetap dapat menggunakan Mode Demo Offline."), "warning");
+      showToast(error.message || t("nav.loginError", "Gagal masuk dengan Google."), "error");
     }
   };
 
@@ -99,12 +132,14 @@ export default function Navbar({
       if (staffSession) {
         setStaffSession(null);
         localStorage.removeItem("taskwai_staff_session");
-        await signOut(auth); // Sign out Firebase anonymous user
+        await DataService.logout();
         showToast("Sesi staff telah berakhir.", "info");
       } else {
-        await signOut(auth);
+        await DataService.logout();
+        setUser(null);
         showToast(t("nav.logoutSuccess", "Berhasil keluar."), "info");
       }
+      setActiveTab("dashboard");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -123,6 +158,10 @@ export default function Navbar({
           { id: "laporan", label: t("nav.laporan", "Laporan"), icon: FileText },
           { id: "target", label: t("nav.target", "Pengaturan"), icon: Settings },
         ];
+
+  // User Profile fields fallbacks
+  const photoURL = user?.picture || user?.photoURL;
+  const displayName = user?.name || user?.displayName;
 
   return (
     <>
@@ -158,14 +197,14 @@ export default function Navbar({
                 <button
                    key={item.id}
                    onClick={() => setActiveTab(item.id)}
-                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
-                     isActive
-                       ? "bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/40 font-black"
-                       : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60"
-                   }`}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                      isActive
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/40 font-black"
+                        : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60"
+                    }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  {item.label}
+                   <Icon className="w-3.5 h-3.5" />
+                   {item.label}
                 </button>
               );
             })}
@@ -230,7 +269,7 @@ export default function Navbar({
               </div>
             ) : user ? (
               <div className="flex items-center gap-2 pl-1.5">
-                {user.photoURL && (
+                {photoURL && (
                   <div 
                     onClick={() => {
                       if (user.email) {
@@ -241,8 +280,8 @@ export default function Navbar({
                     className="relative group cursor-pointer"
                   >
                     <img
-                      src={user.photoURL}
-                      alt={user.displayName || "Owner"}
+                      src={photoURL}
+                      alt={displayName || "Owner"}
                       referrerPolicy="no-referrer"
                       className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all hover:ring-2 hover:ring-zinc-950/10 dark:hover:ring-white/10"
                     />
@@ -533,17 +572,7 @@ export default function Navbar({
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
-                <button
-                  onClick={handleLogin}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-zinc-200/80 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 bg-white dark:bg-zinc-900 rounded-2xl transition-all shadow-sm font-bold text-xs uppercase tracking-wider text-zinc-700 dark:text-zinc-200 cursor-pointer"
-                >
-                  <img
-                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                    alt="Google Logo"
-                    className="w-4 h-4"
-                  />
-                  <span>Masuk dengan Google</span>
-                </button>
+                <div id="google-signin-button" className="w-full flex justify-center py-2 min-h-[44px]"></div>
               </div>
             ) : (
               <form onSubmit={handleStaffLoginSubmit} className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
