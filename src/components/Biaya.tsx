@@ -29,6 +29,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
   const [marketing, setMarketing] = useState(new Intl.NumberFormat(formatLocale).format(expenses.marketing));
   const [pajak, setPajak] = useState(new Intl.NumberFormat(formatLocale).format(expenses.pajak));
   const [biayaLain, setBiayaLain] = useState(new Intl.NumberFormat(formatLocale).format(expenses.biayaLain));
+  const [cicilanBank, setCicilanBank] = useState(new Intl.NumberFormat(formatLocale).format(expenses.cicilanBank || 0));
 
   const handleCurrencyChange = (val: string, setter: (v: string) => void) => {
     const rawValue = val.replace(/[^0-9]/g, "");
@@ -55,10 +56,11 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
   const valInternet = parseValue(internet);
   const valMarketing = parseValue(marketing);
   const valPajak = parseValue(pajak);
+  const valCicilan = parseValue(cicilanBank);
   const valLain = parseValue(biayaLain);
 
   const totalBiaya = 
-    valSewa + valGaji + valFranchise + valListrik + valAir + valInternet + valMarketing + valPajak + valLain;
+    valSewa + valGaji + valFranchise + valListrik + valAir + valInternet + valMarketing + valPajak + valCicilan + valLain;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +75,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
       internet: valInternet,
       marketing: valMarketing,
       pajak: valPajak,
+      cicilanBank: valCicilan,
       biayaLain: valLain
     };
 
@@ -97,6 +100,7 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
     { name: t("biaya.internet", "Internet"), value: valInternet },
     { name: t("biaya.marketing", "Marketing"), value: valMarketing },
     { name: t("biaya.pajak", "Pajak"), value: valPajak },
+    { name: t("biaya.cicilanBank", "Cicilan Bank"), value: valCicilan },
     { name: t("biaya.lain", "Biaya Lain-Lain"), value: valLain }
   ].filter(item => item.value > 0);
 
@@ -250,8 +254,22 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
               </div>
             </div>
 
+            {/* Cicilan Bank */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.cicilanBank", "Cicilan Bank")}</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>
+                <input
+                  type="text"
+                  value={cicilanBank}
+                  onChange={(e) => handleCurrencyChange(e.target.value, setCicilanBank)}
+                  className="w-full pl-9 pr-3 py-2 text-sm font-semibold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                />
+              </div>
+            </div>
+
             {/* Biaya Lain */}
-            <div className="space-y-1.5 sm:col-span-2">
+            <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.lain", "Biaya Lain-Lain")}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 dark:text-zinc-500 font-mono">{currencySymbol}</span>

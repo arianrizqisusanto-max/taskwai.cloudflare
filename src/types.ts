@@ -47,5 +47,6 @@ export interface Expenses {
   marketing: number;
   pajak: number;
   biayaLain: number;
+  cicilanBank: number;
   updatedAt: string;
 }

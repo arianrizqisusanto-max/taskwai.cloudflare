@@ -48,6 +48,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
     expenses.internet +
     expenses.marketing +
     expenses.pajak +
+    (expenses.cicilanBank || 0) +
     expenses.biayaLain;
 
   // Target Profit Bulanan (Laba Bersih yang diinginkan owner)

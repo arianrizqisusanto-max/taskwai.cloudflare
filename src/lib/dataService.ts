@@ -48,6 +48,7 @@ const DEFAULT_EXPENSES = (userId: string, restaurantId: string): Expenses => ({
   marketing: 1500000,
   pajak: 1200000,
   biayaLain: 1000000,
+  cicilanBank: 0,
   updatedAt: new Date().toISOString()
 });
 
@@ -603,6 +604,7 @@ export const DataService = {
         marketing: 0,
         pajak: 0,
         biayaLain: 0,
+        cicilanBank: 0,
         updatedAt: new Date().toISOString()
       });
 

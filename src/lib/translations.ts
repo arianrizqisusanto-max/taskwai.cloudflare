@@ -123,6 +123,7 @@ export const enTranslations: Record<string, string> = {
   "biaya.rentNotice": "Note: All values below are monthly expenses. If rent or other costs are paid annually, please divide by 12 before inputting.",
   "biaya.total": "Total",
   "biaya.sewa": "Rent / Place",
+  "biaya.cicilanBank": "Bank Loan Repayment",
   "biaya.gaji": "Employee Salaries",
   "biaya.royalti": "Franchise Royalty",
   "biaya.listrik": "Electricity",
