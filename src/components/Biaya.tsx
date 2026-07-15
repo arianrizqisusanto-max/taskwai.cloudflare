@@ -124,21 +124,22 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
       {/* Input Form Column */}
       <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-6">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <div>
               <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("biaya.title", "Atur Biaya Operasional Tetap")}</h2>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium leading-relaxed">
                 {t("biaya.subtitle", "Masukkan taksiran pengeluaran tetap bulanan usaha Anda.")}
               </p>
-              <div className="mt-2.5 text-[11px] text-zinc-500 dark:text-zinc-400 font-bold bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/60 rounded-xl p-3 max-w-lg leading-normal flex items-start gap-2">
-                <span className="text-emerald-500 shrink-0 text-xs">💡</span>
-                <span>{t("biaya.rentNotice", "Catatan: Semua nilai di bawah adalah pengeluaran per bulan. Jika ada biaya tahunan (seperti sewa tempat tahunan), silakan dibagi 12 terlebih dahulu sebelum diinput.")}</span>
-              </div>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs font-mono shadow-sm">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs font-mono shadow-sm self-start sm:self-center">
               <Calculator className="w-3.5 h-3.5" />
               <span>{t("biaya.total", "Total")}: {formatRupiah(totalBiaya)}</span>
             </div>
+          </div>
+
+          <div className="mb-6 text-[11px] text-zinc-500 dark:text-zinc-400 font-bold bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/60 rounded-xl p-3 leading-normal flex items-start gap-2">
+            <span className="text-emerald-500 shrink-0 text-xs">💡</span>
+            <span>{t("biaya.rentNotice", "Catatan: Semua nilai di bawah adalah pengeluaran per bulan. Jika ada biaya tahunan (seperti sewa tempat tahunan), silakan dibagi 12 terlebih dahulu sebelum diinput.")}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
