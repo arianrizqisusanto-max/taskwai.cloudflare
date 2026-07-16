@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense, ComponentType } from "react";
 import { DataService } from "./lib/dataService";
 import { Restaurant, DailyProfit, Expenses } from "./types";
 
@@ -13,12 +13,27 @@ import SkeletonLoader from "./components/SkeletonLoader";
 import { ToastProvider, useToast } from "./components/Toast";
 import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
 
+// Helper to catch chunk load errors (due to build hash mismatch after deployment) and reload the page automatically
+function safeLazy<T extends ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+) {
+  return lazy(() =>
+    factory().catch((error) => {
+      console.error("Failed to load chunk, reloading page:", error);
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
+      return { default: (() => null) as unknown as T };
+    })
+  );
+}
+
 // Lazy-loaded tab pages — only downloaded when the user navigates to them
-const InputProfit = lazy(() => import("./components/InputProfit"));
-const Biaya = lazy(() => import("./components/Biaya"));
-const Laporan = lazy(() => import("./components/Laporan"));
-const Target = lazy(() => import("./components/Target"));
-const AdminConsole = lazy(() => import("./components/AdminConsole"));
+const InputProfit = safeLazy(() => import("./components/InputProfit"));
+const Biaya = safeLazy(() => import("./components/Biaya"));
+const Laporan = safeLazy(() => import("./components/Laporan"));
+const Target = safeLazy(() => import("./components/Target"));
+const AdminConsole = safeLazy(() => import("./components/AdminConsole"));
 
 function MainApp() {
   const { showToast } = useToast();
