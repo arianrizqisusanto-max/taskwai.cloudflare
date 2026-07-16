@@ -633,7 +633,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
         <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-550 tracking-tight">{t("profit.history", "Riwayat Operasional")}</h2>
+            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("profit.history", "Riwayat Operasional")}</h2>
             <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("profit.historySubtitle", "Log keuangan harian Anda. Klik baris untuk melihat rincian biaya.")}</p>
           </div>
           <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1 uppercase tracking-wider">
@@ -682,7 +682,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-355 dark:hover:border-zinc-700 rounded-xl transition-all shadow-sm cursor-pointer select-none"
+                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-all shadow-sm cursor-pointer select-none"
                   onClick={() => toggleExpand(p.id)}
                 >
                   <div className="flex items-center justify-between">
@@ -737,7 +737,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                           {formatRupiah(displayProfit)}
                         </span>
                       </div>
-                      <ChevronDown className={`w-4 h-4 text-zinc-400 dark:text-zinc-550 transition-transform duration-200 shrink-0 ${isExpanded ? "rotate-180" : ""}`} />
+                      <ChevronDown className={`w-4 h-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 shrink-0 ${isExpanded ? "rotate-180" : ""}`} />
                     </div>
                   </div>
 
@@ -755,7 +755,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           {/* Left Column: Calculation Breakdown */}
                           <div>
-                            <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-550 tracking-wider mb-2.5 uppercase">
+                            <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 tracking-wider mb-2.5 uppercase">
                               {t("profit.calcDetails", "RINCIAN PERHITUNGAN")}
                             </h4>
                             {hasBreakdown ? (
@@ -791,7 +791,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                                     {formatRupiah(p.profit)}
                                   </span>
                                 </div>
-                                <div className="mt-2 pt-2 border-t border-dotted border-zinc-100/50 dark:border-zinc-800/30 text-[10px] text-zinc-400 dark:text-zinc-550 font-medium">
+                                <div className="mt-2 pt-2 border-t border-dotted border-zinc-100/50 dark:border-zinc-800/30 text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
                                   {t("profit.oldLogDesc", "Log tanpa rincian HPP (Pencatatan Lama)")}
                                 </div>
                               </div>
@@ -801,27 +801,27 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                           {/* Right Column: Notes & Metadata & Trash Icon */}
                           <div className="flex flex-col justify-between">
                             <div>
-                              <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-550 tracking-wider mb-2 uppercase">
+                              <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 tracking-wider mb-2 uppercase">
                                 {t("profit.notes", "CATATAN TAMBAHAN")}
                               </h4>
-                              <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl p-3 text-xs text-zinc-650 dark:text-zinc-350 min-h-[64px] italic flex items-center justify-start">
+                              <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl p-3 text-xs text-zinc-600 dark:text-zinc-300 min-h-[64px] italic flex items-center justify-start">
                                 {p.notes ? `"${p.notes}"` : t("profit.noNotes", "Tidak ada catatan")}
                               </div>
 
                               {/* Metadata Info (Cabang, Operator, Waktu) */}
                               <div className="mt-3 grid grid-cols-3 gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2.5">
                                 <div>
-                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-550 uppercase block font-black mb-0.5">Cabang</span>
+                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Cabang</span>
                                   <span className="text-zinc-800 dark:text-zinc-200 truncate block">🏢 {p.branchName || "Pusat"}</span>
                                 </div>
                                 <div>
-                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-550 uppercase block font-black mb-0.5">Operator</span>
+                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Operator</span>
                                   <span className="text-zinc-800 dark:text-zinc-200 truncate block">
                                     👤 {p.inputterName ? `${p.inputterName} (Staff)` : "Owner"}
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-550 uppercase block font-black mb-0.5">Jam Input</span>
+                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Jam Input</span>
                                   <span className="text-zinc-800 dark:text-zinc-200 font-mono block">⏰ {timeStr || "-"}</span>
                                 </div>
                               </div>
@@ -829,13 +829,13 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
 
                             {/* Details Footer: ID and Delete Action */}
                             <div className="flex items-center justify-between mt-4 border-t border-zinc-100/30 dark:border-zinc-800/30 pt-3">
-                              <span className="text-[9px] text-zinc-400 dark:text-zinc-550 font-mono">
+                              <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">
                                 ID: {p.id}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleDelete(p.id, p.date)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-955/45 text-rose-600 dark:text-rose-450 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/45 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 <span>{t("profit.deleteButton", "Hapus Data")}</span>
@@ -850,8 +850,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
               );
             })
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-555 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-955/25">
-              <Coins className="w-10 h-10 text-zinc-355 dark:text-zinc-600 mb-2" />
+            <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/25">
+              <Coins className="w-10 h-10 text-zinc-300 dark:text-zinc-600 mb-2" />
               <p className="text-xs font-bold text-zinc-500">{t("profit.noHistory", "Belum ada riwayat profit harian.")}</p>
               <p className="text-[10px] mt-1 text-zinc-400">{t("profit.noHistoryDesc", "Silakan tambahkan menggunakan form di sebelah kiri.")}</p>
             </div>
@@ -971,7 +971,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   {t("profit.deleteTitle", "Hapus Riwayat Profit")}
                 </h3>
                 
-                <p className="text-xs text-zinc-550 dark:text-zinc-400 mt-2 leading-relaxed font-semibold">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed font-semibold">
                   {t("profit.deleteConfirmCustom", "Apakah Anda benar-benar yakin ingin menghapus data profit tanggal {date}?").replace("{date}", deleteTargetDate ? formatIndoDate(deleteTargetDate, lang) : "")}
                 </p>
                 
