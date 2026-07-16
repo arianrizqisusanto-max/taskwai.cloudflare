@@ -13,6 +13,24 @@
     <title>Taskwai - Dashboard Usaha Anda</title>
     <meta name="google-site-verification" content="zbTX7FFJpqGeVHJ7kTgYYFFiJ3UEeQKsTilZ9GGQVmo" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script>
+      // Clear any legacy service worker registrations and caches immediately
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].unregister();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(key) {
+            caches.delete(key);
+          });
+        });
+      }
+    </script>
 
     <!-- Preconnect to Google Fonts and Firebase for early connection handshakes -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
