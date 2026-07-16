@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS restaurants (
   staffUsername TEXT,
   staffPassword TEXT,
   staffHash TEXT,
+  staffActive INTEGER DEFAULT 0,
+  staffUpdatedAt TEXT,
   branches TEXT, -- JSON string array
   FOREIGN KEY (ownerId) REFERENCES owners(id) ON DELETE CASCADE
 );
