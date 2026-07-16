@@ -467,10 +467,6 @@ export const DataService = {
     }
   },
 
-  async ensureStaffSession(anonymousUid: string, restaurantId: string, ownerId: string): Promise<void> {
-    // No-op in Cloudflare setup
-  },
-
   // --- GENERAL SYSTEM ENDPOINTS ---
   async resetAllData(userId: string, restaurantId: string): Promise<void> {
     if (!userId || userId === "demo") {
