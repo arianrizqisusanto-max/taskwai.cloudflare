@@ -528,7 +528,7 @@ export default function Navbar({
             {/* Modal Header */}
             <div className="flex flex-col items-center mb-6 mt-2 text-center animate-in">
               <div className="p-3 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-lg mb-3">
-                <TaskwaiLogo size={36} className="filter invert brightness-0 dark:brightness-100 dark:invert-0" />
+                <TaskwaiLogo size={36} transparentBg={true} />
               </div>
               <h3 className="text-xl font-black text-zinc-950 dark:text-zinc-50">
                 Masuk ke taskwai

@@ -11,6 +11,7 @@ interface TaskwaiLogoProps {
   /** Text color class (Tailwind). Defaults to auto based on dark mode. */
   textClassName?: string;
   className?: string;
+  transparentBg?: boolean;
 }
 
 export default function TaskwaiLogo({
@@ -18,6 +19,7 @@ export default function TaskwaiLogo({
   showText = false,
   textClassName = "text-zinc-900 dark:text-zinc-50",
   className = "",
+  transparentBg = false,
 }: TaskwaiLogoProps) {
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
@@ -32,7 +34,7 @@ export default function TaskwaiLogo({
         aria-label="Taskwai logo"
       >
         {/* Emerald green background */}
-        <rect width="512" height="512" rx="120" fill="#10B981" />
+        {!transparentBg && <rect width="512" height="512" rx="120" fill="#10B981" />}
 
         {/* Bar 1 — shortest, left */}
         <rect x="112" y="292" width="80" height="148" rx="18" fill="white" />
