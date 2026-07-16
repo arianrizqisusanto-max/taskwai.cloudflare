@@ -71,3 +71,12 @@ html {
   outline-offset: 2px;
   border-radius: 6px;
 }
+
+/* ── Date Picker Icon Fix in Dark Mode ── */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
