@@ -70,7 +70,17 @@ const generateDefaultDailyProfits = (restaurantId: string): DailyProfit[] => {
     
     const baseProfit = isWeekend ? 2200000 : 1300000;
     const randomVariation = Math.floor(Math.random() * 800000);
-    const profit = baseProfit + randomVariation;
+    const dbProfit = baseProfit + randomVariation;
+
+    const otherExpenses = Math.random() > 0.4 ? Math.floor(Math.random() * 150000) + 50000 : 0;
+    const hppPercent = 35;
+    const omzet = Math.round((dbProfit + otherExpenses) / (1 - hppPercent / 100));
+
+    const branches = ["jakarta", "bandung", "surabaya", "Pusat"];
+    const branchName = branches[Math.floor(Math.random() * branches.length)];
+    
+    const staffNames = ["Andi", "Budi", "Siti", "Rian", "Dewi"];
+    const inputterName = Math.random() > 0.3 ? staffNames[Math.floor(Math.random() * staffNames.length)] : undefined;
 
     const note = notesPreset[Math.floor(Math.random() * notesPreset.length)];
 
@@ -78,9 +88,15 @@ const generateDefaultDailyProfits = (restaurantId: string): DailyProfit[] => {
       id: `dp_${restaurantId}_${dateStr}`,
       restaurantId,
       date: dateStr,
-      profit,
+      profit: dbProfit,
       notes: Math.random() > 0.3 ? note : "",
-      createdAt: new Date(currentYear, currentMonth, i, 22, 0, 0).toISOString()
+      createdAt: new Date(currentYear, currentMonth, i, 22, 0, 0).toISOString(),
+      omzet,
+      hppType: "percentage",
+      hppVal: hppPercent,
+      otherExpenses,
+      branchName,
+      inputterName
     });
   }
 
@@ -261,7 +277,7 @@ export const DataService = {
   async getDailyProfits(userId: string, restaurantId: string): Promise<DailyProfit[]> {
     if (!userId || userId === "demo") {
       let profits = getLocal<DailyProfit[]>("taskwai_daily_profits");
-      if (!profits) {
+      if (!profits || (profits.length > 0 && profits[0].omzet === undefined)) {
         profits = generateDefaultDailyProfits(restaurantId);
         setLocal("taskwai_daily_profits", profits);
       }
@@ -275,7 +291,7 @@ export const DataService = {
     } catch (error) {
       console.error("Error getting daily profits:", error);
       let profits = getLocal<DailyProfit[]>(`taskwai_daily_profits_${userId}`);
-      if (!profits) {
+      if (!profits || (profits.length > 0 && profits[0].omzet === undefined)) {
         profits = generateDefaultDailyProfits(restaurantId);
         setLocal(`taskwai_daily_profits_${userId}`, profits);
       }

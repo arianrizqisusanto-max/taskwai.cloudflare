@@ -798,26 +798,44 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                             )}
                           </div>
 
-                          {/* Right Column: Notes & Trash Icon */}
+                          {/* Right Column: Notes & Metadata & Trash Icon */}
                           <div className="flex flex-col justify-between">
                             <div>
                               <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-550 tracking-wider mb-2 uppercase">
                                 {t("profit.notes", "CATATAN TAMBAHAN")}
                               </h4>
-                              <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl p-3 text-xs text-zinc-650 dark:text-zinc-350 min-h-[72px] italic flex items-center justify-start">
+                              <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl p-3 text-xs text-zinc-650 dark:text-zinc-350 min-h-[64px] italic flex items-center justify-start">
                                 {p.notes ? `"${p.notes}"` : t("profit.noNotes", "Tidak ada catatan")}
+                              </div>
+
+                              {/* Metadata Info (Cabang, Operator, Waktu) */}
+                              <div className="mt-3 grid grid-cols-3 gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2.5">
+                                <div>
+                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-550 uppercase block font-black mb-0.5">Cabang</span>
+                                  <span className="text-zinc-800 dark:text-zinc-200 truncate block">🏢 {p.branchName || "Pusat"}</span>
+                                </div>
+                                <div>
+                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-550 uppercase block font-black mb-0.5">Operator</span>
+                                  <span className="text-zinc-800 dark:text-zinc-200 truncate block">
+                                    👤 {p.inputterName ? `${p.inputterName} (Staff)` : "Owner"}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-550 uppercase block font-black mb-0.5">Jam Input</span>
+                                  <span className="text-zinc-800 dark:text-zinc-200 font-mono block">⏰ {timeStr || "-"}</span>
+                                </div>
                               </div>
                             </div>
 
                             {/* Details Footer: ID and Delete Action */}
-                            <div className="flex items-center justify-between mt-4">
-                              <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">
+                            <div className="flex items-center justify-between mt-4 border-t border-zinc-100/30 dark:border-zinc-800/30 pt-3">
+                              <span className="text-[9px] text-zinc-400 dark:text-zinc-550 font-mono">
                                 ID: {p.id}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleDelete(p.id, p.date)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-955/45 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-955/45 text-rose-600 dark:text-rose-450 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 <span>{t("profit.deleteButton", "Hapus Data")}</span>
