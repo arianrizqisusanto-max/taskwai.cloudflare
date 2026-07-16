@@ -667,7 +667,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-all shadow-sm cursor-pointer select-none"
+                  className="flex flex-col p-3.5 sm:p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-xl transition-all shadow-sm cursor-pointer select-none"
                   onClick={() => toggleExpand(p.id)}
                 >
                   <div className="flex items-center justify-between">
@@ -725,8 +725,6 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                       <ChevronDown className={`w-4 h-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 shrink-0 ${isExpanded ? "rotate-180" : ""}`} />
                     </div>
                   </div>
-
-                  {/* Expanded Accordion Panel */}
                   <AnimatePresence initial={false}>
                     {isExpanded && (
                       <motion.div
@@ -734,30 +732,30 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeInOut" }}
-                        className="overflow-hidden mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/80"
+                        className="overflow-hidden mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80"
                         onClick={(e) => e.stopPropagation()} // Prevent closing accordion when clicking inside details
                       >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Left Column: Calculation Breakdown */}
                           <div>
-                            <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 tracking-wider mb-2.5 uppercase">
+                            <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 tracking-wider mb-2 uppercase">
                               {t("profit.calcDetails", "RINCIAN PERHITUNGAN")}
                             </h4>
                             {hasBreakdown ? (
                               <div className="space-y-2 text-xs font-semibold text-zinc-650 dark:text-zinc-450">
-                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 pb-1.5">
+                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 pb-1">
                                   <span className="text-zinc-500 dark:text-zinc-500">Omzet Kotor</span>
                                   <span className="font-mono text-zinc-850 dark:text-zinc-200">+{formatRupiah(p.omzet || 0)}</span>
                                 </div>
-                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
+                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1">
                                   <span className="text-zinc-500 dark:text-zinc-500">HPP / Food Cost ({p.hppType === "percentage" ? `${p.hppVal}%` : "Nominal"})</span>
                                   <span className="font-mono text-amber-600 dark:text-amber-500">-{formatRupiah(calculatedHpp)}</span>
                                 </div>
-                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
+                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1">
                                   <span className="text-zinc-500 dark:text-zinc-500">Biaya Tambahan Harian</span>
                                   <span className="font-mono text-rose-500/90 dark:text-rose-450/90">-{formatRupiah(p.otherExpenses || 0)}</span>
                                 </div>
-                                <div className="pt-2 flex justify-between font-bold">
+                                <div className="pt-1.5 flex justify-between font-bold">
                                   <span className="text-zinc-800 dark:text-zinc-200">Laba Bersih</span>
                                   <span className={`font-mono ${displayProfit >= 0 ? "text-emerald-600 dark:text-emerald-450" : "text-rose-600 dark:text-rose-450"}`}>
                                     {formatRupiah(displayProfit)}
@@ -782,15 +780,15 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                           {/* Right Column: Notes & Metadata & Trash Icon */}
                           <div className="flex flex-col justify-between">
                             <div>
-                              <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 tracking-wider mb-2 uppercase">
+                              <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 tracking-wider mb-1 uppercase">
                                 {t("profit.notes", "CATATAN TAMBAHAN")}
                               </h4>
-                              <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl p-3 text-xs text-zinc-600 dark:text-zinc-300 min-h-[64px] italic flex items-center justify-start">
+                              <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-300 min-h-[40px] italic flex items-center justify-start">
                                 {p.notes ? `"${p.notes}"` : t("profit.noNotes", "Tidak ada catatan")}
                               </div>
 
                               {/* Metadata Info (Cabang, Operator, Waktu) */}
-                              <div className="mt-3 grid grid-cols-3 gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2.5">
+                              <div className="mt-2 grid grid-cols-3 gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2">
                                 <div>
                                   <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Cabang</span>
                                   <span className="text-zinc-800 dark:text-zinc-200 truncate block">🏢 {p.branchName || "Pusat"}</span>
@@ -809,16 +807,16 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                             </div>
 
                             {/* Details Footer: ID and Delete Action */}
-                            <div className="flex items-center justify-between mt-4 border-t border-zinc-100/30 dark:border-zinc-800/30 pt-3">
+                            <div className="flex items-center justify-between mt-2.5 border-t border-zinc-100/30 dark:border-zinc-800/30 pt-2">
                               <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">
                                 ID: {p.id}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleDelete(p.id, p.date)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/45 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
+                                className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/45 text-rose-600 dark:text-rose-450 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-3 h-3" />
                                 <span>{t("profit.deleteButton", "Hapus Data")}</span>
                               </button>
                             </div>
