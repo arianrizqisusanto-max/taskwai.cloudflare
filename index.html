@@ -55,6 +55,17 @@
           }
         }
       }
+
+      // Add a global capturer for script loading errors to bypass Vite's onerror removal
+      window.addEventListener('error', function(event) {
+        var target = event.target;
+        if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+          var url = target.src || target.href;
+          if (url && (url.indexOf('index') > -1 || url.indexOf('assets/') > -1)) {
+            handleScriptError();
+          }
+        }
+      }, true); // True is critical for capturing resource errors
     </script>
 
     <!-- Preconnect to Google Fonts and Firebase for early connection handshakes -->
@@ -68,7 +79,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx" onerror="handleScriptError()"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
 
