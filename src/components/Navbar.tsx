@@ -573,7 +573,7 @@ export default function Navbar({
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
-                <div id="google-signin-button" className="w-full flex justify-center py-2" style={{ minHeight: '44px', height: '44px' }}></div>
+                <div id="google-signin-button" className="py-2" style={{ minHeight: '44px', height: '44px', width: '190px', margin: '0 auto' }}></div>
               </div>
             ) : (
               <form onSubmit={handleStaffLoginSubmit} className="space-y-4">
