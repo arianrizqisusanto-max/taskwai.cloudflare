@@ -63,8 +63,9 @@ export default function Navbar({
               shape: "pill",
               text: "signin_with"
             }
-          );        }
-      }, 150);
+          );
+        }
+      }, 0);
       return () => clearTimeout(timer);
     }
   }, [showLoginModal, loginTab, isDark]);
@@ -514,7 +515,7 @@ export default function Navbar({
           />
 
           {/* Modal Container */}
-          <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-thin rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80">
+          <div className="relative w-full max-w-md rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80">
             {/* Close Button */}
             {!isLoggingInStaff && (
               <button
@@ -572,7 +573,7 @@ export default function Navbar({
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
-                <div id="google-signin-button" className="w-full flex justify-center py-2 min-h-[44px]"></div>
+                <div id="google-signin-button" className="w-full flex justify-center py-2" style={{ minHeight: '44px', height: '44px' }}></div>
               </div>
             ) : (
               <form onSubmit={handleStaffLoginSubmit} className="space-y-4">
