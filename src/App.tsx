@@ -331,6 +331,7 @@ function MainApp() {
             onDeleteProfit={handleDeleteProfit}
             isStaffMode={!!staffSession}
             restaurant={restaurant}
+            expenses={expenses}
           />
         );
       case "biaya":

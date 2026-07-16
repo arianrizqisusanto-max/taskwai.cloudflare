@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { DailyProfit } from "../types";
+import { DailyProfit, Restaurant, Expenses } from "../types";
 import { formatRupiah, formatIndoDate } from "../lib/utils";
-import { Save, Calendar, Coins, AlignLeft, Trash2, HelpCircle, Sparkles, Percent, AlertCircle } from "lucide-react";
+import { Save, Calendar, Coins, AlignLeft, Trash2, HelpCircle, Sparkles, Percent, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
-
-import { Restaurant } from "../types";
 
 interface StaffLocalHistoryItem {
   id: string;
@@ -32,9 +30,10 @@ interface InputProfitProps {
   onDeleteProfit: (id: string) => Promise<void>;
   isStaffMode?: boolean;
   restaurant?: Restaurant | null;
+  expenses?: Expenses | null;
 }
 
-export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isStaffMode = false, restaurant }: InputProfitProps) {
+export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isStaffMode = false, restaurant, expenses }: InputProfitProps) {
   const { showToast } = useToast();
   const { lang, t, currency, currencySymbol } = useTranslation();
   
@@ -69,6 +68,14 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   const [staffLocalHistory, setStaffLocalHistory] = useState<StaffLocalHistoryItem[]>(() => {
     try {
@@ -97,6 +104,21 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
   // Live Calculations
   const omzetVal = parseCurrency(omzetInput);
   const otherExpensesVal = parseCurrency(otherExpensesInput);
+  
+  const totalFixedExpensesMonth = expenses
+    ? (expenses.sewaTempat || 0) +
+      (expenses.gajiKaryawan || 0) +
+      (expenses.royaltiFranchise || 0) +
+      (expenses.listrik || 0) +
+      (expenses.air || 0) +
+      (expenses.internet || 0) +
+      (expenses.marketing || 0) +
+      (expenses.pajak || 0) +
+      (expenses.cicilanBank || 0) +
+      (expenses.biayaLain || 0)
+    : 0;
+
+  const dailyFixedExpenses = Math.round(totalFixedExpensesMonth / 30);
   
   let hppVal = 0;
   let hppValForDb = 0;
@@ -611,11 +633,11 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
         <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("profit.history", "Riwayat Profit Masuk")}</h2>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("profit.historySubtitle", "Daftar log profit harian yang tersimpan di sistem.")}</p>
+            <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-550 tracking-tight">{t("profit.history", "Riwayat Operasional")}</h2>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">{t("profit.historySubtitle", "Log keuangan harian Anda. Klik baris untuk melihat rincian biaya.")}</p>
           </div>
           <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1 uppercase tracking-wider">
-            {t("profit.historyTotal", "Total: {count} hari").replace("{count}", String(profits.length))}
+            {t("profit.historyTotal", "{count} HARI TERCATAT").replace("{count}", String(profits.length))}
           </span>
         </div>
 
@@ -633,6 +655,11 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                 }
               }
 
+              // Calculate dynamic display profit
+              const displayProfit = hasBreakdown
+                ? (p.omzet || 0) - calculatedHpp - dailyFixedExpenses - (p.otherExpenses || 0)
+                : p.profit;
+
               // Extract time from createdAt
               let timeStr = "";
               try {
@@ -646,6 +673,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                 console.warn(e);
               }
 
+              const isExpanded = !!expandedIds[p.id];
+
               return (
                 <motion.div
                   key={p.id}
@@ -653,92 +682,158 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 rounded-xl transition-all shadow-sm"
+                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-355 dark:hover:border-zinc-700 rounded-xl transition-all shadow-sm cursor-pointer select-none"
+                  onClick={() => toggleExpand(p.id)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0 pr-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs sm:text-sm font-semibold text-zinc-400 dark:text-zinc-500 font-mono">
+                        <span className="text-xs sm:text-sm font-semibold text-zinc-450 dark:text-zinc-500 font-mono">
                           {p.date}
                         </span>
                         <span className="text-sm sm:text-base font-bold text-zinc-800 dark:text-zinc-100">
-                          {formatIndoDate(p.date, lang).split(",")[1]} {/* Get just date and month */}
+                          {formatIndoDate(p.date, lang).split(",")[1]?.trim() || p.date}
                         </span>
                       </div>
                       
-                      {/* Meta information row: Cabang, Penginput, Jam */}
-                      <div className="flex flex-wrap items-center gap-2 mt-2 text-[10px] sm:text-xs font-bold">
-                        <span className="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm border border-zinc-200/40 dark:border-zinc-700/30">
-                          🏢 {p.branchName || "Pusat"}
-                        </span>
-                        {p.inputterName ? (
-                          <span className="bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm border border-indigo-100/50 dark:border-indigo-900/30">
-                            👤 Staff ({p.inputterName})
+                      {/* Sub-info: Omzet: Rp X.XXX.XXX • notes */}
+                      {hasBreakdown ? (
+                        <div className="text-[10px] sm:text-xs text-zinc-450 dark:text-zinc-500 mt-1.5 font-medium flex items-center gap-1.5 flex-wrap">
+                          <span>
+                            Omzet: <span className="font-mono font-bold text-amber-600 dark:text-amber-500">{formatRupiah(p.omzet || 0)}</span>
                           </span>
-                        ) : (
-                          <span className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm border border-emerald-100/50 dark:border-emerald-900/30">
-                            👤 Owner
+                          {p.notes && (
+                            <>
+                              <span className="text-zinc-350 dark:text-zinc-700">&bull;</span>
+                              <span className="italic truncate max-w-[150px] sm:max-w-[280px]">
+                                "{p.notes}"
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 mt-1.5 font-medium flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                            {t("profit.oldLogDesc", "Log tanpa rincian HPP (Pencatatan Lama)")}
                           </span>
-                        )}
-                        {timeStr && (
-                          <span className="bg-zinc-50 dark:bg-zinc-800/40 text-zinc-400 dark:text-zinc-500 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 font-mono shadow-sm">
-                            ⏰ {timeStr}
-                          </span>
-                        )}
-                      </div>
+                          {p.notes && (
+                            <>
+                              <span className="text-zinc-350 dark:text-zinc-700">&bull;</span>
+                              <span className="italic truncate max-w-[150px] sm:max-w-[280px]">
+                                "{p.notes}"
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-4 shrink-0">
-                      <span className={`font-mono text-base sm:text-xl font-black tracking-tight ${p.profit >= 0 ? "text-zinc-950 dark:text-white" : "text-rose-600 dark:text-rose-450"}`}>
-                        {formatRupiah(p.profit)}
-                      </span>
-                      <button
-                        onClick={() => handleDelete(p.id, p.date)}
-                        className="p-2 rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-450 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
-                        title={t("profit.deleteTooltip", "Hapus log")}
-                      >
-                        <Trash2 className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                      </button>
+                    <div className="flex items-center gap-3.5 shrink-0">
+                      <div className="flex flex-col items-end">
+                        <span className="text-[9px] font-black text-zinc-400 dark:text-zinc-500 tracking-wider uppercase mb-0.5">
+                          {t("dashboard.netProfit", "Laba Bersih")}
+                        </span>
+                        <span className={`font-mono text-sm sm:text-base font-black tracking-tight ${displayProfit >= 0 ? "text-emerald-600 dark:text-emerald-450" : "text-rose-600 dark:text-rose-500"}`}>
+                          {formatRupiah(displayProfit)}
+                        </span>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-zinc-400 dark:text-zinc-550 transition-transform duration-200 shrink-0 ${isExpanded ? "rotate-180" : ""}`} />
                     </div>
                   </div>
 
-                  {/* Notes Render */}
-                  {p.notes ? (
-                    <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-2 sm:mt-2.5 italic truncate max-w-sm sm:max-w-xl font-medium">
-                      "{p.notes}"
-                    </p>
-                  ) : null}
-
-                  {/* Profit breakdown fields if saved */}
-                  {hasBreakdown ? (
-                    <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 pt-2.5 border-t border-zinc-100 dark:border-zinc-800/40 text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-semibold tracking-normal">
-                      <div>
-                        {t("laporan.tableTurnover", "Omzet")}: <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{formatRupiah(p.omzet || 0)}</span>
-                      </div>
-                      {p.hppType ? (
-                        <>
-                          <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
+                  {/* Expanded Accordion Panel */}
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        className="overflow-hidden mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/80"
+                        onClick={(e) => e.stopPropagation()} // Prevent closing accordion when clicking inside details
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          {/* Left Column: Calculation Breakdown */}
                           <div>
-                            {t("laporan.tableHpp", "HPP")} ({p.hppType === "percentage" ? `${p.hppVal}%` : currencySymbol}): <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(calculatedHpp)}</span>
+                            <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-550 tracking-wider mb-2.5 uppercase">
+                              {t("profit.calcDetails", "RINCIAN PERHITUNGAN")}
+                            </h4>
+                            {hasBreakdown ? (
+                              <div className="space-y-2 text-xs font-semibold text-zinc-650 dark:text-zinc-450">
+                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 pb-1.5">
+                                  <span className="text-zinc-500 dark:text-zinc-500">Omzet Kotor</span>
+                                  <span className="font-mono text-zinc-850 dark:text-zinc-200">+{formatRupiah(p.omzet || 0)}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
+                                  <span className="text-zinc-500 dark:text-zinc-500">HPP / Food Cost ({p.hppType === "percentage" ? `${p.hppVal}%` : "Nominal"})</span>
+                                  <span className="font-mono text-amber-600 dark:text-amber-500">-{formatRupiah(calculatedHpp)}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
+                                  <span className="text-zinc-500 dark:text-zinc-500">Biaya Tetap Harian</span>
+                                  <span className="font-mono text-rose-500/90 dark:text-rose-450/90">-{formatRupiah(dailyFixedExpenses)}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
+                                  <span className="text-zinc-500 dark:text-zinc-500">Biaya Tambahan Harian</span>
+                                  <span className="font-mono text-rose-500/90 dark:text-rose-450/90">-{formatRupiah(p.otherExpenses || 0)}</span>
+                                </div>
+                                <div className="pt-2 flex justify-between font-bold">
+                                  <span className="text-zinc-800 dark:text-zinc-200">Laba Bersih</span>
+                                  <span className={`font-mono ${displayProfit >= 0 ? "text-emerald-600 dark:text-emerald-450" : "text-rose-600 dark:text-rose-450"}`}>
+                                    {formatRupiah(displayProfit)}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-2 text-xs font-semibold text-zinc-650 dark:text-zinc-450">
+                                <div className="flex justify-between">
+                                  <span className="text-zinc-850 dark:text-zinc-200">Laba Bersih</span>
+                                  <span className={`font-mono ${p.profit >= 0 ? "text-emerald-600 dark:text-emerald-450" : "text-rose-600 dark:text-rose-450"}`}>
+                                    {formatRupiah(p.profit)}
+                                  </span>
+                                </div>
+                                <div className="mt-2 pt-2 border-t border-dotted border-zinc-100/50 dark:border-zinc-800/30 text-[10px] text-zinc-400 dark:text-zinc-550 font-medium">
+                                  {t("profit.oldLogDesc", "Log tanpa rincian HPP (Pencatatan Lama)")}
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        </>
-                      ) : null}
-                      <div className="text-zinc-300 dark:text-zinc-800">&bull;</div>
-                      <div>
-                        {t("profit.otherExpensesLabel", "Lainnya")}: <span className="font-mono font-bold text-rose-500/90 dark:text-rose-450/90">{formatRupiah(p.otherExpenses || 0)}</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-2 pt-2 border-t border-dotted border-zinc-100 dark:border-zinc-800/40">
-                      <span className="text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 font-medium">{t("profit.oldLogDesc", "Log tanpa rincian HPP (Pencatatan Lama)")}</span>
-                    </div>
-                  )}
+
+                          {/* Right Column: Notes & Trash Icon */}
+                          <div className="flex flex-col justify-between">
+                            <div>
+                              <h4 className="text-[10px] font-black text-zinc-400 dark:text-zinc-550 tracking-wider mb-2 uppercase">
+                                {t("profit.notes", "CATATAN TAMBAHAN")}
+                              </h4>
+                              <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl p-3 text-xs text-zinc-650 dark:text-zinc-350 min-h-[72px] italic flex items-center justify-start">
+                                {p.notes ? `"${p.notes}"` : t("profit.noNotes", "Tidak ada catatan")}
+                              </div>
+                            </div>
+
+                            {/* Details Footer: ID and Delete Action */}
+                            <div className="flex items-center justify-between mt-4">
+                              <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">
+                                ID: {p.id}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(p.id, p.date)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-955/45 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>{t("profit.deleteButton", "Hapus Data")}</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               );
             })
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-950/25">
-              <Coins className="w-10 h-10 text-zinc-300 dark:text-zinc-600 mb-2" />
+            <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-555 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl bg-zinc-50/50 dark:bg-zinc-955/25">
+              <Coins className="w-10 h-10 text-zinc-355 dark:text-zinc-600 mb-2" />
               <p className="text-xs font-bold text-zinc-500">{t("profit.noHistory", "Belum ada riwayat profit harian.")}</p>
               <p className="text-[10px] mt-1 text-zinc-400">{t("profit.noHistoryDesc", "Silakan tambahkan menggunakan form di sebelah kiri.")}</p>
             </div>
