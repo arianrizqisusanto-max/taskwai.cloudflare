@@ -130,29 +130,7 @@ function MainApp() {
 
   const toggleDark = () => setIsDark((prev) => !prev);
 
-  // Prefetch lazy-loaded tab components right after Dashboard finishes rendering
-  useEffect(() => {
-    if (loading) return; // Wait until Dashboard data is loaded and rendered
 
-    const triggerPrefetch = () => {
-      import("./components/InputProfit").catch(() => {});
-      import("./components/Biaya").catch(() => {});
-      import("./components/Laporan").catch(() => {});
-      import("./components/Target").catch(() => {});
-      import("./components/AdminConsole").catch(() => {});
-    };
-
-    // Small 500ms grace period, then prefetch during browser idle time
-    const timer = setTimeout(() => {
-      if ("requestIdleCallback" in window) {
-        window.requestIdleCallback(triggerPrefetch);
-      } else {
-        triggerPrefetch();
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [loading]);
 
   // App States
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
