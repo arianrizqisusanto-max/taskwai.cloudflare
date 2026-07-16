@@ -13,17 +13,56 @@ import SkeletonLoader from "./components/SkeletonLoader";
 import { ToastProvider, useToast } from "./components/Toast";
 import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
 
-// Helper to catch chunk load errors (due to build hash mismatch after deployment) and reload the page automatically
+// ChunkErrorFallback - shown when a lazy chunk cannot be loaded even after one retry
+function ChunkErrorFallback() {
+  return (
+    <div style={{
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      minHeight: "60vh", padding: "2rem", textAlign: "center", gap: "1rem"
+    }}>
+      <p style={{ fontSize: "1.1rem", fontWeight: 600 }}>
+        Versi aplikasi telah diperbarui.
+      </p>
+      <p style={{ fontSize: "0.9rem", opacity: 0.7 }}>
+        Silakan muat ulang halaman untuk mendapatkan versi terbaru.
+      </p>
+      <button
+        onClick={() => {
+          sessionStorage.removeItem("taskwai_chunk_reload");
+          window.location.reload();
+        }}
+        style={{
+          marginTop: "0.5rem", padding: "0.75rem 2rem", borderRadius: "0.5rem",
+          background: "#10B981", color: "#fff", fontWeight: 600, fontSize: "1rem",
+          border: "none", cursor: "pointer"
+        }}
+      >
+        🔄 Muat Ulang
+      </button>
+    </div>
+  );
+}
+
+// Helper: catch chunk load errors (hash mismatch after deploy).
+// Reload ONCE. If it still fails, show an error banner instead of infinite loop.
 function safeLazy<T extends ComponentType<any>>(
   factory: () => Promise<{ default: T }>
 ) {
   return lazy(() =>
     factory().catch((error) => {
-      console.error("Failed to load chunk, reloading page:", error);
+      console.error("Failed to load chunk:", error);
       if (typeof window !== "undefined") {
-        window.location.reload();
+        const key = "taskwai_chunk_reload";
+        const last = sessionStorage.getItem(key);
+        const now = Date.now();
+        // Only auto-reload once per 30 seconds to prevent infinite loops
+        if (!last || now - parseInt(last, 10) > 30000) {
+          sessionStorage.setItem(key, String(now));
+          window.location.reload();
+        }
       }
-      return { default: (() => null) as unknown as T };
+      // If we already reloaded recently, render error fallback instead of blank
+      return { default: ChunkErrorFallback as unknown as T };
     })
   );
 }
