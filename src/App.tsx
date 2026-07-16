@@ -94,6 +94,7 @@ function MainApp() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [profits, setProfits] = useState<DailyProfit[]>([]);
   const [expenses, setExpenses] = useState<Expenses | null>(null);
+  const [expensesMonth, setExpensesMonth] = useState(new Date().toISOString().substring(0, 7));
 
   // 1. Fetch Auth State from Cloudflare D1 Backend on startup
   useEffect(() => {
@@ -140,7 +141,7 @@ function MainApp() {
 
         // Fetch operating expenses and daily profits in parallel
         const [expData, profitsData] = await Promise.all([
-          DataService.getExpenses(userId, restData.id),
+          DataService.getExpenses(userId, restData.id, expensesMonth),
           DataService.getDailyProfits(userId, restData.id)
         ]);
 
@@ -161,7 +162,7 @@ function MainApp() {
     if (staffSession) {
       setActiveTab("input");
     }
-  }, [user, authInitialized, staffSession]);
+  }, [user, authInitialized, staffSession, expensesMonth]);
 
   // 3. Handlers for database updates
   const handleSaveProfit = async (
@@ -265,7 +266,10 @@ function MainApp() {
     const userId = user ? user.uid : "demo";
 
     try {
-      const updatedExpenses = await DataService.updateExpenses(userId, restaurant.id, data);
+      const updatedExpenses = await DataService.updateExpenses(userId, restaurant.id, {
+        ...data,
+        month: expensesMonth
+      });
       setExpenses(updatedExpenses);
     } catch (err) {
       console.error(err);
@@ -334,6 +338,8 @@ function MainApp() {
           <Biaya 
             expenses={expenses} 
             onSaveExpenses={handleSaveExpenses} 
+            expensesMonth={expensesMonth}
+            onExpensesMonthChange={setExpensesMonth}
           />
         );
       case "laporan":

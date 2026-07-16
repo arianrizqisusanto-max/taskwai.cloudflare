@@ -209,7 +209,7 @@ export const DataService = {
   },
 
   // --- EXPENSES ENDPOINTS ---
-  async getExpenses(userId: string, restaurantId: string): Promise<Expenses> {
+  async getExpenses(userId: string, restaurantId: string, month?: string): Promise<Expenses> {
     if (!userId || userId === "demo") {
       let exp = getLocal<Expenses>("taskwai_expenses");
       if (!exp) {
@@ -220,7 +220,8 @@ export const DataService = {
     }
 
     try {
-      const res = await fetch('/api/expenses', { headers: getHeaders() });
+      const monthParam = month ? `?month=${month}` : '';
+      const res = await fetch(`/api/expenses${monthParam}`, { headers: getHeaders() });
       if (!res.ok) throw new Error('Failed to fetch expenses');
       return await res.json() as Expenses;
     } catch (error) {
@@ -231,7 +232,7 @@ export const DataService = {
     }
   },
 
-  async updateExpenses(userId: string, restaurantId: string, data: Partial<Expenses>): Promise<Expenses> {
+  async updateExpenses(userId: string, restaurantId: string, data: Partial<Expenses> & { month?: string }): Promise<Expenses> {
     if (!userId || userId === "demo") {
       const exp = await this.getExpenses("demo", restaurantId);
       const updated = { ...exp, ...data, updatedAt: new Date().toISOString() };

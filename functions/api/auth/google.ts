@@ -48,10 +48,11 @@ export async function onRequest(context: any): Promise<Response> {
       ).bind(restaurantId, googleId, 'Warung Kopi Senja', 35000000, nowStr, '[]').run();
 
       // 3. Create Default Expenses
-      const expId = `exp_${googleId}`;
+      const currentMonth = nowStr.substring(0, 7);
+      const expId = `${restaurantId}_${currentMonth}`;
       await db.prepare(
-        'INSERT INTO expenses (id, restaurantId, sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, biayaLain, cicilanBank, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-      ).bind(expId, restaurantId, 6000000, 12000000, 2000000, 1800000, 500000, 350000, 1500000, 1200000, 1000000, 0, nowStr).run();
+        'INSERT INTO expenses (id, restaurantId, month, sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, biayaLain, cicilanBank, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      ).bind(expId, restaurantId, currentMonth, 6000000, 12000000, 2000000, 1800000, 500000, 350000, 1500000, 1200000, 1000000, 0, nowStr).run();
     }
 
     // Generate Session Token

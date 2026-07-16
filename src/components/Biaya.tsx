@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Expenses } from "../types";
 import { formatRupiah } from "../lib/utils";
 import { Landmark, Save, Calculator, HelpCircle, CheckCircle } from "lucide-react";
@@ -9,9 +9,11 @@ import { useTranslation } from "../lib/LanguageContext";
 interface BiayaProps {
   expenses: Expenses;
   onSaveExpenses: (data: Partial<Expenses>) => Promise<void>;
+  expensesMonth: string;
+  onExpensesMonthChange: (month: string) => void;
 }
 
-export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
+export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpensesMonthChange }: BiayaProps) {
   const { showToast } = useToast();
   const { t, currency, currencySymbol } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
@@ -30,6 +32,20 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
   const [pajak, setPajak] = useState(new Intl.NumberFormat(formatLocale).format(expenses.pajak));
   const [biayaLain, setBiayaLain] = useState(new Intl.NumberFormat(formatLocale).format(expenses.biayaLain));
   const [cicilanBank, setCicilanBank] = useState(new Intl.NumberFormat(formatLocale).format(expenses.cicilanBank || 0));
+
+  // Reset form fields when expenses prop updates (e.g. from switching month)
+  useEffect(() => {
+    setSewaTempat(new Intl.NumberFormat(formatLocale).format(expenses.sewaTempat));
+    setGajiKaryawan(new Intl.NumberFormat(formatLocale).format(expenses.gajiKaryawan));
+    setRoyaltiFranchise(new Intl.NumberFormat(formatLocale).format(expenses.royaltiFranchise));
+    setListrik(new Intl.NumberFormat(formatLocale).format(expenses.listrik));
+    setAir(new Intl.NumberFormat(formatLocale).format(expenses.air));
+    setInternet(new Intl.NumberFormat(formatLocale).format(expenses.internet));
+    setMarketing(new Intl.NumberFormat(formatLocale).format(expenses.marketing));
+    setPajak(new Intl.NumberFormat(formatLocale).format(expenses.pajak));
+    setBiayaLain(new Intl.NumberFormat(formatLocale).format(expenses.biayaLain));
+    setCicilanBank(new Intl.NumberFormat(formatLocale).format(expenses.cicilanBank || 0));
+  }, [expenses, formatLocale]);
 
   const handleCurrencyChange = (val: string, setter: (v: string) => void) => {
     const rawValue = val.replace(/[^0-9]/g, "");
@@ -124,12 +140,51 @@ export default function Biaya({ expenses, onSaveExpenses }: BiayaProps) {
       {/* Input Form Column */}
       <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-6">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-zinc-100 dark:border-zinc-800/40">
             <div>
               <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">{t("biaya.title", "Atur Biaya Operasional Tetap")}</h2>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium leading-relaxed">
                 {t("biaya.subtitle", "Masukkan taksiran pengeluaran tetap bulanan usaha Anda.")}
               </p>
+              {/* Month & Year Selectors */}
+              <div className="flex items-center gap-2 mt-3">
+                <select
+                  value={expensesMonth.substring(5, 7)}
+                  onChange={(e) => {
+                    const year = expensesMonth.substring(0, 4);
+                    onExpensesMonthChange(`${year}-${e.target.value}`);
+                  }}
+                  className="pl-3 pr-8 py-1.5 text-xs font-bold bg-zinc-100 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 rounded-xl focus:outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:14px] bg-[right_8px_center] bg-no-repeat"
+                >
+                  <option value="01">Januari</option>
+                  <option value="02">Februari</option>
+                  <option value="03">Maret</option>
+                  <option value="04">April</option>
+                  <option value="05">Mei</option>
+                  <option value="06">Juni</option>
+                  <option value="07">Juli</option>
+                  <option value="08">Agustus</option>
+                  <option value="09">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+
+                <select
+                  value={expensesMonth.substring(0, 4)}
+                  onChange={(e) => {
+                    const month = expensesMonth.substring(5, 7);
+                    onExpensesMonthChange(`${e.target.value}-${month}`);
+                  }}
+                  className="pl-3 pr-8 py-1.5 text-xs font-bold bg-zinc-100 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 rounded-xl focus:outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:14px] bg-[right_8px_center] bg-no-repeat"
+                >
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                </select>
+              </div>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs font-mono shadow-sm self-start sm:self-center">
               <Calculator className="w-3.5 h-3.5" />

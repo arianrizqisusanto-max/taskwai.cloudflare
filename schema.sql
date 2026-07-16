@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS restaurants (
 CREATE TABLE IF NOT EXISTS expenses (
   id TEXT PRIMARY KEY,
   restaurantId TEXT NOT NULL,
+  month TEXT NOT NULL,
   sewaTempat REAL NOT NULL,
   gajiKaryawan REAL NOT NULL,
   royaltiFranchise REAL NOT NULL,

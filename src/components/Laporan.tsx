@@ -19,6 +19,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
   const { showToast } = useToast();
   const { lang, t } = useTranslation();
   const [filter, setFilter] = useState<FilterType>("bulan");
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().substring(0, 7));
 
   const todayObj = new Date();
   const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
@@ -42,8 +43,7 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
     } else if (filter === "minggu") {
       matchesDate = isWithinPastDays(p.date, 7);
     } else if (filter === "bulan") {
-      const currentMonthPrefix = todayStr.substring(0, 7);
-      matchesDate = p.date.startsWith(currentMonthPrefix);
+      matchesDate = p.date.startsWith(selectedMonth);
     }
     return matchesDate;
   });
@@ -254,6 +254,48 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
               })}
             </div>
           </div>
+
+          {/* Month & Year Dropdowns when 'bulan' filter is selected */}
+          {filter === "bulan" && (
+            <div className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-150">
+              <select
+                value={selectedMonth.substring(5, 7)}
+                onChange={(e) => {
+                  const year = selectedMonth.substring(0, 4);
+                  setSelectedMonth(`${year}-${e.target.value}`);
+                }}
+                className="pl-3 pr-8 py-1.5 text-xs font-bold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 rounded-xl focus:outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:14px] bg-[right_8px_center] bg-no-repeat"
+              >
+                <option value="01">Januari</option>
+                <option value="02">Februari</option>
+                <option value="03">Maret</option>
+                <option value="04">April</option>
+                <option value="05">Mei</option>
+                <option value="06">Juni</option>
+                <option value="07">Juli</option>
+                <option value="08">Agustus</option>
+                <option value="09">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+              </select>
+
+              <select
+                value={selectedMonth.substring(0, 4)}
+                onChange={(e) => {
+                  const month = selectedMonth.substring(5, 7);
+                  setSelectedMonth(`${e.target.value}-${month}`);
+                }}
+                className="pl-3 pr-8 py-1.5 text-xs font-bold bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 rounded-xl focus:outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:14px] bg-[right_8px_center] bg-no-repeat"
+              >
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Right: Export buttons */}

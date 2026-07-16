@@ -13,24 +13,53 @@ export async function onRequest(context: any): Promise<Response> {
 
   const db = env.DB;
   const restaurantId = session.restaurantId;
+  const url = new URL(request.url);
+
+  // Default to current month "YYYY-MM"
+  const month = url.searchParams.get('month') || new Date().toISOString().substring(0, 7);
 
   try {
     if (request.method === 'GET') {
       const exp = await db.prepare(
-        'SELECT * FROM expenses WHERE restaurantId = ?'
-      ).bind(restaurantId).first();
+        'SELECT * FROM expenses WHERE restaurantId = ? AND month = ?'
+      ).bind(restaurantId, month).first();
 
       if (!exp) {
-        // Create default if not found
-        const expId = `exp_${session.userId}`;
+        // Find most recent month's expenses for cloning
+        const lastExp = await db.prepare(
+          'SELECT * FROM expenses WHERE restaurantId = ? ORDER BY month DESC LIMIT 1'
+        ).bind(restaurantId).first();
+
+        const defaults = lastExp || {
+          sewaTempat: 6000000,
+          gajiKaryawan: 12000000,
+          royaltiFranchise: 2000000,
+          listrik: 1800000,
+          air: 500000,
+          internet: 350000,
+          marketing: 1500000,
+          pajak: 1200000,
+          biayaLain: 1000000,
+          cicilanBank: 0
+        };
+
+        const expId = `${restaurantId}_${month}`;
         const nowStr = new Date().toISOString();
+        
         await db.prepare(
-          'INSERT INTO expenses (id, restaurantId, sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, biayaLain, cicilanBank, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-        ).bind(expId, restaurantId, 6000000, 12000000, 2000000, 1800000, 500000, 350000, 1500000, 1200000, 1000000, 0, nowStr).run();
+          `INSERT INTO expenses (id, restaurantId, month, sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, biayaLain, cicilanBank, updatedAt) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).bind(
+          expId, restaurantId, month,
+          defaults.sewaTempat, defaults.gajiKaryawan, defaults.royaltiFranchise,
+          defaults.listrik, defaults.air, defaults.internet,
+          defaults.marketing, defaults.pajak, defaults.biayaLain,
+          defaults.cicilanBank, nowStr
+        ).run();
 
         const newExp = await db.prepare(
-          'SELECT * FROM expenses WHERE restaurantId = ?'
-        ).bind(restaurantId).first();
+          'SELECT * FROM expenses WHERE restaurantId = ? AND month = ?'
+        ).bind(restaurantId, month).first();
 
         return jsonResponse(newExp);
       }
@@ -40,6 +69,8 @@ export async function onRequest(context: any): Promise<Response> {
 
     if (request.method === 'POST') {
       const body = await request.json() as any;
+      const postMonth = body.month || month;
+      const expId = `${restaurantId}_${postMonth}`;
       const nowStr = new Date().toISOString();
 
       const fields = [
@@ -47,31 +78,55 @@ export async function onRequest(context: any): Promise<Response> {
         'internet', 'marketing', 'pajak', 'biayaLain', 'cicilanBank'
       ];
 
-      const updates: string[] = [];
-      const values: any[] = [];
+      // Check if monthly expenses row exists
+      const existing = await db.prepare(
+        'SELECT id FROM expenses WHERE id = ?'
+      ).bind(expId).first();
 
-      for (const field of fields) {
-        if (body[field] !== undefined) {
-          updates.push(`${field} = ?`);
-          values.push(Number(body[field]));
+      if (!existing) {
+        // Insert new monthly record
+        const values = [
+          expId, restaurantId, postMonth,
+          Number(body.sewaTempat !== undefined ? body.sewaTempat : 0),
+          Number(body.gajiKaryawan !== undefined ? body.gajiKaryawan : 0),
+          Number(body.royaltiFranchise !== undefined ? body.royaltiFranchise : 0),
+          Number(body.listrik !== undefined ? body.listrik : 0),
+          Number(body.air !== undefined ? body.air : 0),
+          Number(body.internet !== undefined ? body.internet : 0),
+          Number(body.marketing !== undefined ? body.marketing : 0),
+          Number(body.pajak !== undefined ? body.pajak : 0),
+          Number(body.biayaLain !== undefined ? body.biayaLain : 0),
+          Number(body.cicilanBank !== undefined ? body.cicilanBank : 0),
+          nowStr
+        ];
+        await db.prepare(
+          `INSERT INTO expenses (id, restaurantId, month, sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, biayaLain, cicilanBank, updatedAt) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).bind(...values).run();
+      } else {
+        // Update existing record
+        const updates: string[] = [];
+        const values: any[] = [];
+
+        for (const field of fields) {
+          if (body[field] !== undefined) {
+            updates.push(`${field} = ?`);
+            values.push(Number(body[field]));
+          }
         }
+
+        updates.push('updatedAt = ?');
+        values.push(nowStr);
+
+        values.push(expId);
+
+        const query = `UPDATE expenses SET ${updates.join(', ')} WHERE id = ?`;
+        await db.prepare(query).bind(...values).run();
       }
-
-      updates.push('updatedAt = ?');
-      values.push(nowStr);
-
-      if (updates.length === 1) {
-        return jsonResponse({ error: 'No fields to update' }, 400);
-      }
-
-      values.push(restaurantId);
-
-      const query = `UPDATE expenses SET ${updates.join(', ')} WHERE restaurantId = ?`;
-      await db.prepare(query).bind(...values).run();
 
       const updatedExp = await db.prepare(
-        'SELECT * FROM expenses WHERE restaurantId = ?'
-      ).bind(restaurantId).first();
+        'SELECT * FROM expenses WHERE id = ?'
+      ).bind(expId).first();
 
       return jsonResponse(updatedExp);
     }
