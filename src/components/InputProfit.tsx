@@ -105,21 +105,6 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
   const omzetVal = parseCurrency(omzetInput);
   const otherExpensesVal = parseCurrency(otherExpensesInput);
   
-  const totalFixedExpensesMonth = expenses
-    ? (expenses.sewaTempat || 0) +
-      (expenses.gajiKaryawan || 0) +
-      (expenses.royaltiFranchise || 0) +
-      (expenses.listrik || 0) +
-      (expenses.air || 0) +
-      (expenses.internet || 0) +
-      (expenses.marketing || 0) +
-      (expenses.pajak || 0) +
-      (expenses.cicilanBank || 0) +
-      (expenses.biayaLain || 0)
-    : 0;
-
-  const dailyFixedExpenses = Math.round(totalFixedExpensesMonth / 30);
-  
   let hppVal = 0;
   let hppValForDb = 0;
   if (useHpp) {
@@ -657,7 +642,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
 
               // Calculate dynamic display profit
               const displayProfit = hasBreakdown
-                ? (p.omzet || 0) - calculatedHpp - dailyFixedExpenses - (p.otherExpenses || 0)
+                ? (p.omzet || 0) - calculatedHpp - (p.otherExpenses || 0)
                 : p.profit;
 
               // Extract time from createdAt
@@ -767,10 +752,6 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                                 <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
                                   <span className="text-zinc-500 dark:text-zinc-500">HPP / Food Cost ({p.hppType === "percentage" ? `${p.hppVal}%` : "Nominal"})</span>
                                   <span className="font-mono text-amber-600 dark:text-amber-500">-{formatRupiah(calculatedHpp)}</span>
-                                </div>
-                                <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
-                                  <span className="text-zinc-500 dark:text-zinc-500">Biaya Tetap Harian</span>
-                                  <span className="font-mono text-rose-500/90 dark:text-rose-450/90">-{formatRupiah(dailyFixedExpenses)}</span>
                                 </div>
                                 <div className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 py-1.5">
                                   <span className="text-zinc-500 dark:text-zinc-500">Biaya Tambahan Harian</span>
