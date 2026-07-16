@@ -504,7 +504,7 @@ export default function Navbar({
 
       {/* Premium Unified Login Modal */}
       {showLoginModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop Overlay with blur */}
           <div 
             className="absolute inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity duration-300"
