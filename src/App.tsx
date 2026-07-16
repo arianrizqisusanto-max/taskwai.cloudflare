@@ -42,8 +42,11 @@ function MainApp() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("taskwai_staff_session");
-      return saved ? "input" : "dashboard";
+      const savedStaff = localStorage.getItem("taskwai_staff_session");
+      if (savedStaff) return "input";
+      
+      const savedTab = sessionStorage.getItem("taskwai_active_tab");
+      return savedTab || "dashboard";
     }
     return "dashboard";
   });
@@ -78,6 +81,13 @@ function MainApp() {
       localStorage.setItem("theme", "light");
     }
   }, [isDark]);
+
+  // Persist active tab to survive auto-recovery chunk load reloads
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("taskwai_active_tab", activeTab);
+    }
+  }, [activeTab]);
 
   const toggleDark = () => setIsDark((prev) => !prev);
 
