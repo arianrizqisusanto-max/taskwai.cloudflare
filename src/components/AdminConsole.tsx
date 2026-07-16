@@ -133,11 +133,11 @@ export default function AdminConsole() {
         </div>
 
         <div className="space-y-3 pt-1">
-          {/* Firestore Connection */}
+          {/* Cloudflare D1 Connection */}
           <div className="flex items-center justify-between text-xs border-b border-zinc-50 dark:border-zinc-800/40 pb-2.5">
             <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-semibold">
               <Server className="w-3.5 h-3.5 text-zinc-400" />
-              <span>Database Cloud (Firestore)</span>
+              <span>Database Cloud (Cloudflare D1)</span>
             </div>
             <span className="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
               Normal
@@ -159,7 +159,7 @@ export default function AdminConsole() {
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 font-semibold">
               <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
-              <span>Keamanan Aturan Firestore</span>
+              <span>Keamanan Cloudflare D1</span>
             </div>
             <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-mono">Aktif (Live)</span>
           </div>
