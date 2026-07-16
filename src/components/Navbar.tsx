@@ -514,19 +514,19 @@ export default function Navbar({
           />
 
           {/* Modal Container */}
-          <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-thin rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80 animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-thin rounded-3xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl p-6 sm:p-8 shadow-2xl border border-zinc-200/60 dark:border-zinc-800/80">
             {/* Close Button */}
             {!isLoggingInStaff && (
               <button
                 onClick={() => setShowLoginModal(false)}
-                className="absolute top-4 right-4 p-2 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer animate-in"
+                className="absolute top-4 right-4 p-2 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
 
             {/* Modal Header */}
-            <div className="flex flex-col items-center mb-6 mt-2 text-center animate-in">
+            <div className="flex flex-col items-center mb-6 mt-2 text-center">
               <div className="p-3 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-lg mb-3">
                 <TaskwaiLogo size={36} transparentBg={true} />
               </div>
@@ -568,14 +568,14 @@ export default function Navbar({
 
             {/* Login Body */}
             {loginTab === "owner" ? (
-              <div className="flex flex-col items-center text-center space-y-4 py-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+              <div className="flex flex-col items-center text-center space-y-4 py-2">
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
                 <div id="google-signin-button" className="w-full flex justify-center py-2 min-h-[44px]"></div>
               </div>
             ) : (
-              <form onSubmit={handleStaffLoginSubmit} className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
+              <form onSubmit={handleStaffLoginSubmit} className="space-y-4">
                 {/* Username */}
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block">
