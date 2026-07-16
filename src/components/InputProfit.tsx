@@ -653,7 +653,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800/60 hover:border-zinc-200 dark:hover:border-zinc-700 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+                  className="flex flex-col p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 rounded-xl transition-all shadow-sm"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0 pr-4">
@@ -668,12 +668,18 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                       
                       {/* Meta information row: Cabang, Penginput, Jam */}
                       <div className="flex flex-wrap items-center gap-2 mt-2 text-[10px] sm:text-xs font-bold">
-                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                        <span className="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm border border-zinc-200/40 dark:border-zinc-700/30">
                           🏢 {p.branchName || "Pusat"}
                         </span>
-                        <span className="bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm">
-                          👤 {p.inputterName || "Owner"}
-                        </span>
+                        {p.inputterName ? (
+                          <span className="bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm border border-indigo-100/50 dark:border-indigo-900/30">
+                            👤 Staff ({p.inputterName})
+                          </span>
+                        ) : (
+                          <span className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 shadow-sm border border-emerald-100/50 dark:border-emerald-900/30">
+                            👤 Owner
+                          </span>
+                        )}
                         {timeStr && (
                           <span className="bg-zinc-50 dark:bg-zinc-800/40 text-zinc-400 dark:text-zinc-500 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg flex items-center gap-1 font-mono shadow-sm">
                             ⏰ {timeStr}
