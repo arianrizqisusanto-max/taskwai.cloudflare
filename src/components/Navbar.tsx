@@ -59,11 +59,11 @@ export default function Navbar({
             { 
               theme: isDark ? "dark" : "outline", 
               size: "large", 
-              width: 280,
-              shape: "pill"
+              width: 190,
+              shape: "pill",
+              text: "signin_with"
             }
-          );
-        }
+          );        }
       }, 150);
       return () => clearTimeout(timer);
     }
