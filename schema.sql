@@ -65,3 +65,12 @@ CREATE TABLE IF NOT EXISTS sessions (
   createdAt TEXT NOT NULL,
   expiresAt TEXT NOT NULL
 );
+
+-- Tabel Akun Staff (Pemetaan Hash Kredensial Staff)
+CREATE TABLE IF NOT EXISTS staff_accounts (
+  hash TEXT PRIMARY KEY,
+  restaurantId TEXT NOT NULL,
+  ownerId TEXT NOT NULL,
+  staffActive INTEGER NOT NULL DEFAULT 1,
+  FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
+);
