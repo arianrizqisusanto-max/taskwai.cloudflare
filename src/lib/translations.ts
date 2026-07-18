@@ -263,6 +263,10 @@ export const enTranslations: Record<string, string> = {
   "target.staffToastToggleErrorPrefix": "Failed to change staff active status:",
 
   // --- Big Boss ---
+  "bigboss.loginSubtitle": "Manage and monitor the financial performance of all your restaurant branches in a single unified dashboard.",
+  "bigboss.or": "or",
+  "bigboss.enterDemo": "Enter Demo Mode",
+  "bigboss.backHome": "Back to Home",
   "bigboss.title": "Big Boss Dashboard (Consolidated)",
   "bigboss.subtitle": "Monitor the financial performance of all your branches in one unified dashboard.",
   "bigboss.totalBranches": "{count} Connected Branches",

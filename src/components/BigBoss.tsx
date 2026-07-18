@@ -157,7 +157,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   }, [user]);
 
   useEffect(() => {
-    if (authInitialized && user?.isDemo) {
+    if (authInitialized && (!user || user?.isDemo)) {
       const timer = setTimeout(() => {
         const google = (window as any).google;
         if (google) {
@@ -165,21 +165,26 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             client_id: "888780289762-bnd08vbfkspqg2o9iif8bcr91a92jsh5.apps.googleusercontent.com",
             callback: handleGoogleLoginResponse
           });
-          google.accounts.id.renderButton(
-            document.getElementById("bigboss-header-google-signin-button"),
-            { 
-              theme: "outline", 
-              size: "medium", 
-              width: 170,
+          
+          const buttonId = user?.isDemo 
+            ? "bigboss-header-google-signin-button" 
+            : "bigboss-login-google-signin-button";
+            
+          const element = document.getElementById(buttonId);
+          if (element) {
+            google.accounts.id.renderButton(element, { 
+              theme: isDark ? "dark" : "outline", 
+              size: user?.isDemo ? "medium" : "large", 
+              width: user?.isDemo ? 170 : 250,
               shape: "pill",
               text: "signin_with"
-            }
-          );
+            });
+          }
         }
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [authInitialized, user]);
+  }, [authInitialized, user, isDark]);
 
   const handleLinkBranch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,7 +273,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
   // Helper to determine status style of each branch
   const getBranchStatus = (branch: BranchData) => {
-    const prediction = (branch.daysEntered > 0 ? (branch.totalProfitMonth / branch.daysEntered) * 30 : 0);
+    const today = new Date();
+    const currentDateNum = today.getDate();
+    const totalDaysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    
+    // Proyeksi linear realistis berdasarkan hari berjalan: (totalProfitMonth / currentDateNum) * totalDaysInMonth
+    const prediction = currentDateNum > 0 ? (branch.totalProfitMonth / currentDateNum) * totalDaysInMonth : 0;
     const target = branch.monthlyTargetProfit;
 
     if (target <= 0) return "active";
@@ -332,6 +342,79 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       <div className="flex flex-col items-center justify-center py-20 gap-3 min-h-[60vh]">
         <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
         <p className="text-sm text-zinc-550 dark:text-zinc-400 font-bold">Menginisialisasi dasbor Big Boss...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full space-y-8 bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-center relative overflow-hidden"
+        >
+          {/* Accent top border */}
+          <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+          
+          <div className="flex flex-col items-center gap-4">
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl">
+              <Building2 className="w-10 h-10 text-emerald-600 dark:text-emerald-450 animate-pulse" />
+            </div>
+            <div>
+              <h2 className="font-sans font-black text-2xl tracking-tight text-zinc-950 dark:text-white flex items-center justify-center gap-2">
+                <span>taskwai</span>
+                <span 
+                  className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full select-none"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(255,215,0,0.12) 100%)",
+                    border: "1px solid rgba(197,160,40,0.4)",
+                    color: "#c5a028"
+                  }}
+                >
+                  👑 Big Boss
+                </span>
+              </h2>
+              <p className="text-zinc-550 dark:text-zinc-400 text-xs font-semibold mt-2.5 leading-relaxed">
+                {t("bigboss.loginSubtitle", "Kelola dan pantau kinerja keuangan seluruh cabang restoran Anda dalam satu dasbor terpadu.")}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-zinc-800/60">
+            {/* Google Sign-in button */}
+            <div className="flex flex-col items-center justify-center py-2">
+              <div id="bigboss-login-google-signin-button" className="shadow-sm rounded-full overflow-hidden border border-zinc-200/40 dark:border-zinc-850 bg-white dark:bg-zinc-900" />
+            </div>
+
+            <div className="flex items-center justify-center gap-2 text-zinc-350 dark:text-zinc-650 text-xs">
+              <span className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
+              <span>{t("bigboss.or", "atau")}</span>
+              <span className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1" />
+            </div>
+
+            {/* Enter demo button */}
+            <button
+              type="button"
+              onClick={handleEnterDemoMode}
+              className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/60 dark:hover:bg-zinc-700/80 border border-zinc-200/60 dark:border-zinc-800 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-all cursor-pointer shadow-sm"
+            >
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              <span>{t("bigboss.enterDemo", "Masuk Mode Demo")}</span>
+            </button>
+          </div>
+
+          <div className="pt-4">
+            <button
+              type="button"
+              onClick={() => window.location.href = "/"}
+              className="flex items-center justify-center gap-1.5 mx-auto text-xs font-bold text-zinc-400 dark:text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>{t("bigboss.backHome", "Kembali ke Beranda")}</span>
+            </button>
+          </div>
+        </motion.div>
       </div>
     );
   }
