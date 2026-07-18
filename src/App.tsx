@@ -73,6 +73,7 @@ const Biaya = safeLazy(() => import("./components/Biaya"));
 const Laporan = safeLazy(() => import("./components/Laporan"));
 const Target = safeLazy(() => import("./components/Target"));
 const AdminConsole = safeLazy(() => import("./components/AdminConsole"));
+const BigBoss = safeLazy(() => import("./components/BigBoss"));
 
 function MainApp() {
   const { showToast } = useToast();
@@ -387,8 +388,11 @@ function MainApp() {
             onSaveExpenses={handleSaveExpenses} 
             expensesMonth={expensesMonth}
             onExpensesMonthChange={setExpensesMonth}
+            setActiveTab={setActiveTab}
           />
         );
+      case "bigboss":
+        return <BigBoss setActiveTab={setActiveTab} />;
       case "laporan":
         return <Laporan profits={profits} restaurant={restaurant} />;
       case "target":

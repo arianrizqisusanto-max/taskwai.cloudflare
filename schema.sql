@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS restaurants (
   staffActive INTEGER DEFAULT 0,
   staffUpdatedAt TEXT,
   branches TEXT, -- JSON string array
+  authCode TEXT,
+  authCodeExpiresAt TEXT,
   FOREIGN KEY (ownerId) REFERENCES owners(id) ON DELETE CASCADE
 );
 
@@ -76,4 +78,15 @@ CREATE TABLE IF NOT EXISTS staff_accounts (
   ownerId TEXT NOT NULL,
   staffActive INTEGER NOT NULL DEFAULT 1,
   FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
+);
+
+-- Tabel Hubungan Big Boss & Cabang
+CREATE TABLE IF NOT EXISTS bigboss_links (
+  id TEXT PRIMARY KEY,
+  bossOwnerId TEXT NOT NULL,
+  branchRestaurantId TEXT NOT NULL,
+  createdAt TEXT NOT NULL,
+  FOREIGN KEY (bossOwnerId) REFERENCES owners(id) ON DELETE CASCADE,
+  FOREIGN KEY (branchRestaurantId) REFERENCES restaurants(id) ON DELETE CASCADE,
+  UNIQUE(bossOwnerId, branchRestaurantId)
 );

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Restaurant } from "../types";
 import { formatRupiah } from "../lib/utils";
-import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X, Lock, Trash2, AlertTriangle } from "lucide-react";
+import { DataService } from "../lib/dataService";
+import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X, Lock, Trash2, AlertTriangle, Key, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
@@ -51,6 +52,36 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
       });
     }
     setMathAnswerInput("");
+  };
+
+  // Big Boss states
+  const [authCode, setAuthCode] = useState<string>("");
+  const [authCodeExpiry, setAuthCodeExpiry] = useState<string>("");
+  const [isGeneratingCode, setIsGeneratingCode] = useState<boolean>(false);
+  const [codeCopied, setCodeCopied] = useState<boolean>(false);
+
+  const handleGenerateAuthCode = async () => {
+    setIsGeneratingCode(true);
+    try {
+      const res = await DataService.generateBigBossCode();
+      setAuthCode(res.code);
+      setAuthCodeExpiry(res.expiresAt);
+      setCodeCopied(false);
+      showToast("Kode otorisasi berhasil dibuat!", "success");
+    } catch (err: any) {
+      console.error(err);
+      showToast(err.message || "Gagal membuat kode otorisasi.", "error");
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  };
+
+  const handleCopyCode = () => {
+    if (!authCode) return;
+    navigator.clipboard.writeText(authCode);
+    setCodeCopied(true);
+    showToast(t("target.codeCopied", "Kode berhasil disalin!"), "success");
+    setTimeout(() => setCodeCopied(false), 2000);
   };
 
   // Staff Credentials states
@@ -571,6 +602,49 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
         <p className="text-sm font-medium leading-relaxed text-zinc-300 italic">
           {t("target.formulaText", "\"Bisnis yang sukses dibangun dari kejelasan target harian. Dengan mengeset target bulanan, Taskwai memandu Anda merealisasikannya langkah demi langkah setiap hari.\"")}
         </p>
+      </div>
+
+      {/* Big Boss Authorization Section */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center gap-2 mb-3">
+          <Key className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+            {t("target.bigbossAuthTitle", "Otorisasi Big Boss")}
+          </h3>
+        </div>
+        <p className="text-xs text-zinc-550 dark:text-zinc-400 mb-5 leading-relaxed font-semibold">
+          {t("target.bigbossAuthDesc", "Dapatkan kode otorisasi untuk menghubungkan cabang ini ke dasbor Big Boss Anda.")}
+        </p>
+
+        {authCode ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200/65 dark:border-zinc-800 px-4 py-3 rounded-xl flex items-center justify-between font-mono font-black text-lg tracking-widest text-zinc-900 dark:text-white">
+                <span>{authCode}</span>
+                <button
+                  type="button"
+                  onClick={handleCopyCode}
+                  className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-lg text-zinc-500 dark:text-zinc-400 transition-colors cursor-pointer border-0"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold leading-normal">
+              ⚠️ Kode berlaku selama 15 menit. Masukkan kode ini pada menu Big Boss di akun pemantau Anda.
+            </p>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleGenerateAuthCode}
+            disabled={isGeneratingCode}
+            className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0 disabled:opacity-55"
+          >
+            <Key className="w-4 h-4" />
+            <span>{isGeneratingCode ? "Memproses..." : t("target.generateCode", "Dapatkan Kode Otorisasi")}</span>
+          </button>
+        )}
       </div>
 
       {/* Danger Zone: Reset All Data */}

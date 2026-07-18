@@ -513,5 +513,53 @@ export const DataService = {
         activeTodayCount: (localRest && hasToday) ? 1 : 0
       };
     }
+  },
+
+  async generateBigBossCode(): Promise<{ code: string; expiresAt: string }> {
+    const res = await fetch('/api/restaurant/auth-code', {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal menghasilkan kode otorisasi');
+    }
+    return await res.json();
+  },
+
+  async getBigBossBranches(): Promise<{ branches: any[] }> {
+    const res = await fetch('/api/bigboss', {
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal mengambil data cabang');
+    }
+    return await res.json();
+  },
+
+  async linkBigBossBranch(code: string): Promise<any> {
+    const res = await fetch('/api/bigboss', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ code })
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal menautkan cabang');
+    }
+    return await res.json();
+  },
+
+  async unlinkBigBossBranch(restaurantId: string): Promise<any> {
+    const res = await fetch(`/api/bigboss?restaurantId=${encodeURIComponent(restaurantId)}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal menghapus cabang');
+    }
+    return await res.json();
   }
 };
