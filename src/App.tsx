@@ -14,6 +14,7 @@ import SkeletonLoader from "./components/SkeletonLoader";
 import { ToastProvider, useToast } from "./components/Toast";
 import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
 import { Sun, Moon, Building2 } from "lucide-react";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // ChunkErrorFallback - shown when a lazy chunk cannot be loaded even after one retry
 function ChunkErrorFallback() {
@@ -477,10 +478,12 @@ function MainApp() {
         </header>
       )}
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">
-        <Suspense fallback={<SkeletonLoader />}>
-          {renderView()}
-        </Suspense>
+       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">
+        <ErrorBoundary>
+          <Suspense fallback={<SkeletonLoader />}>
+            {renderView()}
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
       <footer className="py-6 pb-24 lg:pb-6 border-t border-zinc-200/60 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm mt-12">
