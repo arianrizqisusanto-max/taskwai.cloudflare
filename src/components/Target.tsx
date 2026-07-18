@@ -378,7 +378,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-[11px] font-bold leading-normal flex items-start gap-2 font-sans">
             <span className="text-sm shrink-0 leading-none">⚠️</span>
             <span>
-              PENTING: Kredensial akun staff (Username & Password) hanya dapat diubah kembali minimal setiap 60 hari sekali. Harap buat dan catat kredensial ini dengan teliti.
+              {t("target.staffEditWarning", "PENTING: Kredensial akun staff (Username & Password) hanya dapat diubah kembali minimal setiap 60 hari sekali. Harap buat dan catat kredensial ini dengan teliti.")}
             </span>
           </div>
 

@@ -243,6 +243,7 @@ export const enTranslations: Record<string, string> = {
   "target.staffToastErrorDefault": "Failed to update staff credentials.",
   "target.staffToastErrorPrefix": "Failed to update staff credentials:",
   "target.staffToast60DaysRule": "Staff account changes are only allowed once every 60 days. Last changed {days} days ago (need {remaining} more days).",
+  "target.staffEditWarning": "IMPORTANT: Staff account credentials (Username & Password) can only be changed once every 60 days. Please create and record these credentials carefully.",
   "target.staffToastActivated": "Staff account successfully reactivated!",
   "target.staffToastDeactivated": "Staff account deactivated.",
   "target.staffToastToggleErrorDefault": "Failed to change staff active status.",
