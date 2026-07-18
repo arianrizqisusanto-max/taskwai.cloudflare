@@ -5,10 +5,11 @@ import { useTranslation } from "../lib/LanguageContext";
 import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
-  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle 
+  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import TaskwaiLogo from "./TaskwaiLogo";
 
 interface BranchData {
   id: string;
@@ -22,9 +23,11 @@ interface BranchData {
 
 interface BigBossProps {
   setActiveTab: (tab: string) => void;
+  isDark: boolean;
+  toggleDark: () => void;
 }
 
-export default function BigBoss({ setActiveTab }: BigBossProps) {
+export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossProps) {
   const { t, currency } = useTranslation();
   const { showToast } = useToast();
   const [branches, setBranches] = useState<BranchData[]>([]);
