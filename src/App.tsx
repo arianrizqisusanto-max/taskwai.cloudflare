@@ -1,6 +1,7 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
+ * Version: 1.0.4-cache-routing-fix
  */
 
 import { useState, useEffect, lazy, Suspense, ComponentType } from "react";
@@ -142,9 +143,9 @@ function MainApp() {
   const [expenses, setExpenses] = useState<Expenses | null>(null);
   const [expensesMonth, setExpensesMonth] = useState(new Date().toISOString().substring(0, 7));
 
-  // 1. Fetch Auth State from Cloudflare D1 Backend on startup
   useEffect(() => {
     const checkAuth = async () => {
+      console.log("Taskwai Init Version 1.0.5-cache-bust-fixed");
       try {
         const data = await DataService.getMe();
         if (data.user) {
