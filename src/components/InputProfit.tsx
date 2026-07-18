@@ -154,7 +154,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
         useHpp ? hppValForDb : undefined, 
         otherExpensesVal,
         branchInput.trim() || undefined,
-        inputterInput.trim() || undefined
+        isStaffMode ? (inputterInput.trim() || undefined) : undefined
       );
       showToast(t("profit.saveSuccess", "Profit tanggal {date} berhasil disimpan!").replace("{date}", formatIndoDate(date, lang)), "success");
       
@@ -162,7 +162,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
       if (branchInput.trim()) {
         localStorage.setItem("taskwai_last_branch", branchInput.trim());
       }
-      if (inputterInput.trim()) {
+      if (isStaffMode && inputterInput.trim()) {
         localStorage.setItem("taskwai_last_inputter", inputterInput.trim());
       }
 
@@ -462,24 +462,26 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
               )}
             </div>
 
-            {/* Nama Penginput */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Nama Penginput / Karyawan <span className="text-zinc-400 dark:text-zinc-500 font-normal lowercase">{t("profit.optional", "(opsional)")}</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 pointer-events-none select-none font-mono">
-                  👤
-                </span>
-                <input
-                  type="text"
-                  value={inputterInput}
-                  onChange={(e) => setInputterInput(e.target.value)}
-                  placeholder="e.g. Andi"
-                  className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all"
-                />
+            {/* Nama Penginput - ONLY SHOW IN STAFF MODE */}
+            {isStaffMode && (
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+                  Nama Penginput / Karyawan <span className="text-zinc-400 dark:text-zinc-500 font-normal lowercase">{t("profit.optional", "(opsional)")}</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 pointer-events-none select-none font-mono">
+                    👤
+                  </span>
+                  <input
+                    type="text"
+                    value={inputterInput}
+                    onChange={(e) => setInputterInput(e.target.value)}
+                    placeholder="e.g. Andi"
+                    className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Live Profit Calculation Panel */}
             <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/60 space-y-3 shadow-xs">
