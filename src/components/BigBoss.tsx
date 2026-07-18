@@ -33,6 +33,10 @@ export default function BigBoss({ setActiveTab }: BigBossProps) {
   const [isLinking, setIsLinking] = useState(false);
   const [linkingError, setLinkingError] = useState("");
 
+  // Isolated session state for Big Boss mode
+  const [user, setUser] = useState<any | null>(null);
+  const [authInitialized, setAuthInitialized] = useState(false);
+
   const formatLocale = currency === "dollar" ? "en-US" : "id-ID";
 
   const fetchBranches = async () => {
@@ -48,9 +52,74 @@ export default function BigBoss({ setActiveTab }: BigBossProps) {
     }
   };
 
+  const handleGoogleLoginResponse = async (response: any) => {
+    try {
+      const idToken = response.credential;
+      const data = await DataService.loginGoogle(idToken);
+      setUser(data.user);
+      showToast("Berhasil masuk ke dasbor Big Boss!", "success");
+    } catch (error: any) {
+      console.error("Login error:", error);
+      showToast("Gagal masuk dengan Google.", "error");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await DataService.logout();
+      setUser(null);
+      showToast("Berhasil keluar dari dasbor Big Boss.", "success");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    fetchBranches();
+    const checkAuth = async () => {
+      try {
+        const data = await DataService.getMe();
+        if (data.user) {
+          setUser(data.user);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setAuthInitialized(true);
+      }
+    };
+    checkAuth();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchBranches();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (authInitialized && !user) {
+      const timer = setTimeout(() => {
+        const google = (window as any).google;
+        if (google) {
+          google.accounts.id.initialize({
+            client_id: "888780289762-bnd08vbfkspqg2o9iif8bcr91a92jsh5.apps.googleusercontent.com",
+            callback: handleGoogleLoginResponse
+          });
+          google.accounts.id.renderButton(
+            document.getElementById("bigboss-google-signin-button"),
+            { 
+              theme: "outline", 
+              size: "large", 
+              width: 240,
+              shape: "pill",
+              text: "signin_with"
+            }
+          );
+        }
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [authInitialized, user]);
 
   const handleLinkBranch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,6 +229,65 @@ export default function BigBoss({ setActiveTab }: BigBossProps) {
     }
   };
 
+  if (!authInitialized) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3 min-h-[60vh]">
+        <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-zinc-550 dark:text-zinc-400 font-bold">Menginisialisasi dasbor Big Boss...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 min-h-[70vh]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-center"
+        >
+          {/* Decorative gold/emerald gradient border at top */}
+          <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-emerald-500 via-amber-500 to-yellow-400" />
+          
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/35 text-emerald-600 dark:text-emerald-450 flex items-center justify-center mb-6">
+            <Building2 className="w-8 h-8" />
+          </div>
+
+          <h1 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">
+            Taskwai Big Boss
+          </h1>
+          <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-1">
+            Dashboard Gabungan Cabang
+          </p>
+
+          <div className="mt-6 p-4 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/60 rounded-2xl text-xs text-zinc-550 dark:text-zinc-450 leading-relaxed font-semibold text-left space-y-2">
+            <p>
+              💡 <strong>Petunjuk Sesi Akun:</strong>
+            </p>
+            <p>
+              Untuk mengelola dan memantau performa gabungan, silakan masuk menggunakan akun Google utama Anda (Big Boss).
+            </p>
+            <p className="text-amber-600 dark:text-amber-400">
+              ⚠️ Jika Anda sedang membuka panel cabang pada tab browser lain, harap gunakan akun Google yang berbeda untuk masuk ke dasbor Big Boss ini agar sesi pencatatan tidak bentrok.
+            </p>
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <div id="bigboss-google-signin-button"></div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => window.location.href = '/'}
+            className="mt-6 text-xs font-bold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors cursor-pointer bg-transparent border-0"
+          >
+            Kembali ke Beranda
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* 1. Header & Navigation Back */}
@@ -167,11 +295,11 @@ export default function BigBoss({ setActiveTab }: BigBossProps) {
         <div className="space-y-1">
           <button
             type="button"
-            onClick={() => setActiveTab("biaya")}
+            onClick={() => window.location.href = "/"}
             className="flex items-center gap-1 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Kembali ke Biaya Operasional</span>
+            <span>Kembali ke Beranda</span>
           </button>
           <h1 className="font-sans font-black text-3xl sm:text-4xl tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5">
             <Building2 className="w-8 h-8 text-emerald-600 dark:text-emerald-450" />
@@ -181,13 +309,29 @@ export default function BigBoss({ setActiveTab }: BigBossProps) {
             {t("bigboss.subtitle", "Pantau performa keuangan seluruh cabang Anda dalam satu dasbor terpadu.")}
           </p>
         </div>
-        <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200/60 dark:border-emerald-900/30 rounded-2xl px-5 py-3 shadow-sm self-start sm:self-center">
-          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-450 block uppercase tracking-widest mb-0.5">
-            {t("bigboss.totalBranches", "Cabang Terhubung").replace("{count}", String(branches.length))}
-          </span>
-          <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {branches.length} Outlet
-          </span>
+        
+        <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
+            <span className="block text-[9px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">Login Big Boss</span>
+            <span className="font-mono">{user.email}</span>
+          </div>
+          
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="px-4 py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
+          >
+            Keluar
+          </button>
+
+          <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200/60 dark:border-emerald-900/30 rounded-2xl px-5 py-2.5 shadow-sm">
+            <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-455 block uppercase tracking-widest mb-0.5">
+              {t("bigboss.totalBranches", "Cabang Terhubung").replace("{count}", String(branches.length))}
+            </span>
+            <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+              {branches.length} Outlet
+            </span>
+          </div>
         </div>
       </div>
 

@@ -82,6 +82,8 @@ function MainApp() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
+      if (window.location.pathname === "/bigboss") return "bigboss";
+
       const savedStaff = localStorage.getItem("taskwai_staff_session");
       if (savedStaff) return "input";
       
@@ -165,7 +167,10 @@ function MainApp() {
 
   // 2. Fetch data based on User Session (Real D1 vs Demo vs Staff)
   useEffect(() => {
-    if (!authInitialized) return;
+    if (!authInitialized || activeTab === "bigboss") {
+      if (activeTab === "bigboss") setLoading(false);
+      return;
+    }
 
     const fetchData = async () => {
       setLoading(true);
@@ -353,6 +358,10 @@ function MainApp() {
 
   // Render correct tab view dynamically
   const renderView = () => {
+    if (activeTab === "bigboss" && authInitialized) {
+      return <BigBoss setActiveTab={setActiveTab} />;
+    }
+
     if (activeTab === "admin" && authInitialized) {
       return <AdminConsole />;
     }

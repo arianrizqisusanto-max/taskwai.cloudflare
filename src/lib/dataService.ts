@@ -113,9 +113,18 @@ const setLocal = <T>(key: string, value: T): void => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
+// Session isolation helpers for Big Boss mode
+function isBigBossRoute(): boolean {
+  return typeof window !== "undefined" && window.location.pathname === "/bigboss";
+}
+
+function getSessionTokenKey(): string {
+  return isBigBossRoute() ? "taskwai_bigboss_session_token" : "taskwai_session_token";
+}
+
 // Helper for API request headers
 function getHeaders() {
-  const token = localStorage.getItem('taskwai_session_token');
+  const token = localStorage.getItem(getSessionTokenKey());
   const headers: Record<string, string> = {
     'Content-Type': 'application/json'
   };
@@ -139,13 +148,13 @@ export const DataService = {
     }
     const data = await res.json() as any;
     if (data.token) {
-      localStorage.setItem('taskwai_session_token', data.token);
+      localStorage.setItem(getSessionTokenKey(), data.token);
     }
     return data;
   },
 
   async getMe(): Promise<any> {
-    const token = localStorage.getItem('taskwai_session_token');
+    const token = localStorage.getItem(getSessionTokenKey());
     if (!token) return { user: null };
 
     try {
@@ -153,7 +162,7 @@ export const DataService = {
         headers: getHeaders()
       });
       if (!res.ok) {
-        localStorage.removeItem('taskwai_session_token');
+        localStorage.removeItem(getSessionTokenKey());
         return { user: null };
       }
       return await res.json();
@@ -172,7 +181,7 @@ export const DataService = {
     } catch (e) {
       console.error('Error calling logout api:', e);
     } finally {
-      localStorage.removeItem('taskwai_session_token');
+      localStorage.removeItem(getSessionTokenKey());
     }
   },
 
