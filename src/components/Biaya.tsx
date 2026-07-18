@@ -211,7 +211,7 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
                   1. <strong>{t("biaya.notePoint1Title", "Biaya Bulanan:")}</strong> {t("biaya.rentNotice", "Semua nilai di bawah adalah pengeluaran per bulan. Jika ada biaya tahunan (seperti sewa tempat tahunan), silakan dibagi 12 terlebih dahulu sebelum diinput.")}
                 </p>
                 <p className="pt-2 border-t border-zinc-200/20 dark:border-zinc-800/40">
-                  2. <strong>{t("biaya.notePoint2Title", "Keterbatasan & Rekomendasi Multi-Cabang:")}</strong> {t("biaya.branchNotice", "Sistem ini dirancang untuk menganalisis performa bisnis secara terpusat dengan menggabungkan seluruh pengeluaran operasional dan pendapatan. Jika Anda ingin memantau profitabilitas detail tiap cabang secara terpisah (tidak digabung), sistem ini akan bekerja lebih akurat jika Anda membuat akun terpisah untuk setiap cabang (satu akun khusus = satu cabang).")}
+                  2. <strong>{t("biaya.notePoint2Title", "Penting untuk Multi-Cabang:")}</strong> {t("biaya.branchNotice", "Jika ingin melihat rincian performa tiap cabang, Anda harus memakai satu akun untuk tiap cabangnya (1 akun = 1 cabang). Taskwai tidak bisa melihat performa tiap cabang secara terpisah dalam 1 dashboard.")}
                 </p>
               </div>
             )}
