@@ -157,7 +157,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   }, [user]);
 
   useEffect(() => {
-    if (authInitialized && !user) {
+    if (authInitialized && user?.isDemo) {
       const timer = setTimeout(() => {
         const google = (window as any).google;
         if (google) {
@@ -166,11 +166,11 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             callback: handleGoogleLoginResponse
           });
           google.accounts.id.renderButton(
-            document.getElementById("bigboss-google-signin-button"),
+            document.getElementById("bigboss-header-google-signin-button"),
             { 
               theme: "outline", 
-              size: "large", 
-              width: 240,
+              size: "medium", 
+              width: 170,
               shape: "pill",
               text: "signin_with"
             }
@@ -336,68 +336,6 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     );
   }
 
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 px-4 min-h-[70vh]">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-center"
-        >
-          {/* Decorative gold/emerald gradient border at top */}
-          <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-emerald-500 via-amber-500 to-yellow-400" />
-          
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/35 text-emerald-600 dark:text-emerald-450 flex items-center justify-center mb-6">
-            <Building2 className="w-8 h-8" />
-          </div>
-
-          <h1 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">
-            Taskwai Big Boss
-          </h1>
-          <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-1">
-            Dashboard Gabungan Cabang
-          </p>
-
-          <div className="mt-6 p-4 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/60 rounded-2xl text-xs text-zinc-550 dark:text-zinc-450 leading-relaxed font-semibold text-left space-y-2">
-            <p>
-              💡 <strong>Petunjuk Sesi Akun:</strong>
-            </p>
-            <p>
-              Untuk mengelola dan memantau performa gabungan, silakan masuk menggunakan akun Google utama Anda (Big Boss).
-            </p>
-            <p className="text-amber-600 dark:text-amber-400">
-              ⚠️ Jika Anda sedang membuka panel cabang pada tab browser lain, harap gunakan akun Google yang berbeda untuk masuk ke dasbor Big Boss ini agar sesi pencatatan tidak bentrok.
-            </p>
-          </div>
-
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <div id="bigboss-google-signin-button"></div>
-            
-            <div className="text-zinc-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-wider my-1">
-              atau
-            </div>
-            
-            <button
-              type="button"
-              onClick={handleEnterDemoMode}
-              className="px-5 py-2.5 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-805 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs transition-colors cursor-pointer border border-zinc-250/50 dark:border-zinc-750 shadow-sm"
-            >
-              🚀 Coba Mode Demo
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => window.location.href = '/'}
-            className="mt-6 text-xs font-bold text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors cursor-pointer bg-transparent border-0"
-          >
-            Kembali ke Beranda
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
       {/* 1. Header & Navigation Back */}
@@ -421,28 +359,37 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         </div>
         
         <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300 flex items-center gap-2">
-            {user.isDemo && (
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+          {user.isDemo ? (
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 px-3 py-2 rounded-xl flex items-center gap-1.5 animate-pulse">
+                <span className="flex h-1.5 w-1.5 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-550"></span>
+                </span>
+                Mode Demo
               </span>
-            )}
-            <div>
-              <span className="block text-[9px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
-                {user.isDemo ? "Simulasi Demo" : "Login Big Boss"}
-              </span>
-              <span className="font-mono">{user.email}</span>
+              <div id="bigboss-header-google-signin-button" className="shadow-sm rounded-full overflow-hidden border border-zinc-200/40 dark:border-zinc-850 bg-white dark:bg-zinc-900"></div>
             </div>
-          </div>
-          
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="px-4 py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
-          >
-            Keluar
-          </button>
+          ) : (
+            <>
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
+                <div>
+                  <span className="block text-[9px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
+                    Login Big Boss
+                  </span>
+                  <span className="font-mono">{user.email}</span>
+                </div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="px-4 py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
+              >
+                Keluar
+              </button>
+            </>
+          )}
 
           <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200/60 dark:border-emerald-900/30 rounded-2xl px-5 py-2.5 shadow-sm">
             <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-455 block uppercase tracking-widest mb-0.5">
@@ -537,8 +484,15 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               </div>
 
               {/* Multi-Branch Usage Disclaimer */}
-              <div className="bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-200/50 dark:border-zinc-800/60 rounded-2xl p-5 text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold leading-relaxed">
-                💡 <strong>Tips Big Boss:</strong> Halaman ini murni menggabungkan data dari cabang-cabang mandiri yang Anda daftarkan. Anda dapat mencatat penginput harian di tiap cabang secara otonom lalu memantau profit gabungannya secara aman di sini.
+              <div className="bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-200/50 dark:border-zinc-800/60 rounded-2xl p-5 text-[10px] text-zinc-400 dark:text-zinc-550 font-semibold leading-relaxed space-y-2">
+                <div>
+                  💡 <strong>Tips Big Boss:</strong> Halaman ini menggabungkan data finansial dari seluruh cabang Anda secara terpadu.
+                </div>
+                {user?.isDemo && (
+                  <div className="text-amber-600 dark:text-amber-500 font-bold border-t border-zinc-200/40 dark:border-zinc-800/40 pt-2">
+                    🔑 <strong>Uji Coba:</strong> Masukkan kode <span className="font-mono bg-zinc-200 dark:bg-zinc-850 px-1 py-0.5 rounded text-zinc-950 dark:text-white">DEMO-YOGYA</span> di atas untuk mensimulasikan penautan cabang baru!
+                  </div>
+                )}
               </div>
             </div>
 
