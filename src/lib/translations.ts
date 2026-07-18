@@ -218,6 +218,8 @@ export const enTranslations: Record<string, string> = {
   "target.resetConfirmTitle": "Confirm Total Reset",
   "target.resetConfirmDesc": "Are you sure you want to delete all business data? All profit history and configuration settings will be lost forever.",
   "target.resetConfirmButton": "Yes, Reset Total",
+  "target.mathQuestionLabel": "Security Challenge (Answer to proceed):",
+  "target.mathQuestionPlaceholder": "Answer...",
   "target.resetSuccess": "All data has been successfully reset. Starting your business from scratch!",
   "target.resetError": "Failed to reset data.",
 

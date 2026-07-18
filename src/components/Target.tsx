@@ -30,6 +30,28 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   // Reset confirmation states
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [mathQuestion, setMathQuestion] = useState({ q: "", ans: 0 });
+  const [mathAnswerInput, setMathAnswerInput] = useState("");
+
+  const generateMathQuestion = () => {
+    const isMultiplication = Math.random() > 0.5;
+    if (isMultiplication) {
+      const num1 = Math.floor(Math.random() * 8) + 3; // 3 to 10
+      const num2 = Math.floor(Math.random() * 8) + 5; // 5 to 12
+      setMathQuestion({
+        q: `${num1} × ${num2}`,
+        ans: num1 * num2
+      });
+    } else {
+      const num1 = Math.floor(Math.random() * 40) + 11; // 11 to 50
+      const num2 = Math.floor(Math.random() * 40) + 11; // 11 to 50
+      setMathQuestion({
+        q: `${num1} + ${num2}`,
+        ans: num1 + num2
+      });
+    }
+    setMathAnswerInput("");
+  };
 
   // Staff Credentials states
   const [staffUsername, setStaffUsername] = useState(restaurant.staffUsername || "");
@@ -562,7 +584,10 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
         </p>
         <button
           type="button"
-          onClick={() => setShowResetConfirm(true)}
+          onClick={() => {
+            generateMathQuestion();
+            setShowResetConfirm(true);
+          }}
           className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0"
         >
           <Trash2 className="w-4 h-4" />
@@ -600,6 +625,26 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                   {t("target.resetConfirmDesc", "Apakah Anda benar-benar yakin ingin menghapus seluruh data usaha ini? Semua riwayat profit dan pengaturan akan hilang selamanya.")}
                 </p>
                 
+                {/* Math Challenge for safety confirmation */}
+                <div className="w-full mt-4 p-3.5 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/80 rounded-2xl text-left space-y-2">
+                  <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-wider block">
+                    {t("target.mathQuestionLabel", "Pertanyaan Keamanan (Jawab untuk mengonfirmasi):")}
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono font-black text-sm text-zinc-850 dark:text-zinc-100 bg-zinc-200/50 dark:bg-zinc-800/60 px-3 py-1.5 rounded-lg border border-zinc-200/20 dark:border-zinc-700/35 select-none shrink-0">
+                      {mathQuestion.q} =
+                    </span>
+                    <input
+                      type="number"
+                      required
+                      value={mathAnswerInput}
+                      onChange={(e) => setMathAnswerInput(e.target.value)}
+                      placeholder={t("target.mathQuestionPlaceholder", "Jawab...")}
+                      className="w-full px-3 py-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-lg text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                    />
+                  </div>
+                </div>
+
                 <div className="flex gap-2.5 w-full mt-6">
                   <button
                     type="button"
@@ -611,6 +656,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                   <button
                     type="button"
                     onClick={async () => {
+                      if (Number(mathAnswerInput) !== mathQuestion.ans) return;
                       setShowResetConfirm(false);
                       setIsResetting(true);
                       try {
@@ -619,8 +665,8 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
                         setIsResetting(false);
                       }
                     }}
-                    disabled={isResetting}
-                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm shadow-red-600/10 disabled:opacity-50"
+                    disabled={isResetting || Number(mathAnswerInput) !== mathQuestion.ans}
+                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-zinc-100 dark:disabled:bg-zinc-850 disabled:text-zinc-400 dark:disabled:text-zinc-500 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm shadow-red-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isResetting ? "Mereset..." : t("target.resetConfirmButton", "Ya, Reset Total")}
                   </button>
