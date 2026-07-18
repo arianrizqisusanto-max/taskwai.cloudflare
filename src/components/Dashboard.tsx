@@ -92,10 +92,10 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   const statusConfigs = {
     amazing: {
       label: t("dashboard.statusAmazing", "Luar Biasa!"),
-      bgClass: "bg-violet-50/50 dark:bg-violet-950/10 border-violet-200/60 dark:border-violet-900/30 text-violet-900 dark:text-violet-100 shadow-[0_1px_3px_rgba(139,92,246,0.03)]",
-      indicatorClass: "bg-violet-500 animate-pulse",
-      textClass: "text-violet-600 dark:text-violet-400 font-extrabold",
-      icon: <Sparkles className="w-5 h-5 text-violet-600 dark:text-violet-400 animate-bounce" />,
+      bgClass: "bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-transparent dark:from-amber-500/15 dark:via-yellow-500/5 dark:to-transparent border-amber-400/80 dark:border-amber-500/40 text-amber-900 dark:text-amber-100 shadow-[0_4px_20px_rgba(245,158,11,0.12)]",
+      indicatorClass: "bg-amber-500 animate-pulse",
+      textClass: "font-extrabold bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent dark:from-amber-450 dark:to-yellow-350",
+      icon: <Sparkles className="w-5 h-5 text-amber-500 dark:text-amber-450 animate-bounce" />,
       message: t("dashboard.messageAmazing", "Luar biasa! Pertumbuhan bisnis Anda sangat pesat dan melampaui seluruh estimasi target.")
     },
     excellent: {
