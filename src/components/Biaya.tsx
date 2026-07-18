@@ -17,6 +17,7 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
   const { showToast } = useToast();
   const { t, currency, currencySymbol } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
+  const [showNote, setShowNote] = useState(false);
 
   const isDollar = currency === "dollar";
   const formatLocale = isDollar ? "en-US" : "id-ID";
@@ -192,9 +193,28 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
             </div>
           </div>
 
-          <div className="mb-6 text-[11px] text-zinc-500 dark:text-zinc-400 font-bold bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/60 rounded-xl p-3 leading-normal flex items-start gap-2">
-            <span className="text-emerald-500 shrink-0 text-xs">💡</span>
-            <span>{t("biaya.rentNotice", "Catatan: Semua nilai di bawah adalah pengeluaran per bulan. Jika ada biaya tahunan (seperti sewa tempat tahunan), silakan dibagi 12 terlebih dahulu sebelum diinput.")}</span>
+          <div className="mb-6 border border-zinc-200/50 dark:border-zinc-800/80 rounded-xl overflow-hidden bg-zinc-50 dark:bg-zinc-950/40">
+            <button
+              type="button"
+              onClick={() => setShowNote(!showNote)}
+              className="w-full flex items-center justify-between p-3 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30 transition-colors cursor-pointer text-left"
+            >
+              <span className="flex items-center gap-1.5">
+                <span>💡</span>
+                <span>{t("biaya.noteTitle", "Penting: Ketentuan Biaya & Panduan Multi-Cabang")}</span>
+              </span>
+              <span className="text-zinc-400 dark:text-zinc-500 text-xs">{showNote ? "▲" : "▼"}</span>
+            </button>
+            {showNote && (
+              <div className="p-3.5 pt-0 border-t border-zinc-100 dark:border-zinc-800/50 text-[11px] text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed space-y-2.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                <p className="mt-2.5">
+                  1. <strong>{t("biaya.notePoint1Title", "Biaya Bulanan:")}</strong> {t("biaya.rentNotice", "Semua nilai di bawah adalah pengeluaran per bulan. Jika ada biaya tahunan (seperti sewa tempat tahunan), silakan dibagi 12 terlebih dahulu sebelum diinput.")}
+                </p>
+                <p className="pt-2 border-t border-zinc-200/20 dark:border-zinc-800/40">
+                  2. <strong>{t("biaya.notePoint2Title", "Keterbatasan & Rekomendasi Multi-Cabang:")}</strong> {t("biaya.branchNotice", "Sistem ini dirancang untuk menganalisis performa bisnis secara terpusat dengan menggabungkan seluruh pengeluaran operasional dan pendapatan. Jika Anda ingin memantau profitabilitas detail tiap cabang secara terpisah (tidak digabung), sistem ini akan bekerja lebih akurat jika Anda membuat akun terpisah untuk setiap cabang (satu akun khusus = satu cabang).")}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
