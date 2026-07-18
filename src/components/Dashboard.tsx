@@ -217,9 +217,23 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
             <span className="font-mono text-3xl font-black tracking-tight text-zinc-950 dark:text-white block tabular-nums">
               {formatRupiah(totalProfitMonth)}
             </span>
-            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-2 block leading-relaxed">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-1 block leading-relaxed">
               {t("dashboard.profitMonthDesc", "Akumulasi laba operasional bulan berjalan")}
             </span>
+
+            {/* Real Net Profit Consolidation Breakdown */}
+            <div className="mt-3.5 pt-3 border-t border-zinc-100 dark:border-zinc-800/60 text-[10px] font-bold space-y-1 text-zinc-500 dark:text-zinc-400">
+              <div className="flex justify-between">
+                <span>{t("dashboard.fixedCostsLabel", "Biaya Tetap Bulanan:")}</span>
+                <span className="font-mono text-rose-600 dark:text-rose-450">-{formatRupiah(totalExpenses)}</span>
+              </div>
+              <div className="flex justify-between border-t border-dotted border-zinc-100 dark:border-zinc-800/40 pt-1 mt-1 text-zinc-850 dark:text-zinc-200">
+                <span>{t("dashboard.netProfitLabel", "Estimasi Laba Murni:")}</span>
+                <span className="font-mono font-black text-emerald-600 dark:text-emerald-450">
+                  {formatRupiah(totalProfitMonth - totalExpenses)}
+                </span>
+              </div>
+            </div>
           </div>
         </motion.div>
 
