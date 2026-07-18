@@ -236,8 +236,12 @@ function MainApp() {
       
       // Update profits list state instantly without page reload
       setProfits((prev) => {
-        const filtered = prev.filter((p) => p.date !== date);
-        return [newEntry, ...filtered].sort((a, b) => b.date.localeCompare(a.date));
+        const filtered = prev.filter((p) => p.id !== newEntry.id);
+        return [newEntry, ...filtered].sort((a, b) => {
+          const dateCompare = b.date.localeCompare(a.date);
+          if (dateCompare !== 0) return dateCompare;
+          return b.createdAt.localeCompare(a.createdAt);
+        });
       });
 
       // Instantly update the restaurant branches cache locally
