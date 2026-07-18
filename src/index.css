@@ -105,3 +105,11 @@ input[type="date"]::-webkit-datetime-edit-year-field:focus {
   border-radius: 3px;
   outline: none;
 }
+
+/* Gold shimmer animation for Amazing business status */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-10deg); opacity: 0; }
+  40%  { opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: translateX(200%) skewX(-10deg); opacity: 0; }
+}

@@ -92,10 +92,16 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   const statusConfigs = {
     amazing: {
       label: t("dashboard.statusAmazing", "Luar Biasa!"),
-      bgClass: "bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-transparent dark:from-amber-500/15 dark:via-yellow-500/5 dark:to-transparent border-amber-400/80 dark:border-amber-500/40 text-amber-900 dark:text-amber-100 shadow-[0_4px_20px_rgba(245,158,11,0.12)]",
-      indicatorClass: "bg-amber-500 animate-pulse",
-      textClass: "font-extrabold bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent dark:from-amber-450 dark:to-yellow-350",
-      icon: <Sparkles className="w-5 h-5 text-amber-500 dark:text-amber-450 animate-bounce" />,
+      bgClass: "border-[#C5A028]/70 text-zinc-900 dark:text-zinc-50",
+      bgStyle: {
+        background: "linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(255,215,0,0.10) 40%, rgba(197,160,40,0.06) 100%)",
+        boxShadow: "0 4px_28px rgba(212,175,55,0.20), inset 0 1px 0 rgba(255,223,80,0.25)"
+      } as React.CSSProperties,
+      indicatorClass: "animate-pulse",
+      indicatorStyle: { background: "linear-gradient(135deg, #D4AF37, #FFD700)" } as React.CSSProperties,
+      textClass: "font-extrabold",
+      textStyle: { background: "linear-gradient(135deg, #B8860B 0%, #FFD700 40%, #D4AF37 70%, #C5A028 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" } as React.CSSProperties,
+      icon: <Sparkles className="w-5 h-5 animate-bounce" style={{ color: "#D4AF37" }} />,
       message: t("dashboard.messageAmazing", "Luar biasa! Pertumbuhan bisnis Anda sangat pesat dan melampaui seluruh estimasi target.")
     },
     excellent: {
@@ -301,18 +307,38 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
           transition={{ delay: 0.15 }}
           whileHover={{ y: -4, scale: 1.01 }}
           className={`p-6 rounded-2xl border hover:shadow-lg transition-all duration-300 ease-out ${currentStatus.bgClass} flex flex-col justify-between relative overflow-hidden`}
+          style={(currentStatus as any).bgStyle}
         >
+          {/* Gold shimmer overlay for amazing status */}
+          {businessStatus === "amazing" && (
+            <div
+              className="absolute inset-0 pointer-events-none rounded-2xl"
+              style={{
+                background: "linear-gradient(105deg, transparent 30%, rgba(255,223,80,0.12) 50%, transparent 70%)",
+                animation: "shimmer 3s ease-in-out infinite"
+              }}
+            />
+          )}
           <div className="flex justify-between items-center">
             <span className="text-[11px] font-black uppercase tracking-widest">{t("dashboard.businessStatus", "Status Bisnis")}</span>
             <span className="flex h-2.5 w-2.5 relative">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${currentStatus.indicatorClass}`}></span>
-              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${currentStatus.indicatorClass}`}></span>
+              <span
+                className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${currentStatus.indicatorClass}`}
+                style={(currentStatus as any).indicatorStyle}
+              />
+              <span
+                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${currentStatus.indicatorClass}`}
+                style={(currentStatus as any).indicatorStyle}
+              />
             </span>
           </div>
           <div className="mt-4">
             <div className="flex items-center gap-2">
               {currentStatus.icon}
-              <span className={`text-2xl font-black tracking-tight ${currentStatus.textClass}`}>
+              <span
+                className={`text-2xl font-black tracking-tight ${currentStatus.textClass}`}
+                style={(currentStatus as any).textStyle}
+              >
                 {currentStatus.label}
               </span>
             </div>
