@@ -24,7 +24,7 @@ export async function onRequest(context: any): Promise<Response> {
       return jsonResponse(results || []);
     }
 
-    // 2. POST: Add or update daily profit
+    // 2. POST: Add daily profit (Always insert a new log entry)
     if (request.method === 'POST') {
       const entry = await request.json() as any;
       const { 
@@ -59,66 +59,35 @@ export async function onRequest(context: any): Promise<Response> {
         }
       }
 
-      // Check if entry for this date AND branch already exists
-      const existing = await db.prepare(
-        'SELECT id FROM daily_profits WHERE restaurantId = ? AND date = ? AND (branchName = ? OR (branchName IS NULL AND ? = ""))'
-      ).bind(restaurantId, date, cleanBranch, cleanBranch).first();
-
       const nowStr = new Date().toISOString();
 
-      if (existing) {
-        // Update existing entry
-        await db.prepare(
-          `UPDATE daily_profits SET 
-            profit = ?, notes = ?, omzet = ?, hppType = ?, hppVal = ?, 
-            otherExpenses = ?, inputterName = ?, createdAt = ? 
-           WHERE id = ?`
-        ).bind(
-          Number(profit),
-          notes || '',
-          omzet !== undefined ? Number(omzet) : null,
-          hppType || null,
-          hppVal !== undefined ? Number(hppVal) : null,
-          otherExpenses !== undefined ? Number(otherExpenses) : null,
-          inputterName || null,
-          nowStr,
-          existing.id
-        ).run();
+      // Create new entry
+      const id = `dp_${restaurantId}_${date}_${Math.random().toString(36).substring(2, 7)}`;
+      await db.prepare(
+        `INSERT INTO daily_profits (
+          id, restaurantId, date, profit, notes, createdAt, 
+          omzet, hppType, hppVal, otherExpenses, branchName, inputterName
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(
+        id,
+        restaurantId,
+        date,
+        Number(profit),
+        notes || '',
+        nowStr,
+        omzet !== undefined ? Number(omzet) : null,
+        hppType || null,
+        hppVal !== undefined ? Number(hppVal) : null,
+        otherExpenses !== undefined ? Number(otherExpenses) : null,
+        cleanBranch || null,
+        inputterName || null
+      ).run();
 
-        const updated = await db.prepare(
-          'SELECT * FROM daily_profits WHERE id = ?'
-        ).bind(existing.id).first();
+      const created = await db.prepare(
+        'SELECT * FROM daily_profits WHERE id = ?'
+      ).bind(id).first();
 
-        return jsonResponse(updated);
-      } else {
-        // Create new entry
-        const id = `dp_${restaurantId}_${date}_${Math.random().toString(36).substring(2, 7)}`;
-        await db.prepare(
-          `INSERT INTO daily_profits (
-            id, restaurantId, date, profit, notes, createdAt, 
-            omzet, hppType, hppVal, otherExpenses, branchName, inputterName
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        ).bind(
-          id,
-          restaurantId,
-          date,
-          Number(profit),
-          notes || '',
-          nowStr,
-          omzet !== undefined ? Number(omzet) : null,
-          hppType || null,
-          hppVal !== undefined ? Number(hppVal) : null,
-          otherExpenses !== undefined ? Number(otherExpenses) : null,
-          cleanBranch || null,
-          inputterName || null
-        ).run();
-
-        const created = await db.prepare(
-          'SELECT * FROM daily_profits WHERE id = ?'
-        ).bind(id).first();
-
-        return jsonResponse(created);
-      }
+      return jsonResponse(created);
     }
 
     // 3. DELETE: Remove an entry
