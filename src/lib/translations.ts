@@ -63,6 +63,7 @@ export const enTranslations: Record<string, string> = {
   "dashboard.chartTitle": "Daily Profit Trend",
   "dashboard.chartTitleDesc": "Daily gross profit movement chart this month",
   "dashboard.averageDailyLabel": "Average: {average}/day",
+  "dashboard.averageDailyLabelActive": "Average (active days): {average}/day",
   "dashboard.netProfit": "Net Profit",
   "dashboard.fixedCostsLabel": "Monthly Fixed Costs:",
   "dashboard.netProfitLabel": "Estimated Net Profit:",

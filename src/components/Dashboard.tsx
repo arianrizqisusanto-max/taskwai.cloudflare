@@ -1,3 +1,4 @@
+import React from "react";
 import { DailyProfit, Expenses, Restaurant } from "../types";
 import { formatIndoDate, formatRupiah } from "../lib/utils";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -62,9 +63,12 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
 
   // Average Daily Profit based on unique days logged so far (handles multiple branches on same date)
   const uniqueDaysEntered = new Set(currentMonthProfits.map(p => p.date)).size;
-  const averageDailyProfit = uniqueDaysEntered > 0 ? totalProfitMonth / uniqueDaysEntered : 0;
+  const averageDailyProfitActive = uniqueDaysEntered > 0 ? totalProfitMonth / uniqueDaysEntered : 0;
 
-  // Prediksi Profit Akhir Bulan
+  // Rata-rata harian berdasarkan jumlah hari kalender yang telah berjalan untuk proyeksi yang realistis
+  const averageDailyProfit = currentDateNum > 0 ? totalProfitMonth / currentDateNum : 0;
+
+  // Prediksi Profit Akhir Bulan (menggunakan rata-rata kalender berjalan)
   const predictionProfit = averageDailyProfit * totalDaysInMonth;
 
   // Target Profit Harian Mulai Besok
@@ -463,9 +467,9 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
               <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-widest">{t("dashboard.chartTitle", "Trend Profit Harian")}</h3>
               <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-1">{t("dashboard.chartTitleDesc", "Grafik pergerakan laba kotor harian bulan ini")}</p>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1">
+             <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1">
               <TrendingUp className="w-3.5 h-3.5 text-zinc-500" />
-              <span className="font-semibold">{t("dashboard.averageDailyLabel", "Rata-rata: {average}/hari").replace("{average}", formatRupiah(averageDailyProfit))}</span>
+              <span className="font-semibold">{t("dashboard.averageDailyLabelActive", "Rata-rata (hari buka): {average}/hari").replace("{average}", formatRupiah(averageDailyProfitActive))}</span>
             </div>
           </div>
 
