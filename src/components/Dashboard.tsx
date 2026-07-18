@@ -1,7 +1,7 @@
 import { DailyProfit, Expenses, Restaurant } from "../types";
 import { formatIndoDate, formatRupiah } from "../lib/utils";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, ArrowUpRight, ArrowDownRight, Sparkles } from "lucide-react";
+import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, ArrowUpRight, ArrowDownRight, Sparkles, Award } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslation } from "../lib/LanguageContext";
 
@@ -71,11 +71,17 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   const targetDailyProfitTomorrow = remainingTarget > 0 ? remainingTarget / daysRemaining : 0;
 
   // 3. Status Bisnis Definition
-  // Hijau: Prediksi >= Target
-  // Kuning: Prediksi >= Target * 0.85 && Prediksi < Target (Dekat target)
-  // Merah: Prediksi < Target * 0.85 (Jauh dari target)
-  let businessStatus: "green" | "yellow" | "red" = "green";
-  if (predictionProfit >= targetProfit) {
+  // Amazing: Prediksi >= Target * 1.5
+  // Excellent: Prediksi >= Target * 1.2
+  // Hijau (Safe): Prediksi >= Target
+  // Kuning (Caution): Prediksi >= Target * 0.85 && Prediksi < Target (Dekat target)
+  // Merah (Danger): Prediksi < Target * 0.85 (Jauh dari target)
+  let businessStatus: "green" | "yellow" | "red" | "excellent" | "amazing" = "green";
+  if (predictionProfit >= targetProfit * 1.5) {
+    businessStatus = "amazing";
+  } else if (predictionProfit >= targetProfit * 1.2) {
+    businessStatus = "excellent";
+  } else if (predictionProfit >= targetProfit) {
     businessStatus = "green";
   } else if (predictionProfit >= targetProfit * 0.85) {
     businessStatus = "yellow";
@@ -84,6 +90,22 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   }
 
   const statusConfigs = {
+    amazing: {
+      label: t("dashboard.statusAmazing", "Luar Biasa!"),
+      bgClass: "bg-violet-50/50 dark:bg-violet-950/10 border-violet-200/60 dark:border-violet-900/30 text-violet-900 dark:text-violet-100 shadow-[0_1px_3px_rgba(139,92,246,0.03)]",
+      indicatorClass: "bg-violet-500 animate-pulse",
+      textClass: "text-violet-600 dark:text-violet-400 font-extrabold",
+      icon: <Sparkles className="w-5 h-5 text-violet-600 dark:text-violet-400 animate-bounce" />,
+      message: t("dashboard.messageAmazing", "Luar biasa! Pertumbuhan bisnis Anda sangat pesat dan melampaui seluruh estimasi target.")
+    },
+    excellent: {
+      label: t("dashboard.statusExcellent", "Sangat Baik"),
+      bgClass: "bg-blue-50/50 dark:bg-blue-950/10 border-blue-200/60 dark:border-blue-900/30 text-blue-900 dark:text-blue-100 shadow-[0_1px_3px_rgba(59,130,246,0.03)]",
+      indicatorClass: "bg-blue-500",
+      textClass: "text-blue-600 dark:text-blue-400",
+      icon: <Award className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
+      message: t("dashboard.messageExcellent", "Kinerja bisnis sangat baik! Proyeksi profit melampaui target bulanan Anda.")
+    },
     green: {
       label: t("dashboard.statusSafe", "Aman"),
       bgClass: "bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-200/60 dark:border-emerald-900/30 text-emerald-900 dark:text-emerald-100 shadow-[0_1px_3px_rgba(16,185,129,0.03)]",
