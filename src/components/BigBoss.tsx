@@ -21,6 +21,36 @@ interface BranchData {
   totalExpenses: number;
 }
 
+const MOCK_DEMO_BRANCHES: BranchData[] = [
+  {
+    id: "demo_br_1",
+    name: "Cabang Jakarta (Pusat)",
+    monthlyTargetProfit: 50000000,
+    totalProfitMonth: 62000000,
+    profitToday: 2500000,
+    daysEntered: 18,
+    totalExpenses: 15000000
+  },
+  {
+    id: "demo_br_2",
+    name: "Cabang Bandung",
+    monthlyTargetProfit: 40000000,
+    totalProfitMonth: 68000000,
+    profitToday: 3800000,
+    daysEntered: 18,
+    totalExpenses: 12000000
+  },
+  {
+    id: "demo_br_3",
+    name: "Cabang Surabaya",
+    monthlyTargetProfit: 60000000,
+    totalProfitMonth: 25000000,
+    profitToday: 1100000,
+    daysEntered: 18,
+    totalExpenses: 18500000
+  }
+];
+
 interface BigBossProps {
   setActiveTab: (tab: string) => void;
   isDark: boolean;
@@ -55,6 +85,17 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     }
   };
 
+  const handleEnterDemoMode = () => {
+    sessionStorage.setItem("taskwai_bigboss_is_demo", "true");
+    setUser({
+      email: "demo_bigboss@taskwai.com",
+      uid: "demo_bigboss",
+      isDemo: true
+    });
+    setBranches(MOCK_DEMO_BRANCHES);
+    showToast("Memasuki dasbor gabungan dalam Mode Demo!", "info");
+  };
+
   const handleGoogleLoginResponse = async (response: any) => {
     try {
       const idToken = response.credential;
@@ -69,7 +110,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
   const handleLogout = async () => {
     try {
-      await DataService.logout();
+      sessionStorage.removeItem("taskwai_bigboss_is_demo");
+      if (!user?.isDemo) {
+        await DataService.logout();
+      }
       setUser(null);
       showToast("Berhasil keluar dari dasbor Big Boss.", "success");
     } catch (err) {
@@ -80,6 +124,19 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        const isDemoSession = sessionStorage.getItem("taskwai_bigboss_is_demo") === "true";
+        if (isDemoSession) {
+          setUser({
+            email: "demo_bigboss@taskwai.com",
+            uid: "demo_bigboss",
+            isDemo: true
+          });
+          setBranches(MOCK_DEMO_BRANCHES);
+          setLoading(false);
+          setAuthInitialized(true);
+          return;
+        }
+
         const data = await DataService.getMe();
         if (data.user) {
           setUser(data.user);
@@ -94,7 +151,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user && !user.isDemo) {
       fetchBranches();
     }
   }, [user]);
@@ -131,6 +188,38 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     setIsLinking(true);
     setLinkingError("");
 
+    if (user?.isDemo) {
+      const code = authCodeInput.trim().toUpperCase();
+      if (code === "DEMO-YOGYA") {
+        if (branches.some(b => b.id === "demo_br_4")) {
+          setLinkingError("Cabang Yogyakarta sudah ditambahkan.");
+          setIsLinking(false);
+          return;
+        }
+        setTimeout(() => {
+          setBranches([
+            ...branches,
+            {
+              id: "demo_br_4",
+              name: "Cabang Yogyakarta",
+              monthlyTargetProfit: 35000000,
+              totalProfitMonth: 44000000,
+              profitToday: 1800000,
+              daysEntered: 18,
+              totalExpenses: 8000000
+            }
+          ]);
+          setIsLinking(false);
+          setAuthCodeInput("");
+          showToast("Cabang Yogyakarta berhasil ditambahkan dalam Mode Demo!", "success");
+        }, 800);
+      } else {
+        setIsLinking(false);
+        setLinkingError("Untuk simulasi, silakan masukkan kode: DEMO-YOGYA");
+      }
+      return;
+    }
+
     try {
       await DataService.linkBigBossBranch(authCodeInput.trim());
       showToast("Cabang berhasil ditambahkan!", "success");
@@ -146,6 +235,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
   const handleUnlinkBranch = async (restaurantId: string, name: string) => {
     if (!confirm(`${t("bigboss.unlinkConfirm", "Apakah Anda yakin ingin menghapus cabang ini dari pantauan?")} (${name})`)) {
+      return;
+    }
+
+    if (user?.isDemo) {
+      setBranches(branches.filter(b => b.id !== restaurantId));
+      showToast("Cabang berhasil diputus dalam Mode Demo.", "success");
       return;
     }
 
@@ -275,8 +370,20 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             </p>
           </div>
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col items-center gap-3">
             <div id="bigboss-google-signin-button"></div>
+            
+            <div className="text-zinc-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-wider my-1">
+              atau
+            </div>
+            
+            <button
+              type="button"
+              onClick={handleEnterDemoMode}
+              className="px-5 py-2.5 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-805 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs transition-colors cursor-pointer border border-zinc-250/50 dark:border-zinc-750 shadow-sm"
+            >
+              🚀 Coba Mode Demo
+            </button>
           </div>
 
           <button
@@ -314,9 +421,19 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         </div>
         
         <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
-            <span className="block text-[9px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">Login Big Boss</span>
-            <span className="font-mono">{user.email}</span>
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300 flex items-center gap-2">
+            {user.isDemo && (
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+              </span>
+            )}
+            <div>
+              <span className="block text-[9px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
+                {user.isDemo ? "Simulasi Demo" : "Login Big Boss"}
+              </span>
+              <span className="font-mono">{user.email}</span>
+            </div>
           </div>
           
           <button
