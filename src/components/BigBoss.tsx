@@ -359,7 +359,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         </div>
         
         <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
-          {user.isDemo ? (
+          {user?.isDemo ? (
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 px-3 py-2 rounded-xl flex items-center gap-1.5 animate-pulse">
                 <span className="flex h-1.5 w-1.5 relative">
