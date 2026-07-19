@@ -236,8 +236,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         if (google) {
           google.accounts.id.initialize({
             client_id: (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || "888780289762-gpiud6mhos00kiljpgnk779tunli4ijr.apps.googleusercontent.com",
-            callback: handleGoogleLoginResponse
+            callback: handleGoogleLoginResponse,
+            auto_select: false
           });
+          google.accounts.id.disableAutoSelect();
           
           const element = document.getElementById("bigboss-header-google-signin-button");
           if (element) {
@@ -266,8 +268,11 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             callback: async (res: any) => {
               setShowLoginModal(false);
               await handleGoogleLoginResponse(res);
-            }
+            },
+            auto_select: false
           });
+          google.accounts.id.disableAutoSelect();
+
           const element = document.getElementById("bigboss-modal-google-signin-button");
           if (element) {
             element.innerHTML = "";

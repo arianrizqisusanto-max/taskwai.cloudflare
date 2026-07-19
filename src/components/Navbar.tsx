@@ -52,8 +52,10 @@ export default function Navbar({
         if (google) {
           google.accounts.id.initialize({
             client_id: (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || "888780289762-gpiud6mhos00kiljpgnk779tunli4ijr.apps.googleusercontent.com",
-            callback: handleGoogleLoginResponse
+            callback: handleGoogleLoginResponse,
+            auto_select: false
           });
+          google.accounts.id.disableAutoSelect();
           google.accounts.id.renderButton(
             document.getElementById("google-signin-button"),
             { 
