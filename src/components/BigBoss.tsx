@@ -69,7 +69,6 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
-  const [isGuideExpanded, setIsGuideExpanded] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -645,69 +644,6 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                     {isLinking ? "Menghubungkan..." : t("bigboss.addBranchButton", "Hubungkan Cabang")}
                   </button>
                 </form>
-              </div>
-
-              {/* Collapsible Big Boss Guide & Rule Note */}
-              <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm transition-all">
-                <button
-                  type="button"
-                  onClick={() => setIsGuideExpanded(!isGuideExpanded)}
-                  className="w-full px-5 py-3.5 flex items-center justify-between bg-zinc-50/80 dark:bg-zinc-950/40 hover:bg-zinc-100/60 dark:hover:bg-zinc-950/80 transition-colors text-left cursor-pointer border-0"
-                >
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-                      {t("bigboss.guideCardTitle", "Panduan & Aturan Cabang")}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                    <span>{isGuideExpanded ? t("bigboss.guideClose", "Tutup") : t("bigboss.guideOpen", "Lihat")}</span>
-                    {isGuideExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  </div>
-                </button>
-
-                <AnimatePresence>
-                  {isGuideExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="px-5 py-4 border-t border-zinc-100 dark:border-zinc-800/60 space-y-3 text-xs text-zinc-650 dark:text-zinc-300 font-medium leading-relaxed"
-                    >
-                      <div className="space-y-1">
-                        <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1 text-[11px]">
-                          <span>🏢 {t("bigboss.guideFungsiTitle", "1. Cara Kerja Dasbor Big Boss:")}</span>
-                        </div>
-                        <p className="text-zinc-500 dark:text-zinc-400 text-[11px] leading-relaxed">
-                          {t("bigboss.guideFungsiDesc", "Memantau gabungan finansial seluruh cabang Anda (omzet, laba kotor, laba bersih) dalam satu dasbor terpadu.")}
-                        </p>
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1 text-[11px]">
-                          <span>🔗 {t("bigboss.guideCaraTitle", "2. Cara Menautkan Cabang:")}</span>
-                        </div>
-                        <ol className="list-decimal pl-5 text-[11px] text-zinc-500 dark:text-zinc-400 space-y-0.5">
-                          <li>{t("bigboss.guideCaraStep1", "Buka Taskwai di akun cabang.")}</li>
-                          <li>{t("bigboss.guideCaraStep2", "Masuk menu Pengaturan (Target) → Otorisasi Big Boss.")}</li>
-                          <li>{t("bigboss.guideCaraStep3", "Klik Dapatkan Kode Otorisasi (6-digit).")}</li>
-                          <li>{t("bigboss.guideCaraStep4", "Masukkan kode pada kolom di atas.")}</li>
-                        </ol>
-                      </div>
-
-                      <div className="space-y-1 bg-amber-50/70 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/50 dark:border-amber-900/30">
-                        <div className="font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1 text-[11px]">
-                          <span>⚠️ {t("bigboss.guideAturanTitle", "3. Aturan Penting Akun (Gmail):")}</span>
-                        </div>
-                        <ul className="list-disc pl-4 text-[10px] text-amber-900/80 dark:text-amber-300/80 space-y-1">
-                          <li>{t("bigboss.guideAturanRule1", "Gmail Bersih: Login Gmail Big Boss harus bersih (tidak boleh sama dengan akun Gmail cabang biasa).")}</li>
-                          <li>{t("bigboss.guideAturanRule2", "1 Cabang = 1 Big Boss: Akun cabang yang terhubung akan terkunci (freeze).")}</li>
-                          <li>{t("bigboss.guideAturanRule3", "Buka Kunci (Unlock): Lepaskan tautan melalui tombol Unlock pada dasbor ini untuk melepaskan penguncian.")}</li>
-                        </ul>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
             </div>
 
