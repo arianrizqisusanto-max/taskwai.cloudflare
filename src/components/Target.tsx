@@ -641,20 +641,20 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
 
         {isLoadingAuthStatus ? (
           <div className="py-4 text-center text-xs font-semibold text-zinc-400 animate-pulse">
-            Memeriksa status otorisasi...
+            {t("target.checkingAuth", "Memeriksa status otorisasi...")}
           </div>
         ) : isFrozen ? (
           <div className="space-y-3 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 p-4 rounded-xl">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-bold text-xs">
               <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span>TERHUBUNG & TERKUNCI (FREEZE)</span>
+              <span>{t("target.frozenStatus", "TERHUBUNG & TERKUNCI (FREEZE)")}</span>
             </div>
             <p className="text-xs text-zinc-650 dark:text-zinc-300 font-medium leading-relaxed">
-              Akun restoran ini telah terhubung dan dikunci oleh akun Big Boss{" "}
-              <b className="font-mono text-zinc-900 dark:text-white">{bossInfo.bossEmail || bossInfo.bossName || "Big Boss"}</b>. Akun ini tidak dapat dihubungkan ke Big Boss lain.
+              {t("target.frozenDesc1", "Akun restoran ini telah terhubung dan dikunci oleh akun Big Boss ")}
+              <b className="font-mono text-zinc-900 dark:text-white">{bossInfo.bossEmail || bossInfo.bossName || "Big Boss"}</b>. {t("target.frozenDesc2", "Akun ini tidak dapat dihubungkan ke Big Boss lain.")}
             </p>
             <div className="text-[10px] text-amber-800/80 dark:text-amber-300/80 font-bold bg-amber-100/60 dark:bg-amber-900/30 p-2.5 rounded-lg">
-              💡 Untuk melepaskan kunci (unlock), lakukan pemutusan tautan (unlock) dari dasbor Big Boss pemantau Anda.
+              {t("target.frozenHint", "💡 Untuk melepaskan kunci (unlock), lakukan pemutusan tautan (unlock) dari dasbor Big Boss pemantau Anda.")}
             </div>
           </div>
         ) : authCode ? (
@@ -672,7 +672,7 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
               </div>
             </div>
             <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold leading-normal">
-              ⚠️ Kode berlaku selama 15 menit. Masukkan kode ini pada menu Big Boss di akun pemantau Anda.
+              {t("target.codeWarning", "⚠️ Kode berlaku selama 15 menit. Masukkan kode ini pada menu Big Boss di akun pemantau Anda.")}
             </p>
           </div>
         ) : (
