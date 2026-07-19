@@ -6,7 +6,7 @@ import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
   CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe, X,
-  ChevronDown, ChevronUp, BookOpen, Info, LogIn, LogOut
+  ChevronDown, ChevronUp, BookOpen, Info, LogIn, LogOut, Calendar
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -17,6 +17,7 @@ interface BranchData {
   name: string;
   monthlyTargetProfit: number;
   totalProfitMonth: number;
+  profitWeek?: number;
   profitToday: number;
   daysEntered: number;
   totalExpenses: number;
@@ -28,6 +29,7 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     name: "Cabang Jakarta (Pusat)",
     monthlyTargetProfit: 50000000,
     totalProfitMonth: 62000000,
+    profitWeek: 16500000,
     profitToday: 2500000,
     daysEntered: 18,
     totalExpenses: 15000000
@@ -37,6 +39,7 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     name: "Cabang Bandung",
     monthlyTargetProfit: 40000000,
     totalProfitMonth: 68000000,
+    profitWeek: 19200000,
     profitToday: 3800000,
     daysEntered: 18,
     totalExpenses: 12000000
@@ -46,6 +49,7 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     name: "Cabang Surabaya",
     monthlyTargetProfit: 60000000,
     totalProfitMonth: 25000000,
+    profitWeek: 7200000,
     profitToday: 1100000,
     daysEntered: 18,
     totalExpenses: 18500000
@@ -69,6 +73,27 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
+  const [timeframe, setTimeframe] = useState<"daily" | "weekly" | "monthly">("monthly");
+
+  const getBranchMetrics = (branch: BranchData, tf: "daily" | "weekly" | "monthly") => {
+    if (tf === "daily") {
+      const gross = branch.profitToday;
+      const exp = Math.round(branch.totalExpenses / 30);
+      const net = Math.max(0, gross - exp);
+      return { gross, exp, net };
+    }
+    if (tf === "weekly") {
+      const gross = branch.profitWeek ?? (branch.profitToday * 7);
+      const exp = Math.round((branch.totalExpenses / 30) * 7);
+      const net = Math.max(0, gross - exp);
+      return { gross, exp, net };
+    }
+    // monthly
+    const gross = branch.totalProfitMonth;
+    const exp = branch.totalExpenses;
+    const net = Math.max(0, gross - exp);
+    return { gross, exp, net };
+  };
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -290,18 +315,21 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     }
   };
 
-  // Aggregated totals across all branches
-  const totalCombinedProfit = branches.reduce((acc, b) => acc + b.totalProfitMonth, 0);
-  const totalCombinedExpenses = branches.reduce((acc, b) => acc + b.totalExpenses, 0);
+  // Aggregated totals across all branches based on selected timeframe
+  const totalCombinedProfit = branches.reduce((acc, b) => acc + getBranchMetrics(b, timeframe).gross, 0);
+  const totalCombinedExpenses = branches.reduce((acc, b) => acc + getBranchMetrics(b, timeframe).exp, 0);
   const totalCombinedNetProfit = Math.max(0, totalCombinedProfit - totalCombinedExpenses);
 
-  // Chart data format
-  const chartData = branches.map(b => ({
-    name: b.name,
-    [t("bigboss.labaKotor", "Laba Kotor")]: b.totalProfitMonth,
-    [t("bigboss.fixedCost", "Fixed Cost")]: b.totalExpenses,
-    [t("bigboss.labaMurni", "Laba Murni")]: Math.max(0, b.totalProfitMonth - b.totalExpenses)
-  }));
+  // Chart data format adapting dynamically to selected timeframe
+  const chartData = branches.map(b => {
+    const m = getBranchMetrics(b, timeframe);
+    return {
+      name: b.name,
+      [t("bigboss.labaKotor", "Laba Kotor")]: m.gross,
+      [t("bigboss.fixedCost", "Fixed Cost")]: m.exp,
+      [t("bigboss.labaMurni", "Laba Murni")]: m.net
+    };
+  });
 
   // Helper to determine status style of each branch
   const getBranchStatus = (branch: BranchData) => {
@@ -583,13 +611,72 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         </div>
       ) : (
         <>
+          {/* 1.5 Timeframe Filter Control Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-3.5 shadow-sm">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl text-emerald-600 dark:text-emerald-400">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 block leading-tight">
+                  {t("bigboss.timeframeLabel", "Periode Laporan Cabang:")}
+                </span>
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
+                  {timeframe === "daily" 
+                    ? (lang === "en" ? "Monitoring 1 current day performance" : "Memantau performa 1 hari berjalan")
+                    : timeframe === "weekly"
+                    ? (lang === "en" ? "Monitoring last 7 days accumulated performance" : "Memantau akumulasi 7 hari terakhir")
+                    : (lang === "en" ? "Monitoring current month accumulated performance" : "Memantau akumulasi bulan berjalan")}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200/50 dark:border-zinc-850 self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setTimeframe("daily")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-0 ${
+                  timeframe === "daily"
+                    ? "bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                }`}
+              >
+                {t("bigboss.timeframeDaily", "Per Hari")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setTimeframe("weekly")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-0 ${
+                  timeframe === "weekly"
+                    ? "bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                }`}
+              >
+                {t("bigboss.timeframeWeekly", "Per Minggu")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setTimeframe("monthly")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-0 ${
+                  timeframe === "monthly"
+                    ? "bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                }`}
+              >
+                {t("bigboss.timeframeMonthly", "Per Bulan")}
+              </button>
+            </div>
+          </div>
+
           {/* 2. Consolidated Totals Metric Cards */}
           {branches.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Card 1: Total Gross Profit */}
               <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400" />
-                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest">{t("bigboss.combinedProfit", "Total Laba Gabungan")}</span>
+                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest">
+                  {t("bigboss.combinedProfit", "Total Laba Gabungan")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
+                </span>
                 <span className="font-mono text-2xl font-black tracking-tight text-zinc-950 dark:text-white block mt-3 tabular-nums">
                   {formatRupiah(totalCombinedProfit)}
                 </span>
@@ -598,7 +685,9 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               {/* Card 2: Total Operating Cost */}
               <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 to-red-400" />
-                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest">{t("bigboss.combinedExpenses", "Total Pengeluaran Operasional Gabungan")}</span>
+                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest">
+                  {t("bigboss.combinedExpenses", "Total Pengeluaran Operasional Gabungan")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
+                </span>
                 <span className="font-mono text-2xl font-black tracking-tight text-rose-600 dark:text-rose-450 block mt-3 tabular-nums">
                   -{formatRupiah(totalCombinedExpenses)}
                 </span>
@@ -607,7 +696,9 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               {/* Card 3: Total Net Profit */}
               <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400" />
-                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">{t("bigboss.combinedNetProfit", "Total Laba Bersih Murni")}</span>
+                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
+                  {t("bigboss.combinedNetProfit", "Total Laba Bersih Murni")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
+                </span>
                 <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-450 block mt-3 tabular-nums">
                   {formatRupiah(totalCombinedNetProfit)}
                 </span>
@@ -723,7 +814,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         </thead>
                         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850 font-medium">
                           {branches.map((branch) => {
-                            const netProfit = Math.max(0, branch.totalProfitMonth - branch.totalExpenses);
+                            const m = getBranchMetrics(branch, timeframe);
                             const status = getBranchStatus(branch);
 
                             return (
@@ -732,13 +823,13 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                   {branch.name}
                                 </td>
                                 <td className="py-3.5 px-4 font-mono tabular-nums text-blue-600 dark:text-blue-400">
-                                  {formatRupiah(branch.totalProfitMonth)}
+                                  {formatRupiah(m.gross)}
                                 </td>
                                 <td className="py-3.5 px-4 font-mono tabular-nums text-rose-600 dark:text-rose-450">
-                                  -{formatRupiah(branch.totalExpenses)}
+                                  -{formatRupiah(m.exp)}
                                 </td>
                                 <td className="py-3.5 px-4 font-mono tabular-nums font-black text-emerald-600 dark:text-emerald-400">
-                                  {formatRupiah(netProfit)}
+                                  {formatRupiah(m.net)}
                                 </td>
                                 <td className="py-3.5 px-4">
                                   {getStatusBadge(status)}

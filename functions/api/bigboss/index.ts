@@ -24,6 +24,9 @@ export async function onRequest(context: any): Promise<Response> {
   const todayStr = `${currentYear}-${currentMonthStr}-${String(now.getDate()).padStart(2, '0')}`;
   const monthPrefix = `${currentYear}-${currentMonthStr}`;
 
+  const sevenDaysAgo = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgoStr = `${sevenDaysAgo.getFullYear()}-${String(sevenDaysAgo.getMonth() + 1).padStart(2, '0')}-${String(sevenDaysAgo.getDate()).padStart(2, '0')}`;
+
   try {
     // ==========================================
     // GET: Retrieve linked branches and their monthly stats
@@ -36,6 +39,7 @@ export async function onRequest(context: any): Promise<Response> {
           r.name as name,
           r.monthlyTargetProfit as monthlyTargetProfit,
           COALESCE(SUM(dp.profit), 0) as totalProfitMonth,
+          COALESCE(SUM(CASE WHEN dp.date >= ? AND dp.date <= ? THEN dp.profit ELSE 0 END), 0) as profitWeek,
           COALESCE(SUM(CASE WHEN dp.date = ? THEN dp.profit ELSE 0 END), 0) as profitToday,
           COUNT(DISTINCT dp.date) as daysEntered
         FROM bigboss_links bl
@@ -43,7 +47,7 @@ export async function onRequest(context: any): Promise<Response> {
         LEFT JOIN daily_profits dp ON r.id = dp.restaurantId AND dp.date LIKE ?
         WHERE bl.bossOwnerId = ?
         GROUP BY r.id, r.name, r.monthlyTargetProfit
-      `).bind(todayStr, `${monthPrefix}-%`, bossOwnerId).all();
+      `).bind(sevenDaysAgoStr, todayStr, todayStr, `${monthPrefix}-%`, bossOwnerId).all();
 
       const branchStats = branchStatsQuery.results || [];
 
@@ -89,6 +93,7 @@ export async function onRequest(context: any): Promise<Response> {
           name: branch.name,
           monthlyTargetProfit: branch.monthlyTargetProfit,
           totalProfitMonth: branch.totalProfitMonth,
+          profitWeek: branch.profitWeek,
           profitToday: branch.profitToday,
           daysEntered: branch.daysEntered,
           totalExpenses
