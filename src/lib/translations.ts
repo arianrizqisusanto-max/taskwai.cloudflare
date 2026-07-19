@@ -283,6 +283,7 @@ export const enTranslations: Record<string, string> = {
   "bigboss.noBranchesDesc": "Start linking branches by entering the authorization code from your branch account.",
   "bigboss.branchName": "Branch Name",
   "bigboss.labaKotor": "Gross Profit",
+  "bigboss.fixedCost": "Fixed Cost",
   "bigboss.labaMurni": "Net Profit",
   "bigboss.targetProfit": "Branch Target",
   "bigboss.status": "Status",
