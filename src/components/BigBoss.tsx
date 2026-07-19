@@ -669,7 +669,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                     </h3>
                     <div className="h-64 w-full">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={4} barCategoryGap="25%">
+                        <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={2} barCategoryGap="12%">
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" className="dark:stroke-zinc-800/40" />
                           <XAxis dataKey="name" stroke="#a1a1aa" fontSize={10} tickLine={false} />
                           <YAxis stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
@@ -684,9 +684,9 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                             }} 
                           />
                           <Legend wrapperStyle={{ fontSize: 10, fontWeight: 'bold' }} />
-                          <Bar dataKey={t("bigboss.labaKotor", "Laba Kotor")} fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={14} />
-                          <Bar dataKey={t("bigboss.fixedCost", "Fixed Cost")} fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={14} />
-                          <Bar dataKey={t("bigboss.labaMurni", "Laba Murni")} fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={14} />
+                          <Bar dataKey={t("bigboss.labaKotor", "Laba Kotor")} fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                          <Bar dataKey={t("bigboss.fixedCost", "Fixed Cost")} fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                          <Bar dataKey={t("bigboss.labaMurni", "Laba Murni")} fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={16} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
