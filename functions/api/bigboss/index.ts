@@ -126,6 +126,17 @@ export async function onRequest(context: any): Promise<Response> {
         return jsonResponse({ error: 'Anda tidak dapat menautkan akun utama Anda sendiri sebagai cabang.' }, 400);
       }
 
+      // Check if branch is already linked & frozen to any Big Boss account
+      const existingLink = await db.prepare(
+        'SELECT bossOwnerId FROM bigboss_links WHERE branchRestaurantId = ?'
+      ).bind(restaurant.id).first();
+
+      if (existingLink) {
+        return jsonResponse({
+          error: 'Cabang ini sudah terhubung & terkunci (freeze) ke akun Big Boss lain.'
+        }, 400);
+      }
+
       const linkId = `${bossOwnerId}_${restaurant.id}`;
       const nowStr = new Date().toISOString();
 

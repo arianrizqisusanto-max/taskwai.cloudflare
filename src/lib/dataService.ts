@@ -525,7 +525,18 @@ export const DataService = {
     }
   },
 
-  async generateBigBossCode(): Promise<{ code: string; expiresAt: string }> {
+  async getBigBossAuthStatus(): Promise<{ isFrozen: boolean; bossName?: string; bossEmail?: string; linkedAt?: string; code?: string | null; expiresAt?: string | null }> {
+    const res = await fetch('/api/restaurant/auth-code', {
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal mengambil status otorisasi Big Boss');
+    }
+    return await res.json();
+  },
+
+  async generateBigBossCode(): Promise<{ isFrozen?: boolean; code: string; expiresAt: string }> {
     const res = await fetch('/api/restaurant/auth-code', {
       method: 'POST',
       headers: getHeaders()

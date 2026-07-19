@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Restaurant } from "../types";
 import { formatRupiah } from "../lib/utils";
 import { DataService } from "../lib/dataService";
@@ -59,6 +59,29 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
   const [authCodeExpiry, setAuthCodeExpiry] = useState<string>("");
   const [isGeneratingCode, setIsGeneratingCode] = useState<boolean>(false);
   const [codeCopied, setCodeCopied] = useState<boolean>(false);
+  const [isFrozen, setIsFrozen] = useState<boolean>(false);
+  const [bossInfo, setBossInfo] = useState<{ bossName?: string; bossEmail?: string }>({});
+  const [isLoadingAuthStatus, setIsLoadingAuthStatus] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchAuthStatus = async () => {
+      try {
+        const data = await DataService.getBigBossAuthStatus();
+        setIsFrozen(!!data.isFrozen);
+        if (data.isFrozen) {
+          setBossInfo({ bossName: data.bossName, bossEmail: data.bossEmail });
+        } else if (data.code) {
+          setAuthCode(data.code);
+          setAuthCodeExpiry(data.expiresAt || "");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoadingAuthStatus(false);
+      }
+    };
+    fetchAuthStatus();
+  }, []);
 
   const handleGenerateAuthCode = async () => {
     setIsGeneratingCode(true);
@@ -616,7 +639,25 @@ export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCreden
           {t("target.bigbossAuthDesc", "Dapatkan kode otorisasi untuk menghubungkan cabang ini ke dasbor Big Boss Anda.")}
         </p>
 
-        {authCode ? (
+        {isLoadingAuthStatus ? (
+          <div className="py-4 text-center text-xs font-semibold text-zinc-400 animate-pulse">
+            Memeriksa status otorisasi...
+          </div>
+        ) : isFrozen ? (
+          <div className="space-y-3 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 p-4 rounded-xl">
+            <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-bold text-xs">
+              <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>TERHUBUNG & TERKUNCI (FREEZE)</span>
+            </div>
+            <p className="text-xs text-zinc-650 dark:text-zinc-300 font-medium leading-relaxed">
+              Akun restoran ini telah terhubung dan dikunci oleh akun Big Boss{" "}
+              <b className="font-mono text-zinc-900 dark:text-white">{bossInfo.bossEmail || bossInfo.bossName || "Big Boss"}</b>. Akun ini tidak dapat dihubungkan ke Big Boss lain.
+            </p>
+            <div className="text-[10px] text-amber-800/80 dark:text-amber-300/80 font-bold bg-amber-100/60 dark:bg-amber-900/30 p-2.5 rounded-lg">
+              💡 Untuk melepaskan kunci (unlock), lakukan pemutusan tautan (unlock) dari dasbor Big Boss pemantau Anda.
+            </div>
+          </div>
+        ) : authCode ? (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="flex-1 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200/65 dark:border-zinc-800 px-4 py-3 rounded-xl flex items-center justify-between font-mono font-black text-lg tracking-widest text-zinc-900 dark:text-white">

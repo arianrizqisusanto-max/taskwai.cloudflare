@@ -264,23 +264,23 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   };
 
   const handleUnlinkBranch = async (restaurantId: string, name: string) => {
-    if (!confirm(`${t("bigboss.unlinkConfirm", "Apakah Anda yakin ingin menghapus cabang ini dari pantauan?")} (${name})`)) {
+    if (!confirm(`Apakah Anda yakin ingin melepas kunci (unlock) dan menghapus pemantauan cabang "${name}"? Akun restoran tersebut akan dilepaskan (unfreeze).`)) {
       return;
     }
 
     if (user?.isDemo) {
       setBranches(branches.filter(b => b.id !== restaurantId));
-      showToast("Cabang berhasil diputus dalam Mode Demo.", "success");
+      showToast("Tautan cabang berhasil dilepas (unlock) dalam Mode Demo.", "success");
       return;
     }
 
     try {
       await DataService.unlinkBigBossBranch(restaurantId);
-      showToast("Cabang berhasil diputus.", "success");
+      showToast("Tautan cabang berhasil dilepas (unlock).", "success");
       fetchBranches();
     } catch (err: any) {
       console.error(err);
-      showToast("Gagal menghapus cabang.", "error");
+      showToast("Gagal melepas kunci cabang.", "error");
     }
   };
 
@@ -720,10 +720,11 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                   <button
                                     type="button"
                                     onClick={() => handleUnlinkBranch(branch.id, branch.name)}
-                                    className="p-1.5 hover:bg-red-50 dark:hover:bg-rose-950/20 text-zinc-400 hover:text-red-600 dark:hover:text-rose-450 rounded-lg transition-colors cursor-pointer border-0 inline-flex"
-                                    title="Hapus Pemantauan Cabang"
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 hover:bg-red-50 dark:hover:bg-rose-950/20 text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-800 text-[11px] font-bold"
+                                    title="Lepas Kunci (Unlock) & Hapus Pemantauan Cabang"
                                   >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <span>Unlock</span>
                                   </button>
                                 </td>
                               </tr>
