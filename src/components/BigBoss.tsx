@@ -6,7 +6,7 @@ import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
   CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe, X,
-  ChevronDown, ChevronUp, BookOpen, Info
+  ChevronDown, ChevronUp, BookOpen, Info, LogIn, LogOut
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -476,15 +476,23 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-550"></span>
                   </span>
-                  Mode Demo
+                  {t("nav.demoMode", "Mode Demo")}
                 </span>
-                <div id="bigboss-header-google-signin-button" className="shadow-sm rounded-full overflow-hidden border border-zinc-200/40 dark:border-zinc-850 bg-white dark:bg-zinc-900 flex items-center min-h-[36px]" />
+
+                <button
+                  type="button"
+                  onClick={() => setShowLoginModal(true)}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1.5 uppercase tracking-wider"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>{t("nav.login", "Login")}</span>
+                </button>
               </>
             ) : (
               <>
                 <div className="hidden sm:block bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-xl px-3 py-1 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
                   <span className="block text-[8px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
-                    Login Big Boss
+                    {t("bigboss.loginHeader", "Login Big Boss")}
                   </span>
                   <span className="font-mono text-[11px]">{user.email}</span>
                 </div>
@@ -492,9 +500,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1.5"
                 >
-                  Keluar
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>{t("nav.logout", "Keluar")}</span>
                 </button>
               </>
             )}
