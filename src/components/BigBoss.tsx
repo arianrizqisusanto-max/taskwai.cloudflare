@@ -159,7 +159,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       showToast("Berhasil masuk ke dasbor Big Boss!", "success");
     } catch (error: any) {
       console.error("Login error:", error);
-      showToast("Gagal masuk dengan Google.", "error");
+      const errMsg = error?.message || "";
+      if (errMsg.includes("type berbeda") || errMsg.includes("Taskwai biasa")) {
+        showToast(t("bigboss.errorWrongType", "Akun ini sudah terdaftar sebagai akun Taskwai biasa. Harap gunakan email lain untuk mendaftar Big Boss."), "error");
+      } else {
+        showToast(errMsg || t("nav.loginError", "Gagal masuk dengan Google."), "error");
+      }
     }
   };
 

@@ -94,7 +94,12 @@ export default function Navbar({
       }
     } catch (error: any) {
       console.error("Login error:", error);
-      showToast(error.message || t("nav.loginError", "Gagal masuk dengan Google."), "error");
+      const errMsg = error?.message || "";
+      if (errMsg.includes("type berbeda") || errMsg.includes("Big Boss")) {
+        showToast(t("nav.errorWrongType", "Akun ini terdaftar khusus sebagai Big Boss. Tidak bisa digunakan untuk cabang Taskwai biasa."), "error");
+      } else {
+        showToast(errMsg || t("nav.loginError", "Gagal masuk dengan Google."), "error");
+      }
     }
   };
 
