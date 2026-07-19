@@ -5,7 +5,7 @@ import { useTranslation } from "../lib/LanguageContext";
 import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
-  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe 
+  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe, X 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -66,6 +66,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [isLinking, setIsLinking] = useState(false);
   const [linkingError, setLinkingError] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -211,44 +212,47 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     }
   }, [authInitialized, user, isDark]);
 
+  useEffect(() => {
+    if (showLoginModal) {
+      const timer = setTimeout(() => {
+        const google = (window as any).google;
+        if (google) {
+          google.accounts.id.initialize({
+            client_id: "888780289762-bnd08vbfkspqg2o9iif8bcr91a92jsh5.apps.googleusercontent.com",
+            callback: async (res: any) => {
+              setShowLoginModal(false);
+              await handleGoogleLoginResponse(res);
+            }
+          });
+          const element = document.getElementById("bigboss-modal-google-signin-button");
+          if (element) {
+            element.innerHTML = "";
+            google.accounts.id.renderButton(element, { 
+              theme: isDark ? "dark" : "outline", 
+              size: "large", 
+              width: 250,
+              shape: "pill",
+              text: "signin_with"
+            });
+          }
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [showLoginModal, isDark]);
+
   const handleLinkBranch = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (user?.isDemo) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!authCodeInput.trim()) return;
 
     setIsLinking(true);
     setLinkingError("");
-
-    if (user?.isDemo) {
-      const code = authCodeInput.trim().toUpperCase();
-      if (code === "DEMO-YOGYA") {
-        if (branches.some(b => b.id === "demo_br_4")) {
-          setLinkingError("Cabang Yogyakarta sudah ditambahkan.");
-          setIsLinking(false);
-          return;
-        }
-        setTimeout(() => {
-          setBranches([
-            ...branches,
-            {
-              id: "demo_br_4",
-              name: "Cabang Yogyakarta",
-              monthlyTargetProfit: 35000000,
-              totalProfitMonth: 44000000,
-              profitToday: 1800000,
-              daysEntered: 18,
-              totalExpenses: 8000000
-            }
-          ]);
-          setIsLinking(false);
-          setAuthCodeInput("");
-          showToast("Cabang Yogyakarta berhasil ditambahkan dalam Mode Demo!", "success");
-        }, 800);
-      } else {
-        setIsLinking(false);
-        setLinkingError("Untuk simulasi, silakan masukkan kode: DEMO-YOGYA");
-      }
-      return;
-    }
 
     try {
       await DataService.linkBigBossBranch(authCodeInput.trim());
@@ -607,7 +611,6 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   <div className="space-y-1.5">
                     <input
                       type="text"
-                      required
                       value={authCodeInput}
                       onChange={(e) => setAuthCodeInput(e.target.value)}
                       placeholder={t("bigboss.codePlaceholder", "Contoh: BRANCH-XYZ999")}
@@ -623,7 +626,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
                   <button
                     type="submit"
-                    disabled={isLinking || !authCodeInput.trim()}
+                    disabled={isLinking || (!user?.isDemo && !authCodeInput.trim())}
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0 disabled:opacity-55 disabled:cursor-not-allowed"
                   >
                     {isLinking ? "Menghubungkan..." : t("bigboss.addBranchButton", "Hubungkan Cabang")}
@@ -638,7 +641,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </div>
                 {user?.isDemo && (
                   <div className="text-amber-600 dark:text-amber-500 font-bold border-t border-zinc-200/40 dark:border-zinc-800/40 pt-2">
-                    🔑 <strong>Uji Coba:</strong> Masukkan kode <span className="font-mono bg-zinc-200 dark:bg-zinc-850 px-1 py-0.5 rounded text-zinc-950 dark:text-white">DEMO-YOGYA</span> di atas untuk mensimulasikan penautan cabang baru!
+                    🔑 Untuk menautkan cabang restoran ril Anda ke dasbor Big Boss, silakan login menggunakan akun Google.
                   </div>
                 )}
               </div>
@@ -754,6 +757,57 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         </>
       )}
       </div>
+
+      {/* Login Required Modal for Big Boss */}
+      <AnimatePresence>
+        {showLoginModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 relative overflow-hidden text-center"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+              
+              <button
+                type="button"
+                onClick={() => setShowLoginModal(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="flex flex-col items-center gap-2 pt-2">
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl">
+                  <Building2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <h3 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
+                  Login ke Big Boss
+                </h3>
+                <p className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 leading-relaxed">
+                  Untuk menautkan dan memantau cabang restoran ril Anda, silakan masuk menggunakan akun Google Anda terlebih dahulu.
+                </p>
+              </div>
+
+              {/* Google Sign-in Button */}
+              <div className="flex flex-col items-center justify-center py-1">
+                <div id="bigboss-modal-google-signin-button" className="shadow-sm rounded-full overflow-hidden border border-zinc-200/40 dark:border-zinc-850 bg-white dark:bg-zinc-900 flex items-center justify-center min-h-[44px]" />
+              </div>
+
+              <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+                <button
+                  type="button"
+                  onClick={() => setShowLoginModal(false)}
+                  className="w-full py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0"
+                >
+                  Batal
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
