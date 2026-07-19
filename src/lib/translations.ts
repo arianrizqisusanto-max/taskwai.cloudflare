@@ -320,6 +320,14 @@ export const enTranslations: Record<string, string> = {
   "target.bigbossAuthDesc": "Generate an authorization code below, then enter it on the Big Boss page to link this branch.",
   "target.generateCode": "Get Authorization Code",
   "target.codeCopied": "Code copied successfully!",
+  "target.checkingAuth": "Checking authorization status...",
+  "target.frozenStatus": "LINKED & FROZEN",
+  "target.frozenDesc1": "This restaurant account is linked and frozen by Big Boss account ",
+  "target.frozenDesc2": "This account cannot be linked to any other Big Boss.",
+  "target.frozenHint": "💡 To release this lock (unlock), please unlink it from your monitoring Big Boss dashboard.",
+  "target.codeWarning": "⚠️ Code is valid for 15 minutes. Enter this code in the Big Boss menu on your monitoring account.",
+  "bigboss.errorWrongType": "This account is already registered as a regular Taskwai account. Please use another email for Big Boss.",
+  "nav.errorWrongType": "This account is registered exclusively as Big Boss. It cannot be used for regular Taskwai branches.",
 
   // --- About Modal ---
   "about.title": "About Taskwai",
