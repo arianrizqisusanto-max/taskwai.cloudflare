@@ -435,7 +435,7 @@ function MainApp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-zinc-50 to-gray-50 dark:bg-zinc-950 dark:[background-image:none] flex flex-col font-sans text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
-      {activeTab !== "bigboss" ? (
+      {activeTab !== "bigboss" && (
         <Navbar
           user={user}
           setUser={setUser}
@@ -448,37 +448,9 @@ function MainApp() {
           staffSession={staffSession}
           setStaffSession={setStaffSession}
         />
-      ) : (
-        /* Minimal Big Boss Header Bar */
-        <header className="w-full border-b border-zinc-200/60 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/40 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between transition-colors duration-300">
-          <div className="flex items-center gap-3">
-            <span className="text-emerald-600 dark:text-emerald-450"><Building2 className="w-6 h-6" /></span>
-            <div className="flex items-center gap-2">
-              <span className="font-sans font-black text-xl tracking-tight text-zinc-950 dark:text-white">taskwai</span>
-              <span 
-                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full select-none"
-                style={{
-                  background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(255,215,0,0.12) 100%)",
-                  border: "1px solid rgba(197,160,40,0.4)",
-                  color: "#c5a028"
-                }}
-              >
-                👑 Big Boss Mode
-              </span>
-            </div>
-          </div>
-          
-          <button
-            onClick={toggleDark}
-            className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
-            title={isDark ? t("nav.lightMode", "Mode Terang") : t("nav.darkMode", "Mode Gelap")}
-          >
-            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
-          </button>
-        </header>
       )}
 
-       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">
+      <main className={`flex-1 w-full ${activeTab === "bigboss" ? "" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8"}`}>
         <ErrorBoundary>
           <Suspense fallback={<SkeletonLoader />}>
             {renderView()}

@@ -437,70 +437,115 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   }
 
   return (
-    <div className="space-y-8">
-      {/* 1. Header & Navigation Back */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/60 dark:border-zinc-800">
-        <div className="space-y-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab("dashboard")}
-            className="flex items-center gap-1 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Kembali ke Beranda</span>
-          </button>
-          <h1 className="font-sans font-black text-3xl sm:text-4xl tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5">
-            <Building2 className="w-8 h-8 text-emerald-600 dark:text-emerald-450" />
+    <div className="min-h-screen flex flex-col">
+      {/* 1. Top Sticky Navbar Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-zinc-200/60 dark:border-zinc-800/80 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.25)] transition-colors duration-300">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          {/* Brand & Back Button */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setActiveTab("dashboard")}
+              className="flex items-center gap-2.5 text-left focus:outline-none hover:opacity-85 active:scale-95 transition-all cursor-pointer group"
+            >
+              <div className="relative flex items-center">
+                <TaskwaiLogo size={34} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-sans font-black text-lg tracking-tight text-zinc-900 dark:text-zinc-50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  taskwai
+                </span>
+                <span 
+                  className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full select-none"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(255,215,0,0.12) 100%)",
+                    border: "1px solid rgba(197,160,40,0.4)",
+                    color: "#c5a028"
+                  }}
+                >
+                  👑 Big Boss
+                </span>
+              </div>
+            </button>
+
+            <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-800 hidden sm:block" />
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("dashboard")}
+              className="hidden sm:flex items-center gap-1 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Beranda</span>
+            </button>
+          </div>
+
+          {/* Controls Aligned on Navbar: Mode Demo, Login Google, Cabang Terhubung, Dark Toggle */}
+          <div className="flex items-center gap-2.5">
+            {user?.isDemo ? (
+              <>
+                <span className="hidden md:flex text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 px-3 py-1.5 rounded-xl items-center gap-1.5 animate-pulse">
+                  <span className="flex h-1.5 w-1.5 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-550"></span>
+                  </span>
+                  Mode Demo
+                </span>
+                <div id="bigboss-header-google-signin-button" className="shadow-sm rounded-full overflow-hidden border border-zinc-200/40 dark:border-zinc-850 bg-white dark:bg-zinc-900 flex items-center min-h-[36px]" />
+              </>
+            ) : (
+              <>
+                <div className="hidden sm:block bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-xl px-3 py-1 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
+                  <span className="block text-[8px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
+                    Login Big Boss
+                  </span>
+                  <span className="font-mono text-[11px]">{user.email}</span>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
+                >
+                  Keluar
+                </button>
+              </>
+            )}
+
+            <div className="hidden xs:flex items-center gap-1.5 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/30 rounded-xl px-3 py-1.5 shadow-sm">
+              <div className="flex flex-col text-left">
+                <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-455 block uppercase tracking-widest leading-none mb-0.5">
+                  Cabang Terhubung
+                </span>
+                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono leading-none">
+                  {branches.length} Outlet
+                </span>
+              </div>
+            </div>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDark}
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
+              title={isDark ? "Mode Terang" : "Mode Gelap"}
+            >
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <div className="pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
+          <h1 className="font-sans font-black text-2xl sm:text-3xl tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5">
+            <Building2 className="w-7 h-7 text-emerald-600 dark:text-emerald-450" />
             {t("bigboss.title", "Dashboard Big Boss")}
           </h1>
-          <p className="text-zinc-550 dark:text-zinc-400 text-sm font-medium">
+          <p className="text-zinc-550 dark:text-zinc-400 text-xs sm:text-sm font-medium mt-1">
             {t("bigboss.subtitle", "Pantau performa keuangan seluruh cabang Anda dalam satu dasbor terpadu.")}
           </p>
         </div>
-        
-        <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
-          {user?.isDemo ? (
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 px-3 py-2 rounded-xl flex items-center gap-1.5 animate-pulse">
-                <span className="flex h-1.5 w-1.5 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-550"></span>
-                </span>
-                Mode Demo
-              </span>
-              <div id="bigboss-header-google-signin-button" className="shadow-sm rounded-full overflow-hidden border border-zinc-200/40 dark:border-zinc-850 bg-white dark:bg-zinc-900"></div>
-            </div>
-          ) : (
-            <>
-              <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-4 py-2.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
-                <div>
-                  <span className="block text-[9px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
-                    Login Big Boss
-                  </span>
-                  <span className="font-mono">{user.email}</span>
-                </div>
-              </div>
-              
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="px-4 py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
-              >
-                Keluar
-              </button>
-            </>
-          )}
-
-          <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-200/60 dark:border-emerald-900/30 rounded-2xl px-5 py-2.5 shadow-sm">
-            <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-455 block uppercase tracking-widest mb-0.5">
-              {t("bigboss.totalBranches", "Cabang Terhubung").replace("{count}", String(branches.length))}
-            </span>
-            <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-              {branches.length} Outlet
-            </span>
-          </div>
-        </div>
-      </div>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -701,10 +746,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </>
               )}
             </div>
-            
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }
