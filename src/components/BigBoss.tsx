@@ -81,14 +81,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     const formattedDate = new Intl.DateTimeFormat(locale, {
       day: "numeric",
       month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false
+      year: "numeric"
     }).format(date);
 
-    return langStr === "en" ? formattedDate : `${formattedDate} WIB`;
+    return formattedDate;
   };
 
   const getBranchMetrics = (branch: BranchData, tf: "daily" | "weekly" | "monthly") => {
@@ -623,7 +619,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               </p>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-900/40 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 font-mono shadow-2xs">
                 <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
-                <span>{t("bigboss.lastUpdated", "Update:")} {formatLastUpdated(lastUpdated, lang)}</span>
+                <span>{formatLastUpdated(lastUpdated, lang)}</span>
               </span>
             </div>
           </div>
