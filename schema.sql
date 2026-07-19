@@ -45,6 +45,26 @@ CREATE TABLE IF NOT EXISTS expenses (
   FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
 );
 
+-- Tabel Riwayat Perubahan Biaya Operasional (Audit Log)
+CREATE TABLE IF NOT EXISTS expenses_history (
+  id TEXT PRIMARY KEY,
+  restaurantId TEXT NOT NULL,
+  month TEXT NOT NULL,
+  sewaTempat REAL NOT NULL,
+  gajiKaryawan REAL NOT NULL,
+  royaltiFranchise REAL NOT NULL,
+  listrik REAL NOT NULL,
+  air REAL NOT NULL,
+  internet REAL NOT NULL,
+  marketing REAL NOT NULL,
+  pajak REAL NOT NULL,
+  biayaLain REAL NOT NULL,
+  cicilanBank REAL NOT NULL,
+  updatedAt TEXT NOT NULL,
+  updatedBy TEXT NOT NULL,
+  FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
+);
+
 -- Tabel Profit Harian
 CREATE TABLE IF NOT EXISTS daily_profits (
   id TEXT PRIMARY KEY,

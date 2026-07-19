@@ -75,6 +75,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [timeframe, setTimeframe] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  
+  // History Modal State
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState<BranchData | null>(null);
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const formatLastUpdated = (date: Date, langStr: string) => {
     const locale = langStr === "en" ? "en-US" : "id-ID";
@@ -144,6 +150,23 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     setBranches(MOCK_DEMO_BRANCHES);
     setLoading(false);
     showToast("Memasuki dasbor gabungan dalam Mode Demo!", "info");
+  };
+
+  const handleOpenHistory = async (branch: BranchData) => {
+    setSelectedBranch(branch);
+    setShowHistoryModal(true);
+    setIsLoadingHistory(true);
+    try {
+      const now = new Date();
+      const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const history = await DataService.getBranchExpensesHistory(branch.id, currentMonthStr);
+      setHistoryData(history);
+    } catch (error: any) {
+      showToast(error.message || "Gagal memuat riwayat", "error");
+      setHistoryData([]);
+    } finally {
+      setIsLoadingHistory(false);
+    }
   };
 
   const handleGoogleLoginResponse = async (response: any) => {
@@ -864,15 +887,26 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                   {getStatusBadge(status)}
                                 </td>
                                 <td className="py-3.5 px-4 text-center">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleUnlinkBranch(branch.id, branch.name)}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1 hover:bg-red-50 dark:hover:bg-rose-950/20 text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-800 text-[11px] font-bold"
-                                    title="Lepas Kunci (Unlock) & Hapus Pemantauan Cabang"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                    <span>Unlock</span>
-                                  </button>
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenHistory(branch)}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 rounded-lg transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-800 text-[11px] font-bold"
+                                      title="Lihat Riwayat Perubahan Biaya Tetap"
+                                    >
+                                      <Clock className="w-3.5 h-3.5" />
+                                      <span>Riwayat</span>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleUnlinkBranch(branch.id, branch.name)}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1 hover:bg-red-50 dark:hover:bg-rose-950/20 text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-800 text-[11px] font-bold"
+                                      title="Lepas Kunci (Unlock) & Hapus Pemantauan Cabang"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                      <span>Unlock</span>
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             );
@@ -1016,6 +1050,93 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 >
                   {t("bigboss.guideUnderstand", "Saya Mengerti")}
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* History Modal */}
+      <AnimatePresence>
+        {showHistoryModal && selectedBranch && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+              
+              <button
+                type="button"
+                onClick={() => setShowHistoryModal(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800/60 pb-4">
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl">
+                  <Clock className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
+                    Riwayat Perubahan Biaya Tetap
+                  </h3>
+                  <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                    {selectedBranch.name} - Bulan Berjalan
+                  </p>
+                </div>
+              </div>
+
+              <div className="max-h-[50vh] overflow-y-auto">
+                {isLoadingHistory ? (
+                  <div className="flex flex-col items-center justify-center py-10 gap-3">
+                    <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-xs text-zinc-500 font-bold">Memuat riwayat...</p>
+                  </div>
+                ) : historyData.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 gap-2">
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-800/40 rounded-full mb-2">
+                      <Clock className="w-6 h-6 text-zinc-400" />
+                    </div>
+                    <p className="text-sm font-bold text-zinc-600 dark:text-zinc-300">Belum ada riwayat perubahan</p>
+                    <p className="text-xs text-zinc-400">Bulan ini belum ada modifikasi biaya operasional.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {historyData.map((item) => {
+                      const totalBiaya = 
+                        (item.sewaTempat || 0) + (item.gajiKaryawan || 0) + (item.royaltiFranchise || 0) +
+                        (item.listrik || 0) + (item.air || 0) + (item.internet || 0) + 
+                        (item.marketing || 0) + (item.pajak || 0) + (item.biayaLain || 0) + (item.cicilanBank || 0);
+
+                      return (
+                        <div key={item.id} className="bg-zinc-50 dark:bg-zinc-950/40 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/60">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-800">
+                              {new Date(item.updatedAt).toLocaleString(lang === 'en' ? 'en-US' : 'id-ID', {
+                                dateStyle: 'medium',
+                                timeStyle: 'short'
+                              })}
+                            </span>
+                            <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                              Oleh: {item.updatedBy || 'Staff/Manager'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60">
+                            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Total Fixed Cost yang Disimpan:</span>
+                            <span className="text-sm font-black text-rose-600 dark:text-rose-450 tabular-nums">
+                              {formatRupiah(totalBiaya)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>

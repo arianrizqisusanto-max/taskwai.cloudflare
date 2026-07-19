@@ -582,5 +582,62 @@ export const DataService = {
       throw new Error(err.error || 'Gagal menghapus cabang');
     }
     return await res.json();
-  }
+  },
+
+  async getBranchExpensesHistory(restaurantId: string, month: string): Promise<any[]> {
+    if (!isBigBossRoute()) {
+      return [];
+    }
+    
+    // In Demo mode, return mock history
+    if (sessionStorage.getItem("taskwai_bigboss_is_demo") === "true") {
+      return [
+        {
+          id: `hist_demo_1_${restaurantId}`,
+          restaurantId,
+          month,
+          sewaTempat: 6000000,
+          gajiKaryawan: 12000000,
+          royaltiFranchise: 2000000,
+          listrik: 1800000,
+          air: 500000,
+          internet: 350000,
+          marketing: 1500000,
+          pajak: 1200000,
+          biayaLain: 1000000,
+          cicilanBank: 0,
+          updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          updatedBy: 'Manager'
+        },
+        {
+          id: `hist_demo_2_${restaurantId}`,
+          restaurantId,
+          month,
+          sewaTempat: 6000000,
+          gajiKaryawan: 10000000,
+          royaltiFranchise: 2000000,
+          listrik: 1500000,
+          air: 500000,
+          internet: 350000,
+          marketing: 1000000,
+          pajak: 1000000,
+          biayaLain: 500000,
+          cicilanBank: 0,
+          updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+          updatedBy: 'Manager'
+        }
+      ];
+    }
+    
+    const res = await fetch(`/api/bigboss/history?restaurantId=${encodeURIComponent(restaurantId)}&month=${encodeURIComponent(month)}`, {
+      method: 'GET',
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal memuat riwayat biaya cabang.');
+    }
+    const data = await res.json() as any;
+    return data.history || [];
+  },
 };

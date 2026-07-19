@@ -128,6 +128,20 @@ export async function onRequest(context: any): Promise<Response> {
         'SELECT * FROM expenses WHERE id = ?'
       ).bind(expId).first();
 
+      // Insert audit history
+      const historyId = crypto.randomUUID();
+      const updatedBy = session.role === 'owner' ? 'Owner' : 'Staff';
+      await db.prepare(
+        `INSERT INTO expenses_history (id, restaurantId, month, sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, biayaLain, cicilanBank, updatedAt, updatedBy) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(
+        historyId, updatedExp.restaurantId, updatedExp.month,
+        updatedExp.sewaTempat, updatedExp.gajiKaryawan, updatedExp.royaltiFranchise,
+        updatedExp.listrik, updatedExp.air, updatedExp.internet,
+        updatedExp.marketing, updatedExp.pajak, updatedExp.biayaLain,
+        updatedExp.cicilanBank, updatedExp.updatedAt, updatedBy
+      ).run();
+
       return jsonResponse(updatedExp);
     }
 
