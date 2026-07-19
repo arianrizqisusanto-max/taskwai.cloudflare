@@ -21,6 +21,7 @@ interface BranchData {
   profitToday: number;
   daysEntered: number;
   totalExpenses: number;
+  historyCount?: number;
 }
 
 const MOCK_DEMO_BRANCHES: BranchData[] = [
@@ -32,7 +33,8 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     profitWeek: 16500000,
     profitToday: 2500000,
     daysEntered: 18,
-    totalExpenses: 15000000
+    totalExpenses: 15000000,
+    historyCount: 2
   },
   {
     id: "demo_br_2",
@@ -877,8 +879,29 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                 <td className="py-3.5 px-4 font-mono tabular-nums text-blue-600 dark:text-blue-400">
                                   {formatRupiah(m.gross)}
                                 </td>
-                                <td className="py-3.5 px-4 font-mono tabular-nums text-rose-600 dark:text-rose-450">
-                                  -{formatRupiah(m.exp)}
+                                <td className="py-3.5 px-4">
+                                  <div className="flex items-center gap-1.5">
+                                    <span 
+                                      className={`font-mono tabular-nums text-rose-600 dark:text-rose-450 ${branch.historyCount && branch.historyCount > 1 ? 'cursor-pointer hover:underline underline-offset-4 decoration-rose-500/50' : ''}`}
+                                      onClick={() => {
+                                        if (branch.historyCount && branch.historyCount > 1) {
+                                          handleOpenHistory(branch);
+                                        }
+                                      }}
+                                    >
+                                      -{formatRupiah(m.exp)}
+                                    </span>
+                                    {branch.historyCount && branch.historyCount > 1 ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenHistory(branch)}
+                                        className="p-1 rounded bg-amber-50 dark:bg-amber-950/30 text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors cursor-pointer border border-amber-200/50 dark:border-amber-900/50 flex-shrink-0"
+                                        title="Biaya Tetap telah dimodifikasi pada bulan ini. Klik untuk melihat rincian riwayat."
+                                      >
+                                        <AlertTriangle className="w-3.5 h-3.5 animate-pulse" />
+                                      </button>
+                                    ) : null}
+                                  </div>
                                 </td>
                                 <td className="py-3.5 px-4 font-mono tabular-nums font-black text-emerald-600 dark:text-emerald-400">
                                   {formatRupiah(m.net)}
@@ -888,15 +911,6 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                 </td>
                                 <td className="py-3.5 px-4 text-center">
                                   <div className="flex items-center justify-center gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleOpenHistory(branch)}
-                                      className="inline-flex items-center gap-1 px-2.5 py-1 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 rounded-lg transition-colors cursor-pointer border border-zinc-200 dark:border-zinc-800 text-[11px] font-bold"
-                                      title="Lihat Riwayat Perubahan Biaya Tetap"
-                                    >
-                                      <Clock className="w-3.5 h-3.5" />
-                                      <span>Riwayat</span>
-                                    </button>
                                     <button
                                       type="button"
                                       onClick={() => handleUnlinkBranch(branch.id, branch.name)}

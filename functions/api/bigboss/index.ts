@@ -55,11 +55,12 @@ export async function onRequest(context: any): Promise<Response> {
         return jsonResponse({ branches: [] });
       }
 
-      // 2. Fetch monthly fixed expenses for all linked branches
+      // 2. Fetch monthly fixed expenses for all linked branches, including history count
       const expensesQuery = await db.prepare(`
         SELECT 
           restaurantId,
-          sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, cicilanBank, biayaLain
+          sewaTempat, gajiKaryawan, royaltiFranchise, listrik, air, internet, marketing, pajak, cicilanBank, biayaLain,
+          (SELECT COUNT(id) FROM expenses_history eh WHERE eh.restaurantId = expenses.restaurantId AND eh.month = expenses.month) as historyCount
         FROM expenses
         WHERE month = ? AND restaurantId IN (
           SELECT branchRestaurantId FROM bigboss_links WHERE bossOwnerId = ?
@@ -69,7 +70,7 @@ export async function onRequest(context: any): Promise<Response> {
       const expensesList = expensesQuery.results || [];
 
       // Map expenses by restaurantId for O(1) retrieval
-      const expensesMap = new Map<string, any>();
+      const expensesMap = new Map<string, { total: number; historyCount: number }>();
       for (const exp of expensesList) {
         const total = 
           (exp.sewaTempat || 0) +
@@ -82,12 +83,12 @@ export async function onRequest(context: any): Promise<Response> {
           (exp.pajak || 0) +
           (exp.cicilanBank || 0) +
           (exp.biayaLain || 0);
-        expensesMap.set(exp.restaurantId, total);
+        expensesMap.set(exp.restaurantId, { total, historyCount: exp.historyCount || 0 });
       }
 
       // Combine profits and expenses to calculate final stats
       const branchesData = branchStats.map((branch: any) => {
-        const totalExpenses = expensesMap.get(branch.id) || 0;
+        const expData = expensesMap.get(branch.id) || { total: 0, historyCount: 0 };
         return {
           id: branch.id,
           name: branch.name,
@@ -96,7 +97,8 @@ export async function onRequest(context: any): Promise<Response> {
           profitWeek: branch.profitWeek,
           profitToday: branch.profitToday,
           daysEntered: branch.daysEntered,
-          totalExpenses
+          totalExpenses: expData.total,
+          historyCount: expData.historyCount
         };
       });
 
