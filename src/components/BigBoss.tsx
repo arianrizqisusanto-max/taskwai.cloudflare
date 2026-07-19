@@ -420,17 +420,6 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               <span>{t("bigboss.enterDemo", "Masuk Mode Demo")}</span>
             </button>
           </div>
-
-          <div className="pt-4">
-            <button
-              type="button"
-              onClick={() => window.location.href = "/"}
-              className="flex items-center justify-center gap-1.5 mx-auto text-xs font-bold text-zinc-400 dark:text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>{t("bigboss.backHome", "Kembali ke Beranda")}</span>
-            </button>
-          </div>
         </motion.div>
       </div>
     );
@@ -441,43 +430,26 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       {/* 1. Top Sticky Navbar Header */}
       <header className="sticky top-0 z-40 w-full border-b border-zinc-200/60 dark:border-zinc-800/80 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.25)] transition-colors duration-300">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Brand & Back Button */}
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setActiveTab("dashboard")}
-              className="flex items-center gap-2.5 text-left focus:outline-none hover:opacity-85 active:scale-95 transition-all cursor-pointer group"
-            >
-              <div className="relative flex items-center">
-                <TaskwaiLogo size={34} />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-sans font-black text-lg tracking-tight text-zinc-900 dark:text-zinc-50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  taskwai
-                </span>
-                <span 
-                  className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full select-none"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(255,215,0,0.12) 100%)",
-                    border: "1px solid rgba(197,160,40,0.4)",
-                    color: "#c5a028"
-                  }}
-                >
-                  👑 Big Boss
-                </span>
-              </div>
-            </button>
-
-            <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-800 hidden sm:block" />
-
-            <button
-              type="button"
-              onClick={() => setActiveTab("dashboard")}
-              className="hidden sm:flex items-center gap-1 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Beranda</span>
-            </button>
+          {/* Brand Title */}
+          <div className="flex items-center gap-2.5 text-left select-none">
+            <div className="relative flex items-center">
+              <TaskwaiLogo size={34} />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-sans font-black text-lg tracking-tight text-zinc-900 dark:text-zinc-50">
+                taskwai
+              </span>
+              <span 
+                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full select-none"
+                style={{
+                  background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(255,215,0,0.12) 100%)",
+                  border: "1px solid rgba(197,160,40,0.4)",
+                  color: "#c5a028"
+                }}
+              >
+                👑 Big Boss
+              </span>
+            </div>
           </div>
 
           {/* Controls Aligned on Navbar: Mode Demo, Login Google, Cabang Terhubung, Dark Toggle */}
