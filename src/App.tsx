@@ -4,7 +4,7 @@
  * Version: 1.0.4-cache-routing-fix
  */
 
-import { useState, useEffect, lazy, Suspense, ComponentType } from "react";
+import { useState, useEffect, lazy, Suspense, ComponentType, useCallback, useRef } from "react";
 import { DataService } from "./lib/dataService";
 import { Restaurant, DailyProfit, Expenses } from "./types";
 
@@ -80,9 +80,11 @@ const BigBoss = safeLazy(() => import("./components/BigBoss"));
 
 function MainApp() {
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const [user, setUser] = useState<any | null>(null);
   const [authInitialized, setAuthInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
+  const lastUserId = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
       if (window.location.pathname === "/bigboss") return "bigboss";
@@ -176,14 +178,18 @@ function MainApp() {
     }
 
     const fetchData = async () => {
-      setLoading(true);
-      
       if (user?.email === "arianrisqi@gmail.com") {
         setLoading(false);
         return;
       }
 
       const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
+
+      // Only trigger full screen loading (Skeleton) if user account changed or initial load
+      if (lastUserId.current !== userId) {
+        setLoading(true);
+      }
+      lastUserId.current = userId;
 
       try {
         // Fetch restaurant config
@@ -216,7 +222,7 @@ function MainApp() {
   }, [user, authInitialized, staffSession, expensesMonth]);
 
   // 3. Handlers for database updates
-  const handleSaveProfit = async (
+  const handleSaveProfit = useCallback(async (
     date: string, 
     profit: number, 
     notes?: string,
@@ -269,9 +275,9 @@ function MainApp() {
       console.error(err);
       throw err;
     }
-  };
+  }, [restaurant, staffSession, user]);
 
-  const handleSaveStaffCredentials = async (username: string, password: string) => {
+  const handleSaveStaffCredentials = useCallback(async (username: string, password: string) => {
     if (!restaurant) return;
     const userId = user ? user.uid : "demo";
     try {
@@ -288,9 +294,9 @@ function MainApp() {
       console.error(err);
       throw err;
     }
-  };
+  }, [restaurant, user]);
 
-  const handleToggleStaffActive = async (active: boolean) => {
+  const handleToggleStaffActive = useCallback(async (active: boolean) => {
     if (!restaurant) return;
     const userId = user ? user.uid : "demo";
     try {
@@ -301,9 +307,9 @@ function MainApp() {
       console.error(err);
       throw err;
     }
-  };
+  }, [restaurant, user]);
 
-  const handleDeleteProfit = async (id: string) => {
+  const handleDeleteProfit = useCallback(async (id: string) => {
     if (!restaurant) return;
     const userId = user ? user.uid : "demo";
 
@@ -314,9 +320,9 @@ function MainApp() {
       console.error(err);
       throw err;
     }
-  };
+  }, [restaurant, user]);
 
-  const handleSaveExpenses = async (data: Partial<Expenses>) => {
+  const handleSaveExpenses = useCallback(async (data: Partial<Expenses>) => {
     if (!restaurant || !expenses) return;
     const userId = user ? user.uid : "demo";
 
@@ -330,9 +336,9 @@ function MainApp() {
       console.error(err);
       throw err;
     }
-  };
+  }, [restaurant, expenses, user, expensesMonth]);
 
-  const handleSaveRestaurant = async (name: string, target: number) => {
+  const handleSaveRestaurant = useCallback(async (name: string, target: number) => {
     const userId = user ? user.uid : "demo";
 
     try {
@@ -342,9 +348,9 @@ function MainApp() {
       console.error(err);
       throw err;
     }
-  };
+  }, [user]);
 
-  const handleResetAll = async () => {
+  const handleResetAll = useCallback(async () => {
     if (!restaurant) return;
     const userId = user ? user.uid : "demo";
     try {
@@ -357,7 +363,7 @@ function MainApp() {
       console.error(err);
       showToast(t("target.resetError", "Gagal mereset data."), "error");
     }
-  };
+  }, [restaurant, user, t, showToast]);
 
   // Render correct tab view dynamically
   const renderView = () => {
@@ -430,8 +436,6 @@ function MainApp() {
         );
     }
   };
-
-  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-zinc-50 to-gray-50 dark:bg-zinc-950 dark:[background-image:none] flex flex-col font-sans text-zinc-900 dark:text-zinc-100 transition-colors duration-300">

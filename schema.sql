@@ -91,3 +91,8 @@ CREATE TABLE IF NOT EXISTS bigboss_links (
   FOREIGN KEY (branchRestaurantId) REFERENCES restaurants(id) ON DELETE CASCADE,
   UNIQUE(bossOwnerId, branchRestaurantId)
 );
+
+-- Indeks Optimasi Kinerja Database (Cloudflare D1)
+CREATE INDEX IF NOT EXISTS idx_daily_profits_rest_date ON daily_profits(restaurantId, date);
+CREATE INDEX IF NOT EXISTS idx_expenses_rest_month ON expenses(restaurantId, month);
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);

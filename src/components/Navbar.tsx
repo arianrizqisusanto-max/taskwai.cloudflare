@@ -150,6 +150,30 @@ export default function Navbar({
 
   const isAdmin = user && user.email === "arianrisqi@gmail.com";
 
+  // Prefetch component chunks on hover to make navigation feel instant
+  const handlePrefetch = (tabId: string) => {
+    switch (tabId) {
+      case "dashboard":
+        import("./Dashboard");
+        break;
+      case "input":
+        import("./InputProfit");
+        break;
+      case "biaya":
+        import("./Biaya");
+        break;
+      case "laporan":
+        import("./Laporan");
+        break;
+      case "target":
+        import("./Target");
+        break;
+      case "admin":
+        import("./AdminConsole");
+        break;
+    }
+  };
+
   const menuItems = isAdmin
     ? [{ id: "admin", label: "Admin Console", icon: ShieldCheck }]
     : staffSession
@@ -200,6 +224,8 @@ export default function Navbar({
                 <button
                    key={item.id}
                    onClick={() => setActiveTab(item.id)}
+                   onMouseEnter={() => handlePrefetch(item.id)}
+                   onTouchStart={() => handlePrefetch(item.id)}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                       isActive
                         ? "bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/40 font-black"
@@ -326,6 +352,8 @@ export default function Navbar({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
+                  onMouseEnter={() => handlePrefetch(item.id)}
+                  onTouchStart={() => handlePrefetch(item.id)}
                   className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
