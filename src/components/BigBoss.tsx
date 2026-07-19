@@ -1106,7 +1106,35 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {historyData.map((item) => {
+                    {historyData.map((item, index) => {
+                      const prevItem = historyData[index + 1];
+                      
+                      const fields = [
+                        { key: 'sewaTempat', label: 'Sewa Tempat' },
+                        { key: 'gajiKaryawan', label: 'Gaji Karyawan' },
+                        { key: 'royaltiFranchise', label: 'Royalti Franchise' },
+                        { key: 'listrik', label: 'Listrik' },
+                        { key: 'air', label: 'Air' },
+                        { key: 'internet', label: 'Internet' },
+                        { key: 'marketing', label: 'Marketing' },
+                        { key: 'pajak', label: 'Pajak' },
+                        { key: 'biayaLain', label: 'Biaya Lain-lain' },
+                        { key: 'cicilanBank', label: 'Cicilan Bank' },
+                      ];
+                      
+                      const changes: { label: string, oldVal: number, newVal: number }[] = [];
+                      if (prevItem) {
+                        fields.forEach(f => {
+                          if (item[f.key] !== prevItem[f.key]) {
+                            changes.push({
+                              label: f.label,
+                              oldVal: prevItem[f.key] || 0,
+                              newVal: item[f.key] || 0
+                            });
+                          }
+                        });
+                      }
+
                       const totalBiaya = 
                         (item.sewaTempat || 0) + (item.gajiKaryawan || 0) + (item.royaltiFranchise || 0) +
                         (item.listrik || 0) + (item.air || 0) + (item.internet || 0) + 
@@ -1126,6 +1154,37 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                             </span>
                           </div>
                           
+                          {/* Changes List */}
+                          {changes.length > 0 && (
+                            <div className="mt-3 space-y-1">
+                              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Rincian Perubahan:</p>
+                              {changes.map((c, idx) => (
+                                <div key={idx} className="flex items-center gap-2 text-xs flex-wrap">
+                                  <span className="font-semibold text-zinc-600 dark:text-zinc-400 min-w-[120px]">{c.label}</span>
+                                  <span className="text-zinc-400 dark:text-zinc-500 line-through tabular-nums text-[11px]">{formatRupiah(c.oldVal)}</span>
+                                  <span className="text-zinc-400 dark:text-zinc-500">→</span>
+                                  <span className="font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">{formatRupiah(c.newVal)}</span>
+                                  {c.newVal > c.oldVal ? (
+                                    <span className="text-[10px] font-black text-rose-500 ml-1 bg-rose-50 dark:bg-rose-950/30 px-1.5 py-0.5 rounded">(+{formatRupiah(c.newVal - c.oldVal)})</span>
+                                  ) : (
+                                    <span className="text-[10px] font-black text-emerald-500 ml-1 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded">(-{formatRupiah(c.oldVal - c.newVal)})</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {changes.length === 0 && prevItem && (
+                            <div className="mt-3">
+                              <p className="text-[11px] font-medium text-zinc-500 italic">Disimpan tanpa mengubah nominal.</p>
+                            </div>
+                          )}
+                          {!prevItem && (
+                             <div className="mt-3">
+                              <p className="text-[11px] font-medium text-zinc-500 italic">Catatan awal bulan / baseline.</p>
+                            </div>
+                          )}
+
                           <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60">
                             <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Total Fixed Cost yang Disimpan:</span>
                             <span className="text-sm font-black text-rose-600 dark:text-rose-450 tabular-nums">
