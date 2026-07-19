@@ -12,7 +12,7 @@ export async function onRequest(context: any): Promise<Response> {
   }
 
   try {
-    const body = await request.json() as { idToken?: string };
+    const body = await request.json() as { idToken?: string; accountType?: string };
     const { idToken } = body;
 
     if (!idToken) {
@@ -27,20 +27,54 @@ export async function onRequest(context: any): Promise<Response> {
 
     const { sub: googleId, email, name, picture } = googleUser;
     const db = env.DB;
+    const { accountType } = body;
+    const targetAccountType = accountType === 'bigboss' ? 'bigboss' : 'regular';
 
-    // Check if owner already exists
+    // Check if owner already exists by ID or Email
     const existingOwner = await db.prepare(
-      'SELECT * FROM owners WHERE id = ?'
-    ).bind(googleId).first();
+      'SELECT * FROM owners WHERE id = ? OR email = ?'
+    ).bind(googleId, email).first();
 
     const restaurantId = `rest_${googleId}`;
 
-    if (!existingOwner) {
-      // 1. Create new Owner
+    if (existingOwner) {
+      // Determine existing account type (with fallback for legacy rows)
+      let ownerType = existingOwner.accountType;
+      if (!ownerType) {
+        const bossCheck = await db.prepare(
+          'SELECT 1 FROM bigboss_links WHERE bossOwnerId = ?'
+        ).bind(googleId).first();
+        ownerType = bossCheck ? 'bigboss' : 'regular';
+        
+        // Attempt to backfill accountType if column exists
+        try {
+          await db.prepare('UPDATE owners SET accountType = ? WHERE id = ?').bind(ownerType, googleId).run();
+        } catch (e) {
+          // Ignore if column doesn't exist on older D1 instances
+        }
+      }
+
+      // Block login if account type does not match requested route
+      if (ownerType !== targetAccountType) {
+        const registeredLabel = ownerType === 'bigboss' ? 'Big Boss' : 'Taskwai biasa';
+        const targetLabel = targetAccountType === 'bigboss' ? 'Big Boss' : 'Taskwai biasa';
+        return jsonResponse({
+          error: `Akun telah digunakan untuk type berbeda. (Terdaftar sebagai ${registeredLabel}, tidak dapat digunakan untuk ${targetLabel})`
+        }, 400);
+      }
+    } else {
+      // 1. Create new Owner with accountType
       const nowStr = new Date().toISOString();
-      await db.prepare(
-        'INSERT INTO owners (id, email, name, picture, createdAt) VALUES (?, ?, ?, ?, ?)'
-      ).bind(googleId, email, name || null, picture || null, nowStr).run();
+      try {
+        await db.prepare(
+          'INSERT INTO owners (id, email, name, picture, createdAt, accountType) VALUES (?, ?, ?, ?, ?, ?)'
+        ).bind(googleId, email, name || null, picture || null, nowStr, targetAccountType).run();
+      } catch (e) {
+        // Fallback for DB instances without accountType column
+        await db.prepare(
+          'INSERT INTO owners (id, email, name, picture, createdAt) VALUES (?, ?, ?, ?, ?)'
+        ).bind(googleId, email, name || null, picture || null, nowStr).run();
+      }
 
       // 2. Create Default Restaurant
       await db.prepare(

@@ -108,7 +108,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const handleGoogleLoginResponse = async (response: any) => {
     try {
       const idToken = response.credential;
-      const data = await DataService.loginGoogle(idToken);
+      const data = await DataService.loginGoogle(idToken, 'bigboss');
       sessionStorage.removeItem("taskwai_bigboss_is_demo");
       setUser(data.user);
       showToast("Berhasil masuk ke dasbor Big Boss!", "success");

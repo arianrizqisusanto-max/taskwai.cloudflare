@@ -80,7 +80,7 @@ export default function Navbar({
   const handleGoogleLoginResponse = async (response: any) => {
     try {
       const idToken = response.credential;
-      const data = await DataService.loginGoogle(idToken);
+      const data = await DataService.loginGoogle(idToken, 'regular');
       setUser(data.user);
       showToast(t("nav.loginSuccess", "Berhasil masuk menggunakan akun Google!"), "success");
       setShowLoginModal(false);

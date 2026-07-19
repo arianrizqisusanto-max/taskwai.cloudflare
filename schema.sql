@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS owners (
   email TEXT UNIQUE NOT NULL,
   name TEXT,
   picture TEXT,
-  createdAt TEXT NOT NULL
+  createdAt TEXT NOT NULL,
+  accountType TEXT DEFAULT 'regular'
 );
 
 -- Tabel Restoran

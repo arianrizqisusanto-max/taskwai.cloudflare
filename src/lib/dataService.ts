@@ -136,11 +136,12 @@ function getHeaders() {
 
 export const DataService = {
   // --- CUSTOM CLOUDFLARE AUTHENTICATION ---
-  async loginGoogle(idToken: string): Promise<any> {
+  async loginGoogle(idToken: string, accountType?: 'regular' | 'bigboss'): Promise<any> {
+    const type = accountType || (isBigBossRoute() ? 'bigboss' : 'regular');
     const res = await fetch('/api/auth/google', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken })
+      body: JSON.stringify({ idToken, accountType: type })
     });
     if (!res.ok) {
       const err = await res.json() as any;
