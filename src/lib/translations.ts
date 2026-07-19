@@ -289,6 +289,7 @@ export const enTranslations: Record<string, string> = {
   "bigboss.timeframeDaily": "Daily",
   "bigboss.timeframeWeekly": "Weekly",
   "bigboss.timeframeMonthly": "Monthly",
+  "bigboss.lastUpdated": "Last Updated:",
   "bigboss.targetProfit": "Branch Target",
   "bigboss.status": "Status",
   "bigboss.actions": "Actions",

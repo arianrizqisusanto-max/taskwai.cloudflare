@@ -6,7 +6,7 @@ import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
   CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe, X,
-  ChevronDown, ChevronUp, BookOpen, Info, LogIn, LogOut, Calendar
+  ChevronDown, ChevronUp, BookOpen, Info, LogIn, LogOut, Calendar, Clock
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -74,6 +74,22 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [timeframe, setTimeframe] = useState<"daily" | "weekly" | "monthly">("monthly");
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const formatLastUpdated = (date: Date, langStr: string) => {
+    const locale = langStr === "en" ? "en-US" : "id-ID";
+    const formattedDate = new Intl.DateTimeFormat(locale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }).format(date);
+
+    return langStr === "en" ? formattedDate : `${formattedDate} WIB`;
+  };
 
   const getBranchMetrics = (branch: BranchData, tf: "daily" | "weekly" | "monthly") => {
     if (tf === "daily") {
@@ -113,6 +129,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     try {
       const data = await DataService.getBigBossBranches();
       setBranches(data.branches || []);
+      setLastUpdated(new Date());
     } catch (err: any) {
       console.error(err);
       showToast("Gagal memuat data cabang gabungan.", "error");
@@ -590,9 +607,15 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               <Building2 className="w-7 h-7 text-emerald-600 dark:text-emerald-450" />
               {t("bigboss.title", "Dashboard Big Boss")}
             </h1>
-            <p className="text-zinc-550 dark:text-zinc-400 text-xs sm:text-sm font-medium mt-1">
-              {t("bigboss.subtitle", "Pantau performa keuangan seluruh cabang Anda dalam satu dasbor terpadu.")}
-            </p>
+            <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
+              <p className="text-zinc-550 dark:text-zinc-400 text-xs sm:text-sm font-medium">
+                {t("bigboss.subtitle", "Pantau performa keuangan seluruh cabang Anda dalam satu dasbor terpadu.")}
+              </p>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-900/40 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 font-mono shadow-2xs">
+                <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                <span>{t("bigboss.lastUpdated", "Update:")} {formatLastUpdated(lastUpdated, lang)}</span>
+              </span>
+            </div>
           </div>
           <button
             type="button"
