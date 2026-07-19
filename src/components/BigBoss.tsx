@@ -5,7 +5,7 @@ import { useTranslation } from "../lib/LanguageContext";
 import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
-  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw 
+  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -58,7 +58,7 @@ interface BigBossProps {
 }
 
 export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossProps) {
-  const { t, currency } = useTranslation();
+  const { t, lang, setLang, currency } = useTranslation();
   const { showToast } = useToast();
   const [branches, setBranches] = useState<BranchData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -502,6 +502,19 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </span>
               </div>
             </div>
+
+            {/* Language Selector */}
+            <button
+              type="button"
+              onClick={() => setLang(lang === "id" ? "en" : "id")}
+              className="px-2.5 py-1.5 rounded-xl text-zinc-650 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 flex items-center gap-1.5 shadow-sm"
+              title={lang === "id" ? "Switch to English" : "Ubah ke Bahasa Indonesia"}
+            >
+              <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-450" />
+              <span className="text-[10px] font-black uppercase tracking-wider font-mono">
+                {lang === "id" ? "ID" : "EN"}
+              </span>
+            </button>
 
             {/* Refresh Button */}
             <button
