@@ -5,7 +5,7 @@ import { useTranslation } from "../lib/LanguageContext";
 import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
-  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon 
+  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -65,6 +65,14 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [authCodeInput, setAuthCodeInput] = useState("");
   const [isLinking, setIsLinking] = useState(false);
   const [linkingError, setLinkingError] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      window.location.reload();
+    }, 400);
+  };
 
   // Isolated session state for Big Boss mode
   const [user, setUser] = useState<any | null>(null);
@@ -494,6 +502,16 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </span>
               </div>
             </div>
+
+            {/* Refresh Button */}
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
+              title={t("nav.refresh", "Muat Ulang")}
+            >
+              <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} />
+            </button>
 
             {/* Dark Mode Toggle */}
             <button
