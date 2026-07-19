@@ -5,7 +5,8 @@ import { useTranslation } from "../lib/LanguageContext";
 import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
-  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe, X 
+  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe, X,
+  ChevronDown, ChevronUp, BookOpen, Info
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -67,6 +68,8 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [linkingError, setLinkingError] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
+  const [isGuideExpanded, setIsGuideExpanded] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -544,14 +547,24 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
       {/* Main Content Area */}
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <div className="pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
-          <h1 className="font-sans font-black text-2xl sm:text-3xl tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5">
-            <Building2 className="w-7 h-7 text-emerald-600 dark:text-emerald-450" />
-            {t("bigboss.title", "Dashboard Big Boss")}
-          </h1>
-          <p className="text-zinc-550 dark:text-zinc-400 text-xs sm:text-sm font-medium mt-1">
-            {t("bigboss.subtitle", "Pantau performa keuangan seluruh cabang Anda dalam satu dasbor terpadu.")}
-          </p>
+        <div className="pb-2 border-b border-zinc-200/60 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="font-sans font-black text-2xl sm:text-3xl tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5">
+              <Building2 className="w-7 h-7 text-emerald-600 dark:text-emerald-450" />
+              {t("bigboss.title", "Dashboard Big Boss")}
+            </h1>
+            <p className="text-zinc-550 dark:text-zinc-400 text-xs sm:text-sm font-medium mt-1">
+              {t("bigboss.subtitle", "Pantau performa keuangan seluruh cabang Anda dalam satu dasbor terpadu.")}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowGuideModal(true)}
+            className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100/80 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-xs rounded-xl border border-emerald-200/60 dark:border-emerald-900/30 transition-all cursor-pointer shadow-sm"
+          >
+            <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span>Panduan & Aturan</span>
+          </button>
         </div>
 
       {loading ? (
@@ -634,16 +647,67 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </form>
               </div>
 
-              {/* Multi-Branch Usage Disclaimer */}
-              <div className="bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-200/50 dark:border-zinc-800/60 rounded-2xl p-5 text-[10px] text-zinc-400 dark:text-zinc-550 font-semibold leading-relaxed space-y-2">
-                <div>
-                  💡 <strong>Tips Big Boss:</strong> Halaman ini menggabungkan data finansial dari seluruh cabang Anda secara terpadu.
-                </div>
-                {user?.isDemo && (
-                  <div className="text-amber-600 dark:text-amber-500 font-bold border-t border-zinc-200/40 dark:border-zinc-800/40 pt-2">
-                    🔑 Untuk menautkan cabang restoran ril Anda ke dasbor Big Boss, silakan login menggunakan akun Google.
+              {/* Collapsible Big Boss Guide & Rule Note */}
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm transition-all">
+                <button
+                  type="button"
+                  onClick={() => setIsGuideExpanded(!isGuideExpanded)}
+                  className="w-full px-5 py-3.5 flex items-center justify-between bg-zinc-50/80 dark:bg-zinc-950/40 hover:bg-zinc-100/60 dark:hover:bg-zinc-950/80 transition-colors text-left cursor-pointer border-0"
+                >
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+                      Panduan & Aturan Cabang
+                    </span>
                   </div>
-                )}
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                    <span>{isGuideExpanded ? "Tutup" : "Lihat"}</span>
+                    {isGuideExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </div>
+                </button>
+
+                <AnimatePresence>
+                  {isGuideExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="px-5 py-4 border-t border-zinc-100 dark:border-zinc-800/60 space-y-3 text-xs text-zinc-650 dark:text-zinc-300 font-medium leading-relaxed"
+                    >
+                      <div className="space-y-1">
+                        <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1 text-[11px]">
+                          <span>🏢 Cara Kerja Dasbor Big Boss:</span>
+                        </div>
+                        <p className="text-zinc-500 dark:text-zinc-400 text-[11px] leading-relaxed">
+                          Memantau gabungan finansial seluruh cabang Anda (omzet, laba kotor, laba bersih) dalam satu dasbor terpadu.
+                        </p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="font-bold text-zinc-900 dark:text-white flex items-center gap-1 text-[11px]">
+                          <span>🔗 Cara Menautkan Cabang:</span>
+                        </div>
+                        <ol className="list-decimal pl-5 text-[11px] text-zinc-500 dark:text-zinc-400 space-y-0.5">
+                          <li>Buka Taskwai di akun cabang.</li>
+                          <li>Masuk menu <b>Pengaturan (Target)</b> → <b>Otorisasi Big Boss</b>.</li>
+                          <li>Klik <b>Dapatkan Kode Otorisasi</b> (6-digit).</li>
+                          <li>Masukkan kode pada kolom di atas.</li>
+                        </ol>
+                      </div>
+
+                      <div className="space-y-1 bg-amber-50/70 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/50 dark:border-amber-900/30">
+                        <div className="font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1 text-[11px]">
+                          <span>⚠️ Aturan Penting Akun (Gmail):</span>
+                        </div>
+                        <ul className="list-disc pl-4 text-[10px] text-amber-900/80 dark:text-amber-300/80 space-y-1">
+                          <li><b>Gmail Bersih:</b> Login Gmail Big Boss harus bersih (tidak boleh sama dengan akun Gmail cabang biasa).</li>
+                          <li><b>1 Cabang = 1 Big Boss:</b> Akun cabang yang terhubung akan terkunci (<i>freeze</i>).</li>
+                          <li><b>Buka Kunci (Unlock):</b> Lepaskan tautan melalui tombol <b>Unlock</b> pada dasbor ini untuk melepaskan penguncian.</li>
+                        </ul>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
@@ -802,6 +866,88 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   className="w-full py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0"
                 >
                   Batal
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Guide Modal for Big Boss */}
+      <AnimatePresence>
+        {showGuideModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="w-full max-w-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden text-left"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+              
+              <button
+                type="button"
+                onClick={() => setShowGuideModal(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800/60 pb-4">
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl">
+                  <BookOpen className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
+                    Panduan & Aturan Dasbor Big Boss
+                  </h3>
+                  <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                    Petunjuk penggunaan dan aturan penautan akun cabang
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4 text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed max-h-[60vh] overflow-y-auto pr-1">
+                <div className="space-y-1.5 bg-zinc-50 dark:bg-zinc-950/40 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/60">
+                  <h4 className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5 text-xs">
+                    🏢 1. Fungsi Dasbor Big Boss
+                  </h4>
+                  <p className="text-zinc-550 dark:text-zinc-400 text-xs pl-5">
+                    Halaman ini digunakan oleh pemilik usaha (<i>owner</i>) untuk memantau ringkasan omzet, laba kotor, laba bersih, dan statistik dari seluruh cabang restoran Anda secara terpadu.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 bg-zinc-50 dark:bg-zinc-950/40 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/60">
+                  <h4 className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5 text-xs">
+                    🔗 2. Cara Menautkan Cabang Baru
+                  </h4>
+                  <ol className="list-decimal pl-9 text-xs text-zinc-550 dark:text-zinc-400 space-y-1">
+                    <li>Buka aplikasi Taskwai pada <b>akun restoran cabang</b> yang hendak dipantau.</li>
+                    <li>Masuk ke menu <b>Pengaturan (Target)</b> → pilih bagian <b>Otorisasi Big Boss</b>.</li>
+                    <li>Klik <b>Dapatkan Kode Otorisasi</b> (kode acak 6-digit berlaku selama 15 menit).</li>
+                    <li>Salin kode tersebut, lalu tempelkan pada kolom <b>Hubungkan Cabang Baru</b> di dasbor Big Boss ini.</li>
+                  </ol>
+                </div>
+
+                <div className="space-y-2 bg-amber-50/70 dark:bg-amber-950/20 p-4 rounded-2xl border border-amber-200/60 dark:border-amber-900/40">
+                  <h4 className="font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1.5 text-xs">
+                    ⚠️ 3. Aturan Penting Akun & Penguncian (Gmail)
+                  </h4>
+                  <ul className="list-disc pl-6 text-xs text-amber-900/80 dark:text-amber-300/80 space-y-1.5">
+                    <li><b>Separasi Akun Gmail:</b> Gmail yang digunakan untuk login Big Boss harus bersih dan berbeda dengan Gmail yang terdaftar untuk akun cabang biasa.</li>
+                    <li><b>Kunci Otomatis (Freeze):</b> Setiap 1 akun cabang biasa hanya dapat terhubung ke 1 akun Big Boss dan akan langsung terkunci (<i>freeze</i>).</li>
+                    <li><b>Pelepasan Kunci (Unlock):</b> Untuk melepaskan penguncian cabang, klik tombol <b>Unlock</b> pada tabel cabang di dasbor Big Boss ini. Akun cabang tersebut akan terbebas kembali.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/60">
+                <button
+                  type="button"
+                  onClick={() => setShowGuideModal(false)}
+                  className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
+                >
+                  Saya Mengerti
                 </button>
               </div>
             </motion.div>
