@@ -218,7 +218,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         const google = (window as any).google;
         if (google) {
           google.accounts.id.initialize({
-            client_id: "888780289762-bnd08vbfkspqg2o9iif8bcr91a92jsh5.apps.googleusercontent.com",
+            client_id: (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || "888780289762-gpiud6mhos00kiljpgnk779tunli4ijr.apps.googleusercontent.com",
             callback: handleGoogleLoginResponse
           });
           
@@ -245,7 +245,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         const google = (window as any).google;
         if (google) {
           google.accounts.id.initialize({
-            client_id: "888780289762-bnd08vbfkspqg2o9iif8bcr91a92jsh5.apps.googleusercontent.com",
+            client_id: (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || "888780289762-gpiud6mhos00kiljpgnk779tunli4ijr.apps.googleusercontent.com",
             callback: async (res: any) => {
               setShowLoginModal(false);
               await handleGoogleLoginResponse(res);
