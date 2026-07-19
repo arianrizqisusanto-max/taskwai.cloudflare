@@ -847,10 +847,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   <Building2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <h3 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
-                  Login ke Big Boss
+                  {t("bigboss.loginModalTitle", "Login ke Big Boss")}
                 </h3>
                 <p className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 leading-relaxed">
-                  Untuk menautkan dan memantau cabang restoran ril Anda, silakan masuk menggunakan akun Google Anda terlebih dahulu.
+                  {t("bigboss.loginModalDesc", "Untuk menautkan dan memantau cabang restoran ril Anda, silakan masuk menggunakan akun Google Anda terlebih dahulu.")}
                 </p>
               </div>
 
@@ -865,7 +865,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   onClick={() => setShowLoginModal(false)}
                   className="w-full py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0"
                 >
-                  Batal
+                  {t("nav.cancel", "Batal")}
                 </button>
               </div>
             </motion.div>
@@ -899,10 +899,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </div>
                 <div>
                   <h3 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
-                    Panduan & Aturan Dasbor Big Boss
+                    {t("bigboss.guideTitle", "Panduan & Aturan Dasbor Big Boss")}
                   </h3>
                   <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-                    Petunjuk penggunaan dan aturan penautan akun cabang
+                    {t("bigboss.guideSubtitle", "Petunjuk penggunaan dan aturan penautan akun cabang")}
                   </p>
                 </div>
               </div>
@@ -910,33 +910,33 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               <div className="space-y-4 text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed max-h-[60vh] overflow-y-auto pr-1">
                 <div className="space-y-1.5 bg-zinc-50 dark:bg-zinc-950/40 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/60">
                   <h4 className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5 text-xs">
-                    🏢 1. Fungsi Dasbor Big Boss
+                    🏢 {t("bigboss.guideFungsiTitle", "1. Fungsi Dasbor Big Boss")}
                   </h4>
                   <p className="text-zinc-550 dark:text-zinc-400 text-xs pl-5">
-                    Halaman ini digunakan oleh pemilik usaha (<i>owner</i>) untuk memantau ringkasan omzet, laba kotor, laba bersih, dan statistik dari seluruh cabang restoran Anda secara terpadu.
+                    {t("bigboss.guideFungsiDesc", "Halaman ini digunakan oleh pemilik usaha (owner) untuk memantau ringkasan omzet, laba kotor, laba bersih, dan statistik dari seluruh cabang restoran Anda secara terpadu.")}
                   </p>
                 </div>
 
                 <div className="space-y-1.5 bg-zinc-50 dark:bg-zinc-950/40 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/60">
                   <h4 className="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5 text-xs">
-                    🔗 2. Cara Menautkan Cabang Baru
+                    🔗 {t("bigboss.guideCaraTitle", "2. Cara Menautkan Cabang Baru")}
                   </h4>
                   <ol className="list-decimal pl-9 text-xs text-zinc-550 dark:text-zinc-400 space-y-1">
-                    <li>Buka aplikasi Taskwai pada <b>akun restoran cabang</b> yang hendak dipantau.</li>
-                    <li>Masuk ke menu <b>Pengaturan (Target)</b> → pilih bagian <b>Otorisasi Big Boss</b>.</li>
-                    <li>Klik <b>Dapatkan Kode Otorisasi</b> (kode acak 6-digit berlaku selama 15 menit).</li>
-                    <li>Salin kode tersebut, lalu tempelkan pada kolom <b>Hubungkan Cabang Baru</b> di dasbor Big Boss ini.</li>
+                    <li>{t("bigboss.guideCaraStep1", "Buka aplikasi Taskwai pada akun restoran cabang yang hendak dipantau.")}</li>
+                    <li>{t("bigboss.guideCaraStep2", "Masuk ke menu Pengaturan (Target) → pilih bagian Otorisasi Big Boss.")}</li>
+                    <li>{t("bigboss.guideCaraStep3", "Klik Dapatkan Kode Otorisasi (kode acak 6-digit berlaku selama 15 menit).")}</li>
+                    <li>{t("bigboss.guideCaraStep4", "Salin kode tersebut, lalu tempelkan pada kolom Hubungkan Cabang Baru di dasbor Big Boss ini.")}</li>
                   </ol>
                 </div>
 
                 <div className="space-y-2 bg-amber-50/70 dark:bg-amber-950/20 p-4 rounded-2xl border border-amber-200/60 dark:border-amber-900/40">
                   <h4 className="font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1.5 text-xs">
-                    ⚠️ 3. Aturan Penting Akun & Penguncian (Gmail)
+                    ⚠️ {t("bigboss.guideAturanTitle", "3. Aturan Penting Akun & Penguncian (Gmail)")}
                   </h4>
                   <ul className="list-disc pl-6 text-xs text-amber-900/80 dark:text-amber-300/80 space-y-1.5">
-                    <li><b>Separasi Akun Gmail:</b> Gmail yang digunakan untuk login Big Boss harus bersih dan berbeda dengan Gmail yang terdaftar untuk akun cabang biasa.</li>
-                    <li><b>Kunci Otomatis (Freeze):</b> Setiap 1 akun cabang biasa hanya dapat terhubung ke 1 akun Big Boss dan akan langsung terkunci (<i>freeze</i>).</li>
-                    <li><b>Pelepasan Kunci (Unlock):</b> Untuk melepaskan penguncian cabang, klik tombol <b>Unlock</b> pada tabel cabang di dasbor Big Boss ini. Akun cabang tersebut akan terbebas kembali.</li>
+                    <li>{t("bigboss.guideAturanRule1", "Separasi Akun Gmail: Gmail yang digunakan untuk login Big Boss harus bersih dan berbeda dengan Gmail yang terdaftar untuk akun cabang biasa.")}</li>
+                    <li>{t("bigboss.guideAturanRule2", "Kunci Otomatis (Freeze): Setiap 1 akun cabang biasa hanya dapat terhubung ke 1 akun Big Boss dan akan langsung terkunci (freeze).")}</li>
+                    <li>{t("bigboss.guideAturanRule3", "Pelepasan Kunci (Unlock): Untuk melepaskan penguncian cabang, klik tombol Unlock pada tabel cabang di dasbor Big Boss ini. Akun cabang tersebut akan terbebas kembali.")}</li>
                   </ul>
                 </div>
               </div>
@@ -947,7 +947,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   onClick={() => setShowGuideModal(false)}
                   className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm"
                 >
-                  Saya Mengerti
+                  {t("bigboss.guideUnderstand", "Saya Mengerti")}
                 </button>
               </div>
             </motion.div>
