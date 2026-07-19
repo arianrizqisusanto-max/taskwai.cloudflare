@@ -1078,33 +1078,33 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden"
+              className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xl relative overflow-hidden flex flex-col max-h-[85vh]"
             >
-              <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400" />
               
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0"
+                className="absolute top-3 right-3 p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
-              <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800/60 pb-4">
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl">
-                  <Clock className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              <div className="flex items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800/60 pb-3 mb-3">
+                <div className="p-2 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl">
+                  <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
-                    Riwayat Perubahan Biaya Tetap
+                  <h3 className="text-sm font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
+                    Riwayat Biaya Tetap
                   </h3>
-                  <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-                    {selectedBranch.name} - Bulan Berjalan
+                  <p className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
+                    {selectedBranch.name}
                   </p>
                 </div>
               </div>
 
-              <div className="max-h-[50vh] overflow-y-auto">
+              <div className="overflow-y-auto pr-1 -mr-1 space-y-2.5">
                 {isLoadingHistory ? (
                   <div className="flex flex-col items-center justify-center py-10 gap-3">
                     <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
@@ -1155,33 +1155,32 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         (item.marketing || 0) + (item.pajak || 0) + (item.biayaLain || 0) + (item.cicilanBank || 0);
 
                       return (
-                        <div key={item.id} className="bg-zinc-50 dark:bg-zinc-950/40 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/60">
+                        <div key={item.id} className="bg-zinc-50 dark:bg-zinc-950/40 p-3 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-800">
+                            <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100">
                               {new Date(item.updatedAt).toLocaleString(lang === 'en' ? 'en-US' : 'id-ID', {
                                 dateStyle: 'medium',
                                 timeStyle: 'short'
                               })}
                             </span>
-                            <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                              Oleh: {item.updatedBy || 'Staff/Manager'}
+                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                              {item.updatedBy || 'Manager'}
                             </span>
                           </div>
                           
                           {/* Changes List */}
                           {changes.length > 0 && (
-                            <div className="mt-3 space-y-1">
-                              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Rincian Perubahan:</p>
+                            <div className="space-y-1 mt-1 border-t border-zinc-200/40 dark:border-zinc-800/40 pt-2">
                               {changes.map((c, idx) => (
-                                <div key={idx} className="flex items-center gap-2 text-xs flex-wrap">
-                                  <span className="font-semibold text-zinc-600 dark:text-zinc-400 min-w-[120px]">{c.label}</span>
-                                  <span className="text-zinc-400 dark:text-zinc-500 line-through tabular-nums text-[11px]">{formatRupiah(c.oldVal)}</span>
-                                  <span className="text-zinc-400 dark:text-zinc-500">→</span>
+                                <div key={idx} className="flex flex-wrap items-center gap-x-1.5 text-[10px]">
+                                  <span className="font-semibold text-zinc-600 dark:text-zinc-400 min-w-[90px]">{c.label}</span>
+                                  <span className="text-zinc-400 line-through tabular-nums">{formatRupiah(c.oldVal)}</span>
+                                  <span className="text-zinc-400">→</span>
                                   <span className="font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">{formatRupiah(c.newVal)}</span>
                                   {c.newVal > c.oldVal ? (
-                                    <span className="text-[10px] font-black text-rose-500 ml-1 bg-rose-50 dark:bg-rose-950/30 px-1.5 py-0.5 rounded">(+{formatRupiah(c.newVal - c.oldVal)})</span>
+                                    <span className="font-black text-rose-500">(+{formatRupiah(c.newVal - c.oldVal)})</span>
                                   ) : (
-                                    <span className="text-[10px] font-black text-emerald-500 ml-1 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded">(-{formatRupiah(c.oldVal - c.newVal)})</span>
+                                    <span className="font-black text-emerald-500">(-{formatRupiah(c.oldVal - c.newVal)})</span>
                                   )}
                                 </div>
                               ))}
@@ -1189,19 +1188,19 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                           )}
 
                           {changes.length === 0 && prevItem && (
-                            <div className="mt-3">
-                              <p className="text-[11px] font-medium text-zinc-500 italic">Disimpan tanpa mengubah nominal.</p>
+                            <div className="mt-1 border-t border-zinc-200/40 dark:border-zinc-800/40 pt-1">
+                              <p className="text-[9px] text-zinc-500 italic">Tidak ada perubahan.</p>
                             </div>
                           )}
                           {!prevItem && (
-                             <div className="mt-3">
-                              <p className="text-[11px] font-medium text-zinc-500 italic">Catatan awal bulan / baseline.</p>
+                             <div className="mt-1 border-t border-zinc-200/40 dark:border-zinc-800/40 pt-1">
+                              <p className="text-[9px] text-zinc-500 italic">Nilai awal (baseline).</p>
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60">
-                            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Total Fixed Cost yang Disimpan:</span>
-                            <span className="text-sm font-black text-rose-600 dark:text-rose-450 tabular-nums">
+                          <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60">
+                            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400">Total:</span>
+                            <span className="text-xs font-black text-rose-600 dark:text-rose-450 tabular-nums">
                               {formatRupiah(totalBiaya)}
                             </span>
                           </div>
