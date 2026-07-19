@@ -93,6 +93,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       isDemo: true
     });
     setBranches(MOCK_DEMO_BRANCHES);
+    setLoading(false);
     showToast("Memasuki dasbor gabungan dalam Mode Demo!", "info");
   };
 
@@ -100,6 +101,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     try {
       const idToken = response.credential;
       const data = await DataService.loginGoogle(idToken);
+      sessionStorage.removeItem("taskwai_bigboss_is_demo");
       setUser(data.user);
       showToast("Berhasil masuk ke dasbor Big Boss!", "success");
     } catch (error: any) {
@@ -114,8 +116,8 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       if (!user?.isDemo) {
         await DataService.logout();
       }
-      setUser(null);
-      showToast("Berhasil keluar dari dasbor Big Boss.", "success");
+      handleEnterDemoMode();
+      showToast("Berhasil keluar dari dasbor Big Boss. Kembali ke Mode Demo.", "info");
     } catch (err) {
       console.error(err);
     }
@@ -140,9 +142,27 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         const data = await DataService.getMe();
         if (data.user) {
           setUser(data.user);
+        } else {
+          // Default directly to Demo Mode if user is not logged in
+          sessionStorage.setItem("taskwai_bigboss_is_demo", "true");
+          setUser({
+            email: "demo_bigboss@taskwai.com",
+            uid: "demo_bigboss",
+            isDemo: true
+          });
+          setBranches(MOCK_DEMO_BRANCHES);
+          setLoading(false);
         }
       } catch (err) {
         console.error(err);
+        sessionStorage.setItem("taskwai_bigboss_is_demo", "true");
+        setUser({
+          email: "demo_bigboss@taskwai.com",
+          uid: "demo_bigboss",
+          isDemo: true
+        });
+        setBranches(MOCK_DEMO_BRANCHES);
+        setLoading(false);
       } finally {
         setAuthInitialized(true);
       }
@@ -166,22 +186,19 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             callback: handleGoogleLoginResponse
           });
           
-          const buttonId = user?.isDemo 
-            ? "bigboss-header-google-signin-button" 
-            : "bigboss-login-google-signin-button";
-            
-          const element = document.getElementById(buttonId);
+          const element = document.getElementById("bigboss-header-google-signin-button");
           if (element) {
+            element.innerHTML = "";
             google.accounts.id.renderButton(element, { 
               theme: isDark ? "dark" : "outline", 
-              size: user?.isDemo ? "medium" : "large", 
-              width: user?.isDemo ? 170 : 250,
+              size: "medium", 
+              width: 170,
               shape: "pill",
               text: "signin_with"
             });
           }
         }
-      }, 0);
+      }, 50);
       return () => clearTimeout(timer);
     }
   }, [authInitialized, user, isDark]);
@@ -426,7 +443,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
         <div className="space-y-1">
           <button
             type="button"
-            onClick={() => window.location.href = "/"}
+            onClick={() => setActiveTab("dashboard")}
             className="flex items-center gap-1 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors cursor-pointer bg-transparent border-0 p-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
