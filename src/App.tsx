@@ -74,7 +74,7 @@ function safeLazy<T extends ComponentType<any>>(
 const InputProfit = safeLazy(() => import("./components/InputProfit"));
 const Biaya = safeLazy(() => import("./components/Biaya"));
 const Laporan = safeLazy(() => import("./components/Laporan"));
-const Target = safeLazy(() => import("./components/Target"));
+const Target = safeLazy(() => import("./components/SettingsPanel"));
 const AdminConsole = safeLazy(() => import("./components/AdminConsole"));
 const BigBoss = safeLazy(() => import("./components/BigBoss"));
 

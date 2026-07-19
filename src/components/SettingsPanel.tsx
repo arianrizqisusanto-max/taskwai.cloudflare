@@ -16,7 +16,7 @@ interface TargetProps {
   onResetAll: () => Promise<void>;
 }
 
-export default function Target({ restaurant, onSaveRestaurant, onSaveStaffCredentials, onToggleStaffActive, userEmail, onResetAll }: TargetProps) {
+export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaffCredentials, onToggleStaffActive, userEmail, onResetAll }: TargetProps) {
   const { showToast } = useToast();
   const { lang, setLang, t, currency, setCurrency, currencySymbol } = useTranslation();
   const [name, setName] = useState(restaurant.name);

@@ -171,7 +171,7 @@ export default function Navbar({
         import("./Laporan");
         break;
       case "target":
-        import("./Target");
+        import("./SettingsPanel");
         break;
       case "admin":
         import("./AdminConsole");
