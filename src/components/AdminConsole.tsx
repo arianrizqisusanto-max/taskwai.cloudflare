@@ -70,11 +70,16 @@ export default function AdminConsole() {
     <div className="max-w-md mx-auto space-y-6 animate-in fade-in duration-300">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-6 h-6 text-emerald-500" />
-          <h1 className="font-sans font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-50">
-            Admin Console
-          </h1>
+        <div className="flex items-start gap-2.5">
+          <ShieldCheck className="w-6 h-6 text-emerald-500 mt-0.5" />
+          <div>
+            <h1 className="font-sans font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight">
+              Admin Console
+            </h1>
+            <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 tracking-wide">
+              Dashboard CEO Mr Arian Rizqi Susanto
+            </p>
+          </div>
         </div>
         <button
           onClick={() => fetchStats(true)}
