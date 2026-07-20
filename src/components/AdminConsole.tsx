@@ -6,6 +6,8 @@ import { useToast } from "./Toast";
 interface SystemStats {
   totalRestaurants: number;
   activeTodayCount: number;
+  totalBigBoss?: number;
+  activeBigBoss?: number;
 }
 
 export default function AdminConsole() {
@@ -59,6 +61,10 @@ export default function AdminConsole() {
   const total = stats?.totalRestaurants || 0;
   const active = stats?.activeTodayCount || 0;
   const engagementRate = total > 0 ? ((active / total) * 100).toFixed(1) : "0.0";
+
+  const totalBB = stats?.totalBigBoss || 0;
+  const activeBB = stats?.activeBigBoss || 0;
+  const bbEngagement = totalBB > 0 ? ((activeBB / totalBB) * 100).toFixed(1) : "0.0";
 
   return (
     <div className="max-w-md mx-auto space-y-6 animate-in fade-in duration-300">
@@ -117,6 +123,45 @@ export default function AdminConsole() {
             <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Keaktifan</span>
             <span className="font-mono text-lg font-black text-zinc-950 dark:text-white block mt-0.5">
               {engagementRate}%
+            </span>
+          </div>
+        </div>
+
+        {/* Total Big Boss */}
+        <div className="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col gap-2">
+          <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 self-start">
+            <Store className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Total Big Boss</span>
+            <span className="font-mono text-lg font-black text-zinc-950 dark:text-white block mt-0.5">
+              {totalBB}
+            </span>
+          </div>
+        </div>
+
+        {/* Active Big Boss */}
+        <div className="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col gap-2">
+          <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 self-start">
+            <Activity className="w-4 h-4 animate-pulse" />
+          </div>
+          <div>
+            <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Big Boss Aktif</span>
+            <span className="font-mono text-lg font-black text-zinc-950 dark:text-white block mt-0.5">
+              {activeBB}
+            </span>
+          </div>
+        </div>
+
+        {/* Engagement Big Boss */}
+        <div className="p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col gap-2">
+          <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 self-start">
+            <TrendingUp className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Keaktifan BB</span>
+            <span className="font-mono text-lg font-black text-zinc-950 dark:text-white block mt-0.5">
+              {bbEngagement}%
             </span>
           </div>
         </div>

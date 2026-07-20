@@ -507,6 +507,8 @@ export const DataService = {
   async getSystemStats(todayStr: string): Promise<{
     totalRestaurants: number;
     activeTodayCount: number;
+    totalBigBoss?: number;
+    activeBigBoss?: number;
   }> {
     try {
       const res = await fetch(`/api/restaurant/stats?today=${todayStr}`);
@@ -520,7 +522,9 @@ export const DataService = {
 
       return {
         totalRestaurants: localRest ? 1 : 0,
-        activeTodayCount: (localRest && hasToday) ? 1 : 0
+        activeTodayCount: (localRest && hasToday) ? 1 : 0,
+        totalBigBoss: 0,
+        activeBigBoss: 0
       };
     }
   },

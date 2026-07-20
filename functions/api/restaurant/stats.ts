@@ -21,9 +21,14 @@ export async function onRequest(context: any): Promise<Response> {
       'SELECT COUNT(DISTINCT restaurantId) as count FROM daily_profits WHERE date = ?'
     ).bind(todayStr).first();
 
+    const totalBigBossRes = await db.prepare("SELECT COUNT(*) as count FROM owners WHERE accountType = 'bigboss'").first();
+    const activeBigBossRes = await db.prepare("SELECT COUNT(DISTINCT bossOwnerId) as count FROM bigboss_links").first();
+
     return jsonResponse({
       totalRestaurants: totalRes ? totalRes.count : 0,
-      activeTodayCount: activeRes ? activeRes.count : 0
+      activeTodayCount: activeRes ? activeRes.count : 0,
+      totalBigBoss: totalBigBossRes ? totalBigBossRes.count : 0,
+      activeBigBoss: activeBigBossRes ? activeBigBossRes.count : 0
     });
   } catch (e: any) {
     return jsonResponse({ error: 'Failed to fetch stats', message: e.message }, 500);
