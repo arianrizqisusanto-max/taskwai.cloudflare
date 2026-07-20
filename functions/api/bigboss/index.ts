@@ -153,6 +153,11 @@ export async function onRequest(context: any): Promise<Response> {
         VALUES (?, ?, ?, ?)
       `).bind(linkId, bossOwnerId, restaurant.id, nowStr).run();
 
+      // Mark owner as bigboss accountType
+      await db.prepare(
+        "UPDATE owners SET accountType = 'bigboss' WHERE id = ?"
+      ).bind(bossOwnerId).run();
+
       // Expire authorization code immediately after use for security
       await db.prepare(
         'UPDATE restaurants SET authCode = NULL, authCodeExpiresAt = NULL WHERE id = ?'
