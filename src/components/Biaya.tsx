@@ -212,7 +212,7 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
                   1. <strong>{t("biaya.notePoint1Title", "Biaya Bulanan:")}</strong> {t("biaya.rentNotice", "Semua nilai di bawah adalah pengeluaran per bulan. Jika ada biaya tahunan (seperti sewa tempat tahunan), silakan dibagi 12 terlebih dahulu sebelum diinput.")}
                 </p>
                 <p className="pt-2 border-t border-zinc-200/20 dark:border-zinc-800/40">
-                  2. <strong>{t("biaya.notePoint2Title", "Penting untuk Multi-Cabang:")}</strong> {t("biaya.branchNotice", "Jika Anda ingin performa detail per cabang maka Anda harus mempunyai 1 akun tiap cabangnya (1 akun - 1 cabang) dan Anda bisa melihat performa tiap cabang di ")}
+                  2. <strong>{t("biaya.notePoint2Title", "Penting untuk Multi-Cabang:")}</strong> {t("biaya.branchNotice", "Jika Anda ingin melihat performa detail per cabang, maka Anda harus mempunyai 1 akun untuk tiap cabangnya (1 akun = 1 cabang), dan Anda bisa melihat rangkuman performa seluruh cabang di ")}
                   <button
                     type="button"
                     onClick={() => window.open("/bigboss", "_blank")}

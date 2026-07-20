@@ -133,7 +133,7 @@ export const enTranslations: Record<string, string> = {
   "biaya.noteTitle": "Important: Cost Rules & Multi-Branch Guide",
   "biaya.notePoint1Title": "Monthly Expenses:",
   "biaya.notePoint2Title": "Important for Multi-Branch:",
-  "biaya.branchNotice": "If you want detailed performance per branch, you must have 1 account for each branch (1 account - 1 branch) and you can view the performance of each branch in the ",
+  "biaya.branchNotice": "If you want to see detailed performance for each branch, then you must have 1 account for each branch (1 account = 1 branch), and you can view the summary performance of all branches in the ",
   "biaya.accessBigBossLink": "Dashboard Big Boss",
   "biaya.total": "Total",
   "biaya.sewa": "Rent / Place",
