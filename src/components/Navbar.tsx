@@ -147,6 +147,9 @@ export default function Navbar({
         setUser(null);
         showToast(t("nav.logoutSuccess", "Berhasil keluar."), "info");
       }
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("taskwai_active_tab");
+      }
       setActiveTab("dashboard");
     } catch (error) {
       console.error("Logout error:", error);

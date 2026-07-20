@@ -372,7 +372,9 @@ function MainApp() {
     }
 
     if (activeTab === "admin" && authInitialized) {
-      return <AdminConsole />;
+      if (user?.email === "arianrisqi@gmail.com") {
+        return <AdminConsole />;
+      }
     }
 
     if (!authInitialized || loading || !restaurant || !expenses) {
@@ -425,7 +427,16 @@ function MainApp() {
           />
         );
       case "admin":
-        return <AdminConsole />;
+        if (user?.email === "arianrisqi@gmail.com") {
+          return <AdminConsole />;
+        }
+        return (
+          <Dashboard 
+            restaurant={restaurant} 
+            profits={profits} 
+            expenses={expenses} 
+          />
+        );
       default:
         return (
           <Dashboard 
