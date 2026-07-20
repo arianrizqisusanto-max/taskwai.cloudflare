@@ -18,7 +18,7 @@ export default defineConfig(() => {
             // Charting library — only needed by Dashboard & Laporan
             recharts: ['recharts'],
             // PDF generation — only needed when user exports reports
-            pdf: ['jspdf', 'jspdf-autotable', 'html2canvas'],
+            pdf: ['jspdf', 'jspdf-autotable'],
             // Animation engine
             motion: ['motion'],
           },
