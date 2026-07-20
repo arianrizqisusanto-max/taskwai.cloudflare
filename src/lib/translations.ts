@@ -9,6 +9,9 @@ export const enTranslations: Record<string, string> = {
   "nav.demoMode": "Demo Mode",
   "nav.login": "Login",
   "nav.logout": "Logout",
+  "nav.loginSuccess": "Successfully logged in with Google account!",
+  "nav.loginSuccessStaff": "Successfully logged in as Staff!",
+  "nav.logoutSuccess": "Successfully logged out.",
   "nav.logoutTitle": "Confirm Logout",
   "nav.logoutConfirmText": "Are you sure you want to log out of your account?",
   "nav.cancel": "Cancel",
@@ -317,6 +320,9 @@ export const enTranslations: Record<string, string> = {
   "bigboss.outletUnit": "Outlets",
   "bigboss.loginModalTitle": "Login to Big Boss",
   "bigboss.loginModalDesc": "To link and monitor your real restaurant branches, please log in with your Google account first.",
+  "bigboss.loginSuccess": "Successfully logged into Big Boss dashboard!",
+  "bigboss.errorWrongType": "This account is already registered as a regular Taskwai account. Please use another email to register as Big Boss.",
+  "nav.errorWrongType": "This account is registered exclusively as Big Boss. It cannot be used for regular Taskwai branches.",
   "target.bigbossAuthTitle": "Big Boss Authorization Code",
   "target.bigbossAuthDesc": "Generate an authorization code below, then enter it on the Big Boss page to link this branch.",
   "target.generateCode": "Get Authorization Code",
@@ -327,8 +333,6 @@ export const enTranslations: Record<string, string> = {
   "target.frozenDesc2": "This account cannot be linked to any other Big Boss.",
   "target.frozenHint": "💡 To release this lock (unlock), please unlink it from your monitoring Big Boss dashboard.",
   "target.codeWarning": "⚠️ Code is valid for 15 minutes. Enter this code in the Big Boss menu on your monitoring account.",
-  "bigboss.errorWrongType": "This account is already registered as a regular Taskwai account. Please use another email for Big Boss.",
-  "nav.errorWrongType": "This account is registered exclusively as Big Boss. It cannot be used for regular Taskwai branches.",
 
   // --- About Modal ---
   "about.title": "About Taskwai",

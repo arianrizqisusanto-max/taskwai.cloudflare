@@ -118,7 +118,7 @@ export default function Navbar({
       setStaffSession(sessionData);
       localStorage.setItem("taskwai_staff_session", JSON.stringify(sessionData));
       
-      showToast("Berhasil masuk sebagai Staff!", "success");
+      showToast(t("nav.loginSuccessStaff", "Berhasil masuk sebagai Staff!"), "success");
       setShowLoginModal(false);
       setStaffUsernameInput("");
       setStaffPasswordInput("");

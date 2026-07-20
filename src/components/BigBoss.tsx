@@ -177,7 +177,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       const data = await DataService.loginGoogle(idToken, 'bigboss');
       sessionStorage.removeItem("taskwai_bigboss_is_demo");
       setUser(data.user);
-      showToast("Berhasil masuk ke dasbor Big Boss!", "success");
+      showToast(t("bigboss.loginSuccess", "Berhasil masuk ke dasbor Big Boss!"), "success");
     } catch (error: any) {
       console.error("Login error:", error);
       const errMsg = error?.message || "";
