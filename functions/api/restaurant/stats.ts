@@ -17,9 +17,13 @@ export async function onRequest(context: any): Promise<Response> {
     const todayStr = url.searchParams.get('today') || new Date().toISOString().split('T')[0];
     
     const totalRes = await db.prepare('SELECT COUNT(*) as count FROM restaurants').first();
-    const activeRes = await db.prepare(
-      'SELECT COUNT(DISTINCT restaurantId) as count FROM daily_profits WHERE date = ?'
-    ).bind(todayStr).first();
+    const activeRes = await db.prepare(`
+      SELECT COUNT(DISTINCT restaurantId) as count FROM (
+        SELECT restaurantId FROM daily_profits WHERE date = ?
+        UNION
+        SELECT restaurantId FROM sessions WHERE createdAt LIKE ? || '%'
+      )
+    `).bind(todayStr, todayStr).first();
 
     const totalBigBossRes = await db.prepare("SELECT COUNT(DISTINCT id) as count FROM owners WHERE accountType = 'bigboss' OR id IN (SELECT bossOwnerId FROM bigboss_links)").first();
     const activeBigBossRes = await db.prepare("SELECT COUNT(DISTINCT bossOwnerId) as count FROM bigboss_links").first();
