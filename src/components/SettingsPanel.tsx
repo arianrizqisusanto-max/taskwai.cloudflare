@@ -742,7 +742,7 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
                 
                 {/* Math Challenge for safety confirmation */}
                 <div className="w-full mt-4 p-3.5 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/80 rounded-2xl text-left space-y-2">
-                  <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-wider block">
+                  <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-400 uppercase tracking-wider block">
                     {t("target.mathQuestionLabel", "Pertanyaan Keamanan (Jawab untuk mengonfirmasi):")}
                   </label>
                   <div className="flex items-center gap-3">
@@ -755,9 +755,25 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
                       value={mathAnswerInput}
                       onChange={(e) => setMathAnswerInput(e.target.value)}
                       placeholder={t("target.mathQuestionPlaceholder", "Jawab...")}
-                      className="w-full px-3 py-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-lg text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
+                      className={`w-full px-3 py-1.5 bg-zinc-50 dark:bg-zinc-950 border rounded-lg text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none transition-all font-mono ${
+                        mathAnswerInput
+                          ? Number(mathAnswerInput) === mathQuestion.ans
+                            ? "border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/20 dark:bg-emerald-950/20"
+                            : "border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/20 dark:bg-rose-950/20"
+                          : "border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300"
+                      }`}
                     />
                   </div>
+                  {mathAnswerInput !== "" && Number(mathAnswerInput) !== mathQuestion.ans && (
+                    <p className="text-[10px] font-bold text-rose-500 dark:text-rose-400 mt-1">
+                      ⚠️ Hasil {mathQuestion.q} adalah {mathQuestion.ans} (Anda memasukkan {mathAnswerInput})
+                    </p>
+                  )}
+                  {mathAnswerInput !== "" && Number(mathAnswerInput) === mathQuestion.ans && (
+                    <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+                      ✓ Jawaban Benar! Tombol "Ya, Reset Total" sekarang menyala.
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex gap-2.5 w-full mt-6">
@@ -781,7 +797,11 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
                       }
                     }}
                     disabled={isResetting || Number(mathAnswerInput) !== mathQuestion.ans}
-                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-zinc-100 dark:disabled:bg-zinc-850 disabled:text-zinc-400 dark:disabled:text-zinc-500 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm shadow-red-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all border-0 shadow-sm ${
+                      !isResetting && Number(mathAnswerInput) === mathQuestion.ans
+                        ? "bg-red-600 hover:bg-red-700 text-white cursor-pointer shadow-red-600/20 animate-pulse"
+                        : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 opacity-50 cursor-not-allowed"
+                    }`}
                   >
                     {isResetting ? "Mereset..." : t("target.resetConfirmButton", "Ya, Reset Total")}
                   </button>
