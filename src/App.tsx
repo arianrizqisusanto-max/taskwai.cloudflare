@@ -148,7 +148,7 @@ function MainApp() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      console.log("Taskwai Init Version 1.0.5-cache-bust-fixed");
+      console.log("Taskwai Init Version 1.0.6-strict-data-sync");
       try {
         const data = await DataService.getMe();
         if (data.user) {
@@ -170,14 +170,14 @@ function MainApp() {
     checkAuth();
   }, []);
 
-  // 2. Fetch data based on User Session (Real D1 vs Demo vs Staff)
+  // 2. Fetch data based on User Session (Real D1 vs Demo vs Staff) with Auto-Revalidation
   useEffect(() => {
     if (!authInitialized || activeTab === "bigboss") {
       if (activeTab === "bigboss") setLoading(false);
       return;
     }
 
-    const fetchData = async () => {
+    const fetchData = async (isBackground = false) => {
       if (user?.email === "arianrisqi@gmail.com") {
         setLoading(false);
         return;
@@ -186,7 +186,7 @@ function MainApp() {
       const userId = staffSession ? staffSession.ownerId : (user ? user.uid : "demo");
 
       // Only trigger full screen loading (Skeleton) if user account changed or initial load
-      if (lastUserId.current !== userId) {
+      if (!isBackground && lastUserId.current !== userId) {
         setLoading(true);
       }
       lastUserId.current = userId;
@@ -207,18 +207,48 @@ function MainApp() {
 
       } catch (err) {
         console.error("Error loading Taskwai data:", err);
-        showToast("Ada masalah memuat data. Menggunakan cadangan lokal.", "warning");
+        if (!isBackground) {
+          showToast("Ada masalah memuat data. Menggunakan cadangan lokal.", "warning");
+        }
       } finally {
-        setLoading(false);
+        if (!isBackground) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
 
+    // Revalidate data whenever the tab/window becomes active or focused again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchData(true);
+      }
+    };
+    const handleFocus = () => {
+      fetchData(true);
+    };
+
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    // Auto polling every 60s when tab is active to ensure data is synced
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchData(true);
+      }
+    }, 60000);
+
     // If staff session is active, lock tab to "input"
     if (staffSession) {
       setActiveTab("input");
     }
+
+    return () => {
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+      clearInterval(interval);
+    };
   }, [user, authInitialized, staffSession, expensesMonth]);
 
   // 3. Handlers for database updates

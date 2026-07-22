@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import TaskwaiLogo from "./TaskwaiLogo";
+import { calculateTotalExpenses } from "../lib/financialMath";
 
 interface BranchData {
   id: string;
@@ -128,17 +129,19 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
   const formatLocale = currency === "dollar" ? "en-US" : "id-ID";
 
-  const fetchBranches = async () => {
-    setLoading(true);
+  const fetchBranches = async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
     try {
       const data = await DataService.getBigBossBranches();
       setBranches(data.branches || []);
       setLastUpdated(new Date());
     } catch (err: any) {
       console.error(err);
-      showToast("Gagal memuat data cabang gabungan.", "error");
+      if (!isBackground) {
+        showToast("Gagal memuat data cabang gabungan.", "error");
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
@@ -252,6 +255,31 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   useEffect(() => {
     if (user && !user.isDemo) {
       fetchBranches();
+
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          fetchBranches(true);
+        }
+      };
+      const handleFocus = () => {
+        fetchBranches(true);
+      };
+
+      window.addEventListener("visibilitychange", handleVisibilityChange);
+      window.addEventListener("focus", handleFocus);
+
+      // Auto poll every 45s for Big Boss branch statistics
+      const interval = setInterval(() => {
+        if (document.visibilityState === "visible") {
+          fetchBranches(true);
+        }
+      }, 45000);
+
+      return () => {
+        window.removeEventListener("visibilitychange", handleVisibilityChange);
+        window.removeEventListener("focus", handleFocus);
+        clearInterval(interval);
+      };
     }
   }, [user]);
 
@@ -1149,10 +1177,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         });
                       }
 
-                      const totalBiaya = 
-                        (item.sewaTempat || 0) + (item.gajiKaryawan || 0) + (item.royaltiFranchise || 0) +
-                        (item.listrik || 0) + (item.air || 0) + (item.internet || 0) + 
-                        (item.marketing || 0) + (item.pajak || 0) + (item.biayaLain || 0) + (item.cicilanBank || 0);
+                      const totalBiaya = calculateTotalExpenses(item);
 
                       return (
                         <div key={item.id} className="bg-zinc-50 dark:bg-zinc-950/40 p-3 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60">

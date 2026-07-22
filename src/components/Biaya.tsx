@@ -5,6 +5,7 @@ import { Landmark, Save, Calculator, HelpCircle, CheckCircle } from "lucide-reac
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
+import { calculateTotalExpenses } from "../lib/financialMath";
 
 interface BiayaProps {
   expenses: Expenses;
@@ -77,8 +78,18 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
   const valCicilan = parseValue(cicilanBank);
   const valLain = parseValue(biayaLain);
 
-  const totalBiaya = 
-    valSewa + valGaji + valFranchise + valListrik + valAir + valInternet + valMarketing + valPajak + valCicilan + valLain;
+  const totalBiaya = calculateTotalExpenses({
+    sewaTempat: valSewa,
+    gajiKaryawan: valGaji,
+    royaltiFranchise: valFranchise,
+    listrik: valListrik,
+    air: valAir,
+    internet: valInternet,
+    marketing: valMarketing,
+    pajak: valPajak,
+    cicilanBank: valCicilan,
+    biayaLain: valLain
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

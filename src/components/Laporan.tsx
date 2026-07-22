@@ -8,6 +8,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useTranslation } from "../lib/LanguageContext";
 
+import { calculateDailyProfitBreakdown } from "../lib/financialMath";
+
 interface LaporanProps {
   profits: DailyProfit[];
   restaurant: Restaurant | null;
@@ -50,11 +52,14 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
 
   // Calculate statistics
   const totalDays = filteredProfits.length;
-  const totalProfit = filteredProfits.reduce((acc, curr) => acc + curr.profit, 0);
-  const averageProfit = totalDays > 0 ? totalProfit / totalDays : 0;
+  const totalProfit = filteredProfits.reduce((acc, curr) => {
+    const breakdown = calculateDailyProfitBreakdown(curr);
+    return acc + breakdown.netProfit;
+  }, 0);
+  const averageProfit = totalDays > 0 ? Math.round(totalProfit / totalDays) : 0;
   
-  const maxProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => b.profit - a.profit)[0] : null;
-  const minProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => a.profit - b.profit)[0] : null;
+  const maxProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => calculateDailyProfitBreakdown(b).netProfit - calculateDailyProfitBreakdown(a).netProfit)[0] : null;
+  const minProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => calculateDailyProfitBreakdown(a).netProfit - calculateDailyProfitBreakdown(b).netProfit)[0] : null;
 
   const handleExportPDF = () => {
     if (filteredProfits.length === 0) {

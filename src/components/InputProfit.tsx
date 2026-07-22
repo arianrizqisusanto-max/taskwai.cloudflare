@@ -12,6 +12,7 @@ interface StaffLocalHistoryItem {
   omzet: number;
   branch: string;
   submittedAt: string;
+  synced?: boolean;
 }
 
 interface InputProfitProps {
@@ -178,7 +179,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
             date: date,
             omzet: omzetVal,
             branch: branchInput.trim() || "-",
-            submittedAt: `${tglInput} ${jamMenit}`
+            submittedAt: `${tglInput} ${jamMenit}`,
+            synced: true
           };
           
           const savedHistory = localStorage.getItem("taskwai_staff_local_history");
@@ -593,9 +595,16 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
               {staffLocalHistory.map((item) => (
                 <div key={item.id} className="flex justify-between items-center text-[11px] py-1.5 px-2.5 bg-zinc-50/50 dark:bg-zinc-950/25 border border-zinc-100 dark:border-zinc-800/40 rounded-xl">
                   <div className="flex flex-col">
-                    <span className="font-extrabold text-zinc-800 dark:text-zinc-200">
-                      {formatRupiah(item.omzet)}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-extrabold text-zinc-800 dark:text-zinc-200">
+                        {formatRupiah(item.omzet)}
+                      </span>
+                      {item.synced !== false && (
+                        <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded-md">
+                          ✓ Terkirim ke Cloud
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-semibold mt-0.5">
                       Cabang: <span className="font-bold text-zinc-650 dark:text-zinc-400">{item.branch}</span>
                     </span>

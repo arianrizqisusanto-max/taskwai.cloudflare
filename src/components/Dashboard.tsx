@@ -6,6 +6,8 @@ import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, Arrow
 import { motion } from "motion/react";
 import { useTranslation } from "../lib/LanguageContext";
 
+import { calculateTotalExpenses, calculateMonthlySummary } from "../lib/financialMath";
+
 interface DashboardProps {
   restaurant: Restaurant;
   profits: DailyProfit[];
@@ -21,58 +23,34 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   const currentDateNum = today.getDate();
   const todayStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(currentDateNum).padStart(2, "0")}`;
 
-  // Number of days in current month
-  const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  
-  // Hari Tersisa (including today or starting tomorrow)
-  // Let's count remaining days starting tomorrow (besok):
-  const daysRemaining = Math.max(1, totalDaysInMonth - currentDateNum);
+  const summary = calculateMonthlySummary(
+    profits,
+    expenses,
+    restaurant.monthlyTargetProfit,
+    currentYear,
+    currentMonth,
+    currentDateNum
+  );
 
-  // 2. Filter profits of the CURRENT month only for calculations
-  const currentMonthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
-  const currentMonthProfits = profits.filter(p => p.date.startsWith(currentMonthPrefix));
+  const {
+    monthProfits: currentMonthProfits,
+    totalProfitMonth,
+    totalExpenses,
+    remainingTarget,
+    progressPercent,
+    averageDailyProfit,
+    predictionProfit,
+    targetDailyProfitTomorrow,
+    daysRemaining,
+    totalDaysInMonth
+  } = summary;
 
   // Profit Hari Ini (Sum of all branch profits logged today)
   const todayEntries = currentMonthProfits.filter(p => p.date === todayStr);
   const profitToday = todayEntries.reduce((acc, curr) => acc + curr.profit, 0);
 
-  // Profit Bulan Ini (Sum of daily profits)
-  const totalProfitMonth = currentMonthProfits.reduce((acc, curr) => acc + curr.profit, 0);
-
-  // Total Fixed Expenses (Biaya Tetap)
-  const totalExpenses = 
-    expenses.sewaTempat +
-    expenses.gajiKaryawan +
-    expenses.royaltiFranchise +
-    expenses.listrik +
-    expenses.air +
-    expenses.internet +
-    expenses.marketing +
-    expenses.pajak +
-    (expenses.cicilanBank || 0) +
-    expenses.biayaLain;
-
   // Target Profit Bulanan (Laba Bersih yang diinginkan owner)
   const targetProfit = restaurant.monthlyTargetProfit;
-
-  // Sisa Target
-  const remainingTarget = Math.max(0, targetProfit - totalProfitMonth);
-
-  // Progress Percentage
-  const progressPercent = targetProfit > 0 ? Math.min(100, Math.round((totalProfitMonth / targetProfit) * 100)) : 0;
-
-  // Average Daily Profit based on unique days logged so far (handles multiple branches on same date)
-  const uniqueDaysEntered = new Set(currentMonthProfits.map(p => p.date)).size;
-  const averageDailyProfitActive = uniqueDaysEntered > 0 ? totalProfitMonth / uniqueDaysEntered : 0;
-
-  // Rata-rata harian berdasarkan jumlah hari kalender yang telah berjalan untuk proyeksi yang realistis
-  const averageDailyProfit = currentDateNum > 0 ? totalProfitMonth / currentDateNum : 0;
-
-  // Prediksi Profit Akhir Bulan (menggunakan rata-rata kalender berjalan)
-  const predictionProfit = averageDailyProfit * totalDaysInMonth;
-
-  // Target Profit Harian Mulai Besok
-  const targetDailyProfitTomorrow = remainingTarget > 0 ? remainingTarget / daysRemaining : 0;
 
   // 3. Status Bisnis Definition
   // Amazing: Prediksi >= Target * 1.5
