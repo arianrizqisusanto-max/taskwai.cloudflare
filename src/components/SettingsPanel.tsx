@@ -629,14 +629,50 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
 
       {/* Big Boss Authorization Section */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <Key className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-          <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-            {t("target.bigbossAuthTitle", "Otorisasi Big Boss")}
-          </h3>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Key className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+              {t("target.bigbossAuthTitle", "Otorisasi Big Boss")}
+            </h3>
+          </div>
+          <a
+            href="/bigboss"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60 transition-all shrink-0"
+          >
+            <span>Buka Dashboard Big Boss ↗</span>
+          </a>
         </div>
         <p className="text-xs text-zinc-550 dark:text-zinc-400 mb-5 leading-relaxed font-semibold">
-          {t("target.bigbossAuthDesc", "Dapatkan kode otorisasi untuk menghubungkan cabang ini ke dasbor Big Boss Anda.")}
+          {lang === "en" ? (
+            <>
+              You can monitor multiple restaurant branches in one place. Get the code below, then paste it into the{" "}
+              <a
+                href="/bigboss"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-extrabold text-emerald-600 dark:text-emerald-400 underline underline-offset-2 hover:text-emerald-700 dark:hover:text-emerald-300"
+              >
+                Big Boss Dashboard
+              </a>{" "}
+              to link and monitor this branch.
+            </>
+          ) : (
+            <>
+              Anda bisa memantau beberapa cabang sekaligus dengan otorisasi Big Boss. Salin kode di bawah ini, lalu masukkan ke dalam{" "}
+              <a
+                href="/bigboss"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-extrabold text-emerald-600 dark:text-emerald-400 underline underline-offset-2 hover:text-emerald-700 dark:hover:text-emerald-300"
+              >
+                Dashboard Big Boss
+              </a>{" "}
+              untuk menghubungkan dan memantau cabang ini.
+            </>
+          )}
         </p>
 
         {isLoadingAuthStatus ? (
