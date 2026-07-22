@@ -82,6 +82,9 @@ export function calculateMonthlySummary(
 
   const progressPercent = target > 0 ? Math.min(100, Math.round((totalProfitMonth / target) * 100)) : 0;
 
+  const uniqueDaysEntered = new Set(monthProfits.map(p => p.date)).size;
+  const averageDailyProfitActive = uniqueDaysEntered > 0 ? Math.round(totalProfitMonth / uniqueDaysEntered) : 0;
+
   const averageDailyProfit = currentDateNum > 0 ? Math.round(totalProfitMonth / currentDateNum) : 0;
   const predictionProfit = Math.round(averageDailyProfit * totalDaysInMonth);
   const targetDailyProfitTomorrow = remainingTarget > 0 ? Math.round(remainingTarget / daysRemaining) : 0;
@@ -93,6 +96,7 @@ export function calculateMonthlySummary(
     remainingTarget,
     progressPercent,
     averageDailyProfit,
+    averageDailyProfitActive,
     predictionProfit,
     targetDailyProfitTomorrow,
     daysRemaining,

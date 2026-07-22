@@ -39,6 +39,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
     remainingTarget,
     progressPercent,
     averageDailyProfit,
+    averageDailyProfitActive,
     predictionProfit,
     targetDailyProfitTomorrow,
     daysRemaining,
