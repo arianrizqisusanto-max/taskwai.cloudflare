@@ -337,9 +337,9 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             google.accounts.id.renderButton(element, { 
               theme: isDark ? "dark" : "outline", 
               size: "large", 
-              width: 250,
+              width: 280,
               shape: "pill",
-              text: "signin_with"
+              text: "continue_with"
             });
           }
         }
@@ -1073,18 +1073,21 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </p>
               </div>
 
-              {/* Google Sign-in Button */}
-              <div className="flex flex-col items-center justify-center py-1">
-                <div id="bigboss-modal-google-signin-button" className="shadow-sm rounded-full overflow-hidden border border-zinc-200/40 dark:border-zinc-850 bg-white dark:bg-zinc-900 flex items-center justify-center min-h-[44px]" />
+              {/* Google Sign-in Button with Prominent Guidance */}
+              <div className="flex flex-col items-center justify-center space-y-3 py-2">
+                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 animate-pulse">
+                  👇 Klik tombol Google di bawah ini untuk Masuk:
+                </span>
+                <div id="bigboss-modal-google-signin-button" className="shadow-md rounded-full overflow-hidden border-2 border-emerald-500/40 dark:border-emerald-500/50 bg-white dark:bg-zinc-900 flex items-center justify-center min-h-[46px] p-0.5" />
               </div>
 
               <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
                 <button
                   type="button"
                   onClick={() => setShowLoginModal(false)}
-                  className="w-full py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0"
+                  className="w-full py-2 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 font-semibold text-xs transition-colors cursor-pointer border-0 bg-transparent"
                 >
-                  {t("nav.cancel", "Batal")}
+                  Tutup / Batal
                 </button>
               </div>
             </motion.div>

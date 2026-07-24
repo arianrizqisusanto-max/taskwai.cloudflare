@@ -61,9 +61,9 @@ export default function Navbar({
             { 
               theme: isDark ? "dark" : "outline", 
               size: "large", 
-              width: 190,
+              width: 280,
               shape: "pill",
-              text: "signin_with"
+              text: "continue_with"
             }
           );
         }
@@ -611,7 +611,10 @@ export default function Navbar({
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
-                <div id="google-signin-button" className="py-2" style={{ minHeight: '44px', height: '44px', width: '190px', margin: '0 auto' }}></div>
+                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 animate-pulse">
+                  👇 Klik tombol Google di bawah ini untuk Masuk:
+                </span>
+                <div id="google-signin-button" className="py-1 shadow-md rounded-full overflow-hidden border-2 border-emerald-500/40 dark:border-emerald-500/50 bg-white dark:bg-zinc-900 flex items-center justify-center" style={{ minHeight: '46px', width: '280px', margin: '0 auto' }}></div>
               </div>
             ) : (
               <form onSubmit={handleStaffLoginSubmit} className="space-y-4">
