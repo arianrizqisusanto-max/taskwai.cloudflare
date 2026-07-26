@@ -611,10 +611,24 @@ export default function Navbar({
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
-                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 animate-pulse">
-                  👇 Klik tombol Google di bawah ini untuk Masuk:
-                </span>
-                <div id="google-signin-button" className="py-1 shadow-md rounded-full overflow-hidden border-2 border-emerald-500/40 dark:border-emerald-500/50 bg-white dark:bg-zinc-900 flex items-center justify-center" style={{ minHeight: '46px', width: '280px', margin: '0 auto' }}></div>
+                <div className="relative w-full max-w-[280px] mx-auto group">
+                  {/* Clean Visible Button UI */}
+                  <div className="w-full flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-800 text-zinc-800 dark:text-zinc-100 font-bold py-3 px-5 rounded-full border-2 border-zinc-200 dark:border-zinc-700 shadow-sm transition-all text-xs sm:text-sm select-none">
+                    <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                    </svg>
+                    <span>Masuk dengan Google</span>
+                  </div>
+
+                  {/* Transparent Google GSI Overlay */}
+                  <div 
+                    id="google-signin-button" 
+                    className="absolute inset-0 opacity-0 overflow-hidden cursor-pointer z-10 flex items-center justify-center pointer-events-auto"
+                  />
+                </div>
               </div>
             ) : (
               <form onSubmit={handleStaffLoginSubmit} className="space-y-4">
