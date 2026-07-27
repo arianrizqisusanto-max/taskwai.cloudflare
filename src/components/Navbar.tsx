@@ -103,6 +103,29 @@ export default function Navbar({
     }
   };
 
+  const handleTriggerNavbarGoogleLogin = () => {
+    const google = (window as any).google;
+    if (google?.accounts?.id) {
+      google.accounts.id.initialize({
+        client_id: (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || "888780289762-gpiud6mhos00kiljpgnk779tunli4ijr.apps.googleusercontent.com",
+        callback: handleGoogleLoginResponse,
+        auto_select: false
+      });
+      google.accounts.id.disableAutoSelect();
+
+      try {
+        google.accounts.id.prompt();
+      } catch (e) {
+        console.log("Prompt suppressed:", e);
+      }
+
+      const targetBtn = document.querySelector("#google-signin-button iframe, #google-signin-button div[role='button']") as HTMLElement;
+      if (targetBtn) {
+        targetBtn.click();
+      }
+    }
+  };
+
   const handleStaffLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!staffUsernameInput.trim() || !staffPasswordInput.trim()) {
@@ -611,7 +634,10 @@ export default function Navbar({
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[280px]">
                   Masuk sebagai Owner untuk memantau performa bisnis secara menyeluruh dan mengelola akses karyawan.
                 </p>
-                <div className="relative w-full max-w-[280px] mx-auto group">
+                <div 
+                  onClick={handleTriggerNavbarGoogleLogin}
+                  className="relative w-full max-w-[280px] mx-auto group cursor-pointer"
+                >
                   {/* Clean Visible Button UI */}
                   <div className="w-full flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-800 text-zinc-800 dark:text-zinc-100 font-bold py-3 px-5 rounded-full border-2 border-zinc-200 dark:border-zinc-700 shadow-sm transition-all text-xs sm:text-sm select-none">
                     <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
