@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Restaurant } from "../types";
-import { formatRupiah } from "../lib/utils";
 import { DataService } from "../lib/dataService";
-import { Save, User, Store, Target as TargetIcon, ShieldCheck, Pencil, X, Lock, Trash2, AlertTriangle, Key, Copy, Globe, DollarSign, ChevronRight, Sparkles, Crown, UserCheck, CheckCircle2, ExternalLink } from "lucide-react";
+import { Save, User, Store, Target as TargetIcon, Pencil, X, Lock, Trash2, AlertTriangle, Key, Copy, Sparkles, Crown, UserCheck, CheckCircle2, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
@@ -56,7 +55,6 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
 
   // Big Boss states
   const [authCode, setAuthCode] = useState<string>("");
-  const [authCodeExpiry, setAuthCodeExpiry] = useState<string>("");
   const [isGeneratingCode, setIsGeneratingCode] = useState<boolean>(false);
   const [codeCopied, setCodeCopied] = useState<boolean>(false);
   const [isFrozen, setIsFrozen] = useState<boolean>(false);
@@ -72,7 +70,6 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
           setBossInfo({ bossName: data.bossName, bossEmail: data.bossEmail });
         } else if (data.code) {
           setAuthCode(data.code);
-          setAuthCodeExpiry(data.expiresAt || "");
         }
       } catch (err) {
         console.error(err);
@@ -88,7 +85,6 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
     try {
       const res = await DataService.generateBigBossCode();
       setAuthCode(res.code);
-      setAuthCodeExpiry(res.expiresAt);
       setCodeCopied(false);
       showToast("Kode otorisasi berhasil dibuat!", "success");
     } catch (err: any) {
