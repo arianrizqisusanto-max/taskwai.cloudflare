@@ -224,25 +224,25 @@ export default function Navbar({
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-zinc-100 dark:border-zinc-800/80 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.25)] transition-colors duration-300">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Logo */}
           <button
             onClick={() => setShowAboutModal(true)}
-            className="flex items-center gap-3 text-left focus:outline-none hover:opacity-85 active:scale-95 transition-all cursor-pointer group"
+            className="flex items-center gap-2.5 text-left focus:outline-none hover:opacity-85 active:scale-95 transition-all cursor-pointer group"
           >
             <div className="relative">
-              <TaskwaiLogo size={36} />
-              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <TaskwaiLogo size={32} />
+              <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="font-sans font-black text-base tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+              <span className="font-sans font-black text-[15px] tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-none">
                 taskwai
-                <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                <Sparkles className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
               </span>
-              <span className="hidden sm:inline text-[10px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase">{t("nav.profitDashboard", "Profit Dashboard")}</span>
+              <span className="hidden sm:inline text-[9px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider uppercase mt-0.5">{t("nav.profitDashboard", "Profit Dashboard")}</span>
             </div>
           </button>
 
@@ -257,7 +257,7 @@ export default function Navbar({
                    onClick={() => setActiveTab(item.id)}
                    onMouseEnter={() => handlePrefetch(item.id)}
                    onTouchStart={() => handlePrefetch(item.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                       isActive
                         ? "bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/40 font-black"
                         : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60"
@@ -271,22 +271,22 @@ export default function Navbar({
           </nav>
 
           {/* Auth Button and Badges */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             {/* Status Badge */}
             {!authInitialized ? (
-              <div className="hidden sm:block h-6 w-24 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-full animate-pulse" />
+              <div className="hidden sm:block h-5 w-20 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-full animate-pulse" />
             ) : staffSession ? (
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                <UserCheck className="w-3.5 h-3.5" />
+              <div className="hidden sm:flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[9px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                <UserCheck className="w-3 h-3" />
                 <span>Mode Karyawan</span>
               </div>
             ) : user ? (
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                <ShieldCheck className="w-3.5 h-3.5" />
+              <div className="hidden sm:flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-[9px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                <ShieldCheck className="w-3 h-3" />
                 <span>{t("nav.cloudSync", "Cloud Sync")}</span>
               </div>
             ) : (
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-[10px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider">
+              <div className="hidden sm:flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-[9px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wider">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
                 <span>{t("nav.demoMode", "Mode Demo")}</span>
               </div>
@@ -296,39 +296,39 @@ export default function Navbar({
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
+              className="p-1.5 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
               title={t("nav.refresh", "Muat Ulang")}
             >
-              <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} />
+              <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} />
             </button>
 
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDark}
-              className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
+              className="p-1.5 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
               title={isDark ? t("nav.lightMode", "Mode Terang") : t("nav.darkMode", "Mode Gelap")}
             >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
+              {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-zinc-500" />}
             </button>
 
             {!authInitialized ? (
-              <div className="h-9 w-20 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-xl animate-pulse" />
+              <div className="h-8 w-16 bg-zinc-200/60 dark:bg-zinc-800/60 rounded-lg animate-pulse" />
             ) : staffSession ? (
-              <div className="flex items-center gap-2 pl-1.5">
+              <div className="flex items-center gap-1.5 pl-1">
                 <div className="hidden xs:flex flex-col items-end leading-none">
-                  <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Akses</span>
-                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Staff</span>
+                  <span className="text-[8px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Akses</span>
+                  <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300">Staff</span>
                 </div>
                 <button
                   onClick={handleLogoutClick}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900/40 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
+                  className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900/40 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-3 h-3" />
                   <span className="hidden xs:inline">{t("nav.logout", "Keluar")}</span>
                 </button>
               </div>
             ) : user ? (
-              <div className="flex items-center gap-2 pl-1.5">
+              <div className="flex items-center gap-1.5 pl-1">
                 {photoURL && (
                   <div 
                     onClick={() => {
@@ -343,7 +343,7 @@ export default function Navbar({
                       src={photoURL}
                       alt={displayName || "Owner"}
                       referrerPolicy="no-referrer"
-                      className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all hover:ring-2 hover:ring-zinc-950/10 dark:hover:ring-white/10"
+                      className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-800 transition-all hover:ring-2 hover:ring-zinc-950/10 dark:hover:ring-white/10"
                     />
                     {/* Hover custom tooltip */}
                     <div className="absolute right-0 top-full mt-2 hidden group-hover:block bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 text-[10px] font-bold px-2.5 py-1.5 rounded-lg shadow-md whitespace-nowrap z-50">
@@ -353,18 +353,18 @@ export default function Navbar({
                 )}
                 <button
                   onClick={handleLogoutClick}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
+                  className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-lg border border-zinc-200/60 dark:border-zinc-800 transition-colors cursor-pointer bg-white dark:bg-zinc-900"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-3 h-3" />
                   <span className="hidden xs:inline">{t("nav.logout", "Keluar")}</span>
                 </button>
               </div>
             ) : (
               <button
                 onClick={() => setShowLoginModal(true)}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white dark:text-zinc-950 bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-950 dark:hover:bg-white rounded-xl transition-all shadow-sm cursor-pointer"
+                className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white dark:text-zinc-950 bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-950 dark:hover:bg-white rounded-lg transition-all shadow-sm cursor-pointer"
               >
-                <LogIn className="w-4 h-4" />
+                <LogIn className="w-3.5 h-3.5" />
                 <span>{t("nav.login", "Login")}</span>
               </button>
             )}
