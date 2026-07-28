@@ -261,13 +261,12 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
   const labelBase = "text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest block mb-1.5";
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-56px)] w-full">
 
-      {/* ═══════════════════════════ TOP GRID ═══════════════════════════ */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+      {/* ═══════════════════════════ LEFT COLUMN (Scrollable) ═══════════════════════════ */}
+      <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-7 space-y-5 lg:max-w-[62%]">
 
-        {/* ─── Left: Profil & Target ─── */}
-        <div className="lg:col-span-3 space-y-5">
+
 
           {/* Card: Profil & Target */}
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/70 dark:border-zinc-800 shadow-sm overflow-hidden">
@@ -581,10 +580,10 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
               </form>
             </div>
           </div>
-        </div>
+      </div>
 
-        {/* ─── Right Column ─── */}
-        <div className="lg:col-span-2 space-y-5">
+      {/* ═══════════════════════════ RIGHT COLUMN (Sticky Sidebar) ═══════════════════════════ */}
+      <div className="lg:w-[38%] lg:max-w-sm xl:max-w-md flex-shrink-0 lg:sticky lg:top-[56px] lg:h-[calc(100vh-56px)] lg:overflow-y-auto px-5 sm:px-6 py-7 space-y-5 border-t lg:border-t-0 lg:border-l border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/40 dark:bg-zinc-900/30">
 
           {/* Card: Targeting Formula – dark premium */}
           <div className="relative bg-zinc-950 rounded-2xl p-6 overflow-hidden border border-zinc-800/80 shadow-xl">
@@ -720,8 +719,6 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
               </button>
             </div>
           </div>
-
-        </div>
       </div>
 
       {/* ═══════════════════════ Reset Confirmation Modal ═══════════════════════ */}

@@ -495,7 +495,7 @@ function MainApp() {
         />
       )}
 
-      <main className={`flex-1 w-full ${activeTab === "bigboss" ? "" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8"}`}>
+      <main className={`flex-1 w-full ${activeTab === "bigboss" ? "" : activeTab === "target" ? "flex flex-col" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8"}`}>
         <ErrorBoundary>
           <Suspense fallback={<SkeletonLoader />}>
             {renderView()}
