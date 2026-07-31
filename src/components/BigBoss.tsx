@@ -664,18 +664,18 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     <div className="min-h-screen flex flex-col">
       {/* 1. Top Sticky Navbar Header */}
       <header className="sticky top-0 z-40 w-full border-b border-zinc-200/60 dark:border-zinc-800/80 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.25)] transition-colors duration-300">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Title */}
-          <div className="flex items-center gap-2 text-left select-none">
+          <div className="flex items-center gap-2.5 text-left select-none">
             <div className="relative flex items-center">
-              <TaskwaiLogo size={30} />
+              <TaskwaiLogo size={34} />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-sans font-black text-base tracking-tight text-zinc-900 dark:text-zinc-50">
+              <span className="font-sans font-black text-lg tracking-tight text-zinc-900 dark:text-zinc-550">
                 taskwai
               </span>
               <span 
-                className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full select-none"
+                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full select-none"
                 style={{
                   background: "linear-gradient(135deg, rgba(212,175,55,0.22) 0%, rgba(255,215,0,0.12) 100%)",
                   border: "1px solid rgba(197,160,40,0.4)",
@@ -691,7 +691,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
           <div className="flex items-center gap-2">
             {user?.isDemo ? (
               <>
-                <span className="hidden md:flex text-[9px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 px-2.5 py-1 rounded-lg items-center gap-1.5 animate-pulse">
+                <span className="hidden md:flex text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 px-3 py-0.5 rounded-lg items-center gap-1.5 animate-pulse">
                   <span className="flex h-1.5 w-1.5 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-550"></span>
@@ -702,7 +702,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 <button
                   type="button"
                   onClick={() => setShowLoginModal(true)}
-                  className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1 uppercase tracking-wider"
+                  className="px-3.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1.5 uppercase tracking-wider"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   <span>{t("nav.login", "Login")}</span>
@@ -710,17 +710,17 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               </>
             ) : (
               <>
-                <div className="hidden sm:block bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-lg px-2.5 py-0.5 text-right shadow-sm text-[11px] font-bold text-zinc-650 dark:text-zinc-300">
+                <div className="hidden sm:block bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-lg px-3 py-0.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
                   <span className="block text-[8px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
                     {t("bigboss.loginHeader", "Login Big Boss")}
                   </span>
-                  <span className="font-mono text-[10px]">{user.email}</span>
+                  <span className="font-mono text-[11px]">{user.email}</span>
                 </div>
                 
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-[11px] transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1"
+                  className="px-3 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1.5"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>{t("nav.logout", "Keluar")}</span>
@@ -728,12 +728,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               </>
             )}
 
-            <div className="hidden xs:flex items-center gap-1 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/30 rounded-lg px-2.5 py-1 shadow-sm">
+            <div className="hidden xs:flex items-center gap-1.5 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/30 rounded-lg px-3 py-0.5 shadow-sm">
               <div className="flex flex-col text-left">
                 <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-455 block uppercase tracking-widest leading-none mb-0.5">
                   Cabang Terhubung
                 </span>
-                <span className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 font-mono leading-none">
+                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 font-mono leading-none">
                   {branches.length} Outlet
                 </span>
               </div>
@@ -743,11 +743,11 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             <button
               type="button"
               onClick={() => setLang(lang === "id" ? "en" : "id")}
-              className="px-2 py-1 rounded-lg text-zinc-650 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 flex items-center gap-1 shadow-sm"
+              className="px-2.5 py-0.5 rounded-lg text-zinc-650 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 flex items-center gap-1.5 shadow-sm"
               title={lang === "id" ? "Switch to English" : "Ubah ke Bahasa Indonesia"}
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-450" />
-              <span className="text-[9px] font-black uppercase tracking-wider font-mono">
+              <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-455" />
+              <span className="text-[10px] font-black uppercase tracking-wider font-mono">
                 {lang === "id" ? "ID" : "EN"}
               </span>
             </button>
@@ -756,19 +756,19 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-1.5 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
+              className="p-1 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900 disabled:opacity-50"
               title={t("nav.refresh", "Muat Ulang")}
             >
-              <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} />
+              <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-emerald-500" : ""}`} />
             </button>
 
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDark}
-              className="p-1.5 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
+              className="p-1 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 border border-zinc-200/40 dark:border-zinc-800 transition-all cursor-pointer bg-white dark:bg-zinc-900"
               title={isDark ? "Mode Terang" : "Mode Gelap"}
             >
-              {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-zinc-500" />}
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
             </button>
           </div>
         </div>
