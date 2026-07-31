@@ -419,50 +419,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
               </div>
             </div>
 
-            {/* Cabang Input */}
-            <div className="space-y-2 relative">
-              <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Cabang Restoran / Outlet <span className="text-zinc-400 dark:text-zinc-500 font-normal lowercase">{t("profit.optional", "(opsional)")}</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 pointer-events-none select-none font-mono">
-                  🏢
-                </span>
-                <input
-                  type="text"
-                  value={branchInput}
-                  onChange={(e) => {
-                    setBranchInput(e.target.value);
-                    setShowBranchSuggestions(true);
-                  }}
-                  onFocus={() => setShowBranchSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowBranchSuggestions(false), 200)}
-                  placeholder="e.g. Cabang Sudirman"
-                  className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all"
-                />
-              </div>
-              
-              {/* Autocomplete branch suggestions */}
-              {showBranchSuggestions && restaurant && restaurant.branches && restaurant.branches.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-xl shadow-lg max-h-40 overflow-y-auto pr-1">
-                  {restaurant.branches
-                    .filter(b => b.toLowerCase().includes(branchInput.toLowerCase()))
-                    .map((branch, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onMouseDown={() => {
-                          setBranchInput(branch);
-                          setShowBranchSuggestions(false);
-                        }}
-                        className="w-full text-left px-4 py-2.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border-b border-zinc-100 dark:border-zinc-800 last:border-b-0"
-                      >
-                        {branch}
-                      </button>
-                    ))}
-                </div>
-              )}
-            </div>
+
 
             {/* Nama Penginput - ONLY SHOW IN STAFF MODE */}
             {isStaffMode && (
@@ -605,9 +562,6 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                         </span>
                       )}
                     </div>
-                    <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-semibold mt-0.5">
-                      Cabang: <span className="font-bold text-zinc-650 dark:text-zinc-400">{item.branch}</span>
-                    </span>
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="font-mono text-zinc-500 dark:text-zinc-400 font-bold">
@@ -799,11 +753,13 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                               </div>
 
                               {/* Metadata Info (Cabang, Operator, Waktu) */}
-                              <div className="mt-2 grid grid-cols-3 gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2">
-                                <div>
-                                  <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Cabang</span>
-                                  <span className="text-zinc-800 dark:text-zinc-200 truncate block">🏢 {p.branchName || "Pusat"}</span>
-                                </div>
+                              <div className={`mt-2 grid ${p.branchName ? "grid-cols-3" : "grid-cols-2"} gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2`}>
+                                {p.branchName && (
+                                  <div>
+                                    <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Cabang</span>
+                                    <span className="text-zinc-800 dark:text-zinc-200 truncate block">🏢 {p.branchName}</span>
+                                  </div>
+                                )}
                                 <div>
                                   <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Operator</span>
                                   <span className="text-zinc-800 dark:text-zinc-200 truncate block">
@@ -894,15 +850,11 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   <span className="text-zinc-400 dark:text-zinc-500">Pengeluaran Lain</span>
                   <span className="font-mono text-rose-500 font-bold">-{formatRupiah(otherExpensesVal)}</span>
                 </div>
-                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/40 py-2">
+                <div className="flex justify-between pt-1">
                   <span className="text-zinc-400 dark:text-zinc-500">Total Laba Bersih</span>
                   <span className={`font-mono font-bold ${computedProfit >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-500"}`}>
                     {formatRupiah(computedProfit)}
                   </span>
-                </div>
-                <div className="flex justify-between pt-1">
-                  <span className="text-zinc-400 dark:text-zinc-500">Cabang</span>
-                  <span className="text-zinc-800 dark:text-zinc-200">{branchInput.trim() || "-"}</span>
                 </div>
               </div>
               
