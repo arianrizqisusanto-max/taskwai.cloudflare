@@ -1495,10 +1495,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   </div>
                   <div>
                     <h3 className="text-sm font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
-                      Rincian Laba Kotor
+                      {t("bigboss.breakdownTitle", "Rincian Laba Kotor")}
                     </h3>
                     <p className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
-                      {selectedBranch.name} • {timeframe === "daily" ? "Hari Ini" : timeframe === "weekly" ? "Minggu Ini" : "Bulan Ini"}
+                      {selectedBranch.name} • {timeframe === "daily" ? t("bigboss.breakdownDaily", "Hari Ini") : timeframe === "weekly" ? t("bigboss.breakdownWeekly", "Minggu Ini") : t("bigboss.breakdownMonthly", "Bulan Ini")}
                     </p>
                   </div>
                 </div>
@@ -1509,38 +1509,38 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                       <HelpCircle className="w-6 h-6 text-zinc-400 dark:text-zinc-500" />
                     </div>
                     <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                      Belum ada data operasional
+                      {t("bigboss.breakdownNoData", "Belum ada data operasional")}
                     </p>
                     <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 max-w-[200px]">
-                      Cabang ini belum menginput omzet atau pengeluaran operasional harian untuk periode ini.
+                      {t("bigboss.breakdownNoDataDesc", "Cabang ini belum menginput omzet atau pengeluaran operasional harian untuk periode ini.")}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div className="space-y-2 py-3 px-3.5 bg-zinc-50/50 dark:bg-zinc-950/25 border border-zinc-100 dark:border-zinc-800/40 rounded-2xl text-xs font-semibold">
                       <div className="flex justify-between items-center py-1.5 border-b border-zinc-100 dark:border-zinc-800/40">
-                        <span className="text-zinc-500 dark:text-zinc-400">Omzet Kotor</span>
+                        <span className="text-zinc-500 dark:text-zinc-400">{t("bigboss.breakdownOmzet", "Omzet Kotor")}</span>
                         <span className="font-mono text-emerald-600 dark:text-emerald-450 font-bold">
                           {formatRupiah(omzet)}
                         </span>
                       </div>
                       
                       <div className="flex justify-between items-center py-1.5 border-b border-zinc-100 dark:border-zinc-800/40">
-                        <span className="text-zinc-500 dark:text-zinc-400">Potongan HPP</span>
+                        <span className="text-zinc-500 dark:text-zinc-400">{t("bigboss.breakdownHpp", "Potongan HPP")}</span>
                         <span className="font-mono text-rose-500 dark:text-rose-450 font-bold">
                           -{formatRupiah(hpp)}
                         </span>
                       </div>
 
                       <div className="flex justify-between items-center py-1.5 border-b border-zinc-100 dark:border-zinc-800/40">
-                        <span className="text-zinc-500 dark:text-zinc-400">Biaya Lain-lain</span>
+                        <span className="text-zinc-500 dark:text-zinc-400">{t("bigboss.breakdownOther", "Biaya Lain-lain")}</span>
                         <span className="font-mono text-rose-500 dark:text-rose-450 font-bold">
                           -{formatRupiah(other)}
                         </span>
                       </div>
 
                       <div className="flex justify-between items-center pt-2">
-                        <span className="text-zinc-900 dark:text-zinc-100 font-bold">Total Laba Kotor</span>
+                        <span className="text-zinc-900 dark:text-zinc-100 font-bold">{t("bigboss.labaKotor", "Laba Kotor")}</span>
                         <span className={`font-mono font-black ${profit >= 0 ? "text-blue-600 dark:text-blue-400" : "text-rose-600 dark:text-rose-500"}`}>
                           {formatRupiah(profit)}
                         </span>
@@ -1548,8 +1548,8 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                     </div>
 
                     <div className="text-[9px] text-zinc-400 dark:text-zinc-500 text-center leading-normal">
-                      Laba Kotor = Omzet - HPP - Biaya Lain-lain.<br />
-                      Belum dikurangi biaya tetap bulanan (sewa, gaji, dsb).
+                      {t("bigboss.breakdownFormula", "Laba Kotor = Omzet - HPP - Biaya Lain-lain.")}<br />
+                      {t("bigboss.breakdownFormulaDesc", "Belum dikurangi biaya tetap bulanan (sewa, gaji, dsb).")}
                     </div>
                   </div>
                 )}
@@ -1558,9 +1558,9 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   <button
                     type="button"
                     onClick={() => setShowBreakdownModal(false)}
-                    className="w-full py-2 bg-zinc-150 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 font-bold text-xs rounded-xl transition-colors cursor-pointer border-0"
+                    className="w-full py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 font-bold text-xs rounded-xl transition-colors cursor-pointer border-0"
                   >
-                    Tutup
+                    {t("bigboss.guideClose", "Tutup")}
                   </button>
                 </div>
               </motion.div>
