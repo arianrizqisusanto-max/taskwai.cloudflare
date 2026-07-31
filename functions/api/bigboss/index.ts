@@ -38,16 +38,29 @@ export async function onRequest(context: any): Promise<Response> {
           r.id as id,
           r.name as name,
           r.monthlyTargetProfit as monthlyTargetProfit,
+          
           COALESCE(SUM(dp.profit), 0) as totalProfitMonth,
-          COALESCE(SUM(CASE WHEN dp.date >= ? AND dp.date <= ? THEN dp.profit ELSE 0 END), 0) as profitWeek,
-          COALESCE(SUM(CASE WHEN dp.date = ? THEN dp.profit ELSE 0 END), 0) as profitToday,
+          COALESCE(SUM(dp.omzet), 0) as omzetMonth,
+          COALESCE(SUM(dp.hppVal), 0) as hppMonth,
+          COALESCE(SUM(dp.otherExpenses), 0) as otherExpensesMonth,
+          
+          COALESCE(SUM(CASE WHEN dp.date >= ?1 AND dp.date <= ?2 THEN dp.profit ELSE 0 END), 0) as profitWeek,
+          COALESCE(SUM(CASE WHEN dp.date >= ?1 AND dp.date <= ?2 THEN dp.omzet ELSE 0 END), 0) as omzetWeek,
+          COALESCE(SUM(CASE WHEN dp.date >= ?1 AND dp.date <= ?2 THEN dp.hppVal ELSE 0 END), 0) as hppWeek,
+          COALESCE(SUM(CASE WHEN dp.date >= ?1 AND dp.date <= ?2 THEN dp.otherExpenses ELSE 0 END), 0) as otherExpensesWeek,
+          
+          COALESCE(SUM(CASE WHEN dp.date = ?2 THEN dp.profit ELSE 0 END), 0) as profitToday,
+          COALESCE(SUM(CASE WHEN dp.date = ?2 THEN dp.omzet ELSE 0 END), 0) as omzetToday,
+          COALESCE(SUM(CASE WHEN dp.date = ?2 THEN dp.hppVal ELSE 0 END), 0) as hppToday,
+          COALESCE(SUM(CASE WHEN dp.date = ?2 THEN dp.otherExpenses ELSE 0 END), 0) as otherExpensesToday,
+          
           COUNT(DISTINCT dp.date) as daysEntered
         FROM bigboss_links bl
         JOIN restaurants r ON bl.branchRestaurantId = r.id
-        LEFT JOIN daily_profits dp ON r.id = dp.restaurantId AND dp.date LIKE ?
-        WHERE bl.bossOwnerId = ?
+        LEFT JOIN daily_profits dp ON r.id = dp.restaurantId AND dp.date LIKE ?3
+        WHERE bl.bossOwnerId = ?4
         GROUP BY r.id, r.name, r.monthlyTargetProfit
-      `).bind(sevenDaysAgoStr, todayStr, todayStr, `${monthPrefix}-%`, bossOwnerId).all();
+      `).bind(sevenDaysAgoStr, todayStr, `${monthPrefix}-%`, bossOwnerId).all();
 
       const branchStats = branchStatsQuery.results || [];
 
@@ -98,7 +111,19 @@ export async function onRequest(context: any): Promise<Response> {
           profitToday: branch.profitToday,
           daysEntered: branch.daysEntered,
           totalExpenses: expData.total,
-          historyCount: expData.historyCount
+          historyCount: expData.historyCount,
+          
+          omzetToday: branch.omzetToday,
+          hppToday: branch.hppToday,
+          otherExpensesToday: branch.otherExpensesToday,
+          
+          omzetWeek: branch.omzetWeek,
+          hppWeek: branch.hppWeek,
+          otherExpensesWeek: branch.otherExpensesWeek,
+          
+          omzetMonth: branch.omzetMonth,
+          hppMonth: branch.hppMonth,
+          otherExpensesMonth: branch.otherExpensesMonth
         };
       });
 

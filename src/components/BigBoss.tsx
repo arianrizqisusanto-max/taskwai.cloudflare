@@ -23,6 +23,15 @@ interface BranchData {
   daysEntered: number;
   totalExpenses: number;
   historyCount?: number;
+  omzetToday?: number;
+  hppToday?: number;
+  otherExpensesToday?: number;
+  omzetWeek?: number;
+  hppWeek?: number;
+  otherExpensesWeek?: number;
+  omzetMonth?: number;
+  hppMonth?: number;
+  otherExpensesMonth?: number;
 }
 
 const MOCK_DEMO_BRANCHES: BranchData[] = [
@@ -35,7 +44,16 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     profitToday: 2500000,
     daysEntered: 18,
     totalExpenses: 15000000,
-    historyCount: 2
+    historyCount: 2,
+    omzetToday: 5000000,
+    hppToday: 1800000,
+    otherExpensesToday: 700000,
+    omzetWeek: 33000000,
+    hppWeek: 11500000,
+    otherExpensesWeek: 5000000,
+    omzetMonth: 120000000,
+    hppMonth: 42000000,
+    otherExpensesMonth: 16000000
   },
   {
     id: "demo_br_2",
@@ -45,7 +63,16 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     profitWeek: 19200000,
     profitToday: 3800000,
     daysEntered: 18,
-    totalExpenses: 12000000
+    totalExpenses: 12000000,
+    omzetToday: 7000000,
+    hppToday: 2450000,
+    otherExpensesToday: 750000,
+    omzetWeek: 35000000,
+    hppWeek: 12250000,
+    otherExpensesWeek: 3550000,
+    omzetMonth: 130000000,
+    hppMonth: 45500000,
+    otherExpensesMonth: 16500000
   },
   {
     id: "demo_br_3",
@@ -55,7 +82,16 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     profitWeek: 7200000,
     profitToday: 1100000,
     daysEntered: 18,
-    totalExpenses: 18500000
+    totalExpenses: 18500000,
+    omzetToday: 3000000,
+    hppToday: 1200000,
+    otherExpensesToday: 700000,
+    omzetWeek: 18000000,
+    hppWeek: 7200000,
+    otherExpensesWeek: 3600000,
+    omzetMonth: 70000000,
+    hppMonth: 28000000,
+    otherExpensesMonth: 17000000
   }
 ];
 
@@ -88,6 +124,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [selectedBranch, setSelectedBranch] = useState<BranchData | null>(null);
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [showBreakdownModal, setShowBreakdownModal] = useState(false);
 
   const formatLastUpdated = (date: Date, langStr: string) => {
     const locale = langStr === "en" ? "en-US" : "id-ID";
@@ -176,6 +213,11 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     } finally {
       setIsLoadingHistory(false);
     }
+  };
+
+  const handleOpenBreakdown = (branch: BranchData) => {
+    setSelectedBranch(branch);
+    setShowBreakdownModal(true);
   };
 
   const handleGoogleLoginResponse = async (response: any) => {
@@ -1038,8 +1080,16 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                 <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-100">
                                   {branch.name}
                                 </td>
-                                <td className="py-3.5 px-4 font-mono tabular-nums text-blue-600 dark:text-blue-400">
-                                  {formatRupiah(m.gross)}
+                                <td className="py-3.5 px-4">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenBreakdown(branch)}
+                                    className="text-left font-mono text-blue-600 dark:text-blue-400 hover:underline underline-offset-4 decoration-blue-500/50 cursor-pointer bg-transparent border-0 p-0 font-bold flex items-center gap-1 group"
+                                    title="Klik untuk melihat rincian (Omzet, HPP, Biaya Lain)"
+                                  >
+                                    <span>{formatRupiah(m.gross)}</span>
+                                    <Info className="w-3.5 h-3.5 text-blue-400 dark:text-blue-500/70 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  </button>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <div className="flex items-center gap-1.5">
@@ -1392,6 +1442,131 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             </motion.div>
           </div>
         )}
+      </AnimatePresence>
+
+      {/* Breakdown Modal */}
+      <AnimatePresence>
+        {showBreakdownModal && selectedBranch && (() => {
+          let omzet = 0;
+          let hpp = 0;
+          let other = 0;
+          let profit = 0;
+          
+          if (timeframe === "daily") {
+            omzet = selectedBranch.omzetToday ?? 0;
+            hpp = selectedBranch.hppToday ?? 0;
+            other = selectedBranch.otherExpensesToday ?? 0;
+            profit = selectedBranch.profitToday ?? 0;
+          } else if (timeframe === "weekly") {
+            omzet = selectedBranch.omzetWeek ?? 0;
+            hpp = selectedBranch.hppWeek ?? 0;
+            other = selectedBranch.otherExpensesWeek ?? 0;
+            profit = selectedBranch.profitWeek ?? (selectedBranch.profitToday * 7);
+          } else {
+            omzet = selectedBranch.omzetMonth ?? 0;
+            hpp = selectedBranch.hppMonth ?? 0;
+            other = selectedBranch.otherExpensesMonth ?? 0;
+            profit = selectedBranch.totalProfitMonth ?? 0;
+          }
+
+          const hasData = omzet > 0 || hpp > 0 || other > 0 || profit !== 0;
+
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xl relative overflow-hidden flex flex-col max-h-[85vh]"
+              >
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400" />
+                
+                <button
+                  type="button"
+                  onClick={() => setShowBreakdownModal(false)}
+                  className="absolute top-3 right-3 p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <div className="flex items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800/60 pb-3 mb-4">
+                  <div className="p-2 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-xl">
+                    <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
+                      Rincian Laba Kotor
+                    </h3>
+                    <p className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
+                      {selectedBranch.name} • {timeframe === "daily" ? "Hari Ini" : timeframe === "weekly" ? "Minggu Ini" : "Bulan Ini"}
+                    </p>
+                  </div>
+                </div>
+
+                {!hasData ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-800/40 rounded-full mb-3">
+                      <HelpCircle className="w-6 h-6 text-zinc-400 dark:text-zinc-500" />
+                    </div>
+                    <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                      Belum ada data operasional
+                    </p>
+                    <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 max-w-[200px]">
+                      Cabang ini belum menginput omzet atau pengeluaran operasional harian untuk periode ini.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2 py-3 px-3.5 bg-zinc-50/50 dark:bg-zinc-950/25 border border-zinc-100 dark:border-zinc-800/40 rounded-2xl text-xs font-semibold">
+                      <div className="flex justify-between items-center py-1.5 border-b border-zinc-100 dark:border-zinc-800/40">
+                        <span className="text-zinc-500 dark:text-zinc-400">Omzet Kotor</span>
+                        <span className="font-mono text-emerald-600 dark:text-emerald-450 font-bold">
+                          {formatRupiah(omzet)}
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-1.5 border-b border-zinc-100 dark:border-zinc-800/40">
+                        <span className="text-zinc-500 dark:text-zinc-400">Potongan HPP</span>
+                        <span className="font-mono text-rose-500 dark:text-rose-450 font-bold">
+                          -{formatRupiah(hpp)}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center py-1.5 border-b border-zinc-100 dark:border-zinc-800/40">
+                        <span className="text-zinc-500 dark:text-zinc-400">Biaya Lain-lain</span>
+                        <span className="font-mono text-rose-500 dark:text-rose-450 font-bold">
+                          -{formatRupiah(other)}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-2">
+                        <span className="text-zinc-900 dark:text-zinc-100 font-bold">Total Laba Kotor</span>
+                        <span className={`font-mono font-black ${profit >= 0 ? "text-blue-600 dark:text-blue-400" : "text-rose-600 dark:text-rose-500"}`}>
+                          {formatRupiah(profit)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-[9px] text-zinc-400 dark:text-zinc-500 text-center leading-normal">
+                      Laba Kotor = Omzet - HPP - Biaya Lain-lain.<br />
+                      Belum dikurangi biaya tetap bulanan (sewa, gaji, dsb).
+                    </div>
+                  </div>
+                )}
+                
+                <div className="mt-5 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowBreakdownModal(false)}
+                    className="w-full py-2 bg-zinc-150 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 font-bold text-xs rounded-xl transition-colors cursor-pointer border-0"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
       </AnimatePresence>
     </div>
   );
