@@ -20,7 +20,7 @@ export const enTranslations: Record<string, string> = {
   "nav.copied": "Copied",
 
   "dashboard.statusActive": "Active",
-  "dashboard.messageNoTarget": "Restaurant is active. You have not set a monthly profit target.",
+  "dashboard.messageNoTarget": "Business is active. You have not set a monthly profit target.",
   "dashboard.setTargetTipTitle": "Want to track monthly target progress?",
   "dashboard.setTargetTipDesc": "Set your monthly net profit target in the Settings menu to enable the progress bar and target analysis.",
   "dashboard.noTargetDailyDesc": "Daily target is not set.",
