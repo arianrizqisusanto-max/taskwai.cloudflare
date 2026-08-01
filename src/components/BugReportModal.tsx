@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Bug, X, Send, AlertCircle, CheckCircle2, Loader2, Mail, ShieldAlert, Sparkles } from "lucide-react";
+import { Bug, X, Send, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { DataService } from "../lib/dataService";
 import { useToast } from "./Toast";
+import { useTranslation } from "../lib/LanguageContext";
 
 interface BugReportModalProps {
   isOpen: boolean;
@@ -10,16 +11,9 @@ interface BugReportModalProps {
   staffSession: { restaurantId: string; ownerId: string; role: "staff" } | null;
 }
 
-const BUG_CATEGORIES = [
-  { id: "UI/Tampilan", label: "🎨 Tampilan / Layout", desc: "Masalah desain, tombol, atau respon halaman" },
-  { id: "Kalkulasi", label: "📊 Kalkulasi Profit & Biaya", desc: "Angka atau perhitungan tidak akurat" },
-  { id: "Auth/Session", label: "🔐 Akun & Login", desc: "Masalah autentikasi Google atau akses Staff" },
-  { id: "Performa", label: "⚡ Lambat / Freeze", desc: "Aplikasi lemot atau tidak merespon" },
-  { id: "Lainnya", label: "💡 Kendala Lain / Masukan", desc: "Keluhan atau saran fitur baru" },
-];
-
 export default function BugReportModal({ isOpen, onClose, user, staffSession }: BugReportModalProps) {
   const { showToast } = useToast();
+  const { t } = useTranslation();
   
   const [emailInput, setEmailInput] = useState("");
   const [category, setCategory] = useState("UI/Tampilan");
@@ -27,6 +21,14 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const bugCategories = [
+    { id: "UI/Tampilan", label: t("bug.catUi", "🎨 Tampilan / Layout"), desc: t("bug.catUiDesc", "Masalah desain, tombol, atau respon halaman") },
+    { id: "Kalkulasi", label: t("bug.catCalc", "📊 Kalkulasi Profit & Biaya"), desc: t("bug.catCalcDesc", "Angka atau perhitungan tidak akurat") },
+    { id: "Auth/Session", label: t("bug.catAuth", "🔐 Akun & Login"), desc: t("bug.catAuthDesc", "Masalah autentikasi Google atau akses Staff") },
+    { id: "Performa", label: t("bug.catPerf", "⚡ Lambat / Freeze"), desc: t("bug.catPerfDesc", "Aplikasi lemot atau tidak merespon") },
+    { id: "Lainnya", label: t("bug.catOther", "💡 Kendala Lain / Masukan"), desc: t("bug.catOtherDesc", "Keluhan atau saran fitur baru") },
+  ];
 
   useEffect(() => {
     if (user?.email) {
@@ -44,11 +46,11 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
     e.preventDefault();
 
     if (!emailInput.trim()) {
-      showToast("Harap masukkan email Anda.", "error");
+      showToast(t("bug.toastError", "Harap masukkan email Anda."), "error");
       return;
     }
     if (!description.trim()) {
-      showToast("Harap isi detail keluhan / bug yang Anda alami.", "error");
+      showToast(t("bug.toastError", "Harap isi detail keluhan / bug yang Anda alami."), "error");
       return;
     }
 
@@ -69,7 +71,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
 
       if (result.success) {
         setSubmitSuccess(true);
-        showToast("Laporan bug berhasil dikirim! Terima kasih atas masukan Anda.", "success");
+        showToast(t("bug.toastSuccess", "Laporan bug berhasil dikirim! Terima kasih atas masukan Anda."), "success");
         setTimeout(() => {
           setSubmitSuccess(false);
           setTitle("");
@@ -77,11 +79,11 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
           onClose();
         }, 1800);
       } else {
-        throw new Error(result.message || "Gagal mengirim laporan");
+        throw new Error(result.message || t("bug.toastError", "Gagal mengirim laporan"));
       }
     } catch (err: any) {
       console.error("Bug report submission error:", err);
-      showToast(err.message || "Gagal mengirim laporan bug. Silakan coba lagi.", "error");
+      showToast(err.message || t("bug.toastError", "Gagal mengirim laporan bug. Silakan coba lagi."), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -101,9 +103,11 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
                 <Bug className="w-6 h-6 text-white animate-pulse" />
               </div>
               <div>
-                <h3 className="text-lg font-bold tracking-tight">Laporkan Bug / Kendala</h3>
+                <h3 className="text-lg font-bold tracking-tight">
+                  {t("bug.modalTitle", "Laporkan Bug / Kendala")}
+                </h3>
                 <p className="text-xs text-white/90">
-                  Laporan akan terkirim langsung ke tim pengembang Taskwai
+                  {t("bug.modalSubtitle", "Laporan akan terkirim langsung ke tim pengembang Taskwai")}
                 </p>
               </div>
             </div>
@@ -111,7 +115,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
             <button
               onClick={onClose}
               className="p-1.5 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-              title="Tutup"
+              title={t("about.close", "Tutup")}
             >
               <X className="w-5 h-5" />
             </button>
@@ -123,9 +127,11 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
             <div className="w-16 h-16 mx-auto bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center animate-bounce">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h4 className="text-xl font-bold text-slate-800 dark:text-slate-100">Laporan Terkirim!</h4>
+            <h4 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+              {t("bug.successTitle", "Laporan Terkirim!")}
+            </h4>
             <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
-              Terima kasih atas laporan Anda. Tim pengembang akan meninjau dan menindaklanjuti kendala ini sesegera mungkin.
+              {t("bug.successMessage", "Terima kasih atas laporan Anda. Tim pengembang akan meninjau dan menindaklanjuti kendala ini sesegera mungkin.")}
             </p>
           </div>
         ) : (
@@ -136,7 +142,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
                 <Mail className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <div className="min-w-0">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Pengirim (Identitas Terdaftar)
+                    {t("bug.senderIdentity", "Pengirim (Identitas Terdaftar)")}
                   </p>
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
                     {emailInput || "Email belum disetel"}
@@ -144,7 +150,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
                 </div>
               </div>
               <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 shrink-0">
-                Terverifikasi
+                {t("bug.verified", "Terverifikasi")}
               </span>
             </div>
 
@@ -152,7 +158,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
             {!user?.email && !staffSession && (
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Email Anda <span className="text-rose-500">*</span>
+                  {t("bug.yourEmail", "Email Anda")} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -168,10 +174,10 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
             {/* Category Selector */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                Kategori Kendala <span className="text-rose-500">*</span>
+                {t("bug.categoryLabel", "Kategori Kendala")} <span className="text-rose-500">*</span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {BUG_CATEGORIES.map((cat) => (
+                {bugCategories.map((cat) => (
                   <button
                     key={cat.id}
                     type="button"
@@ -192,13 +198,13 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
             {/* Subject Title */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Subjek / Ringkasan Kendala
+                {t("bug.subjectLabel", "Subjek / Ringkasan Kendala")}
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Contoh: Tombol simpan biaya tidak merespon saat diklik"
+                placeholder={t("bug.subjectPlaceholder", "Contoh: Tombol simpan biaya tidak merespon saat diklik")}
                 className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-800 dark:text-slate-100"
               />
             </div>
@@ -206,19 +212,19 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
             {/* Detailed Description */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Detail Keluhan / Langkah Reproduksi <span className="text-rose-500">*</span>
+                {t("bug.descriptionLabel", "Detail Keluhan / Langkah Reproduksi")} <span className="text-rose-500">*</span>
               </label>
               <textarea
                 required
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Jelaskan secara detail apa yang terjadi, halaman tempat masalah muncul, atau pesan error yang tampak..."
+                placeholder={t("bug.descriptionPlaceholder", "Jelaskan secara detail apa yang terjadi, halaman tempat masalah muncul, atau pesan error yang tampak...")}
                 className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-800 dark:text-slate-100 resize-none"
               />
               <div className="flex justify-between items-center mt-1 text-[11px] text-slate-400">
-                <span>Mohon jelaskan sejelas mungkin</span>
-                <span>{description.length} karakter</span>
+                <span>{t("bug.descriptionHint", "Mohon jelaskan sejelas mungkin")}</span>
+                <span>{description.length} {t("bug.characters", "karakter")}</span>
               </div>
             </div>
 
@@ -230,7 +236,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
                 disabled={isSubmitting}
                 className="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
               >
-                Batal
+                {t("bug.cancel", "Batal")}
               </button>
               <button
                 type="submit"
@@ -240,12 +246,12 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Mengirim...
+                    {t("bug.submitting", "Mengirim...")}
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    Kirim Laporan
+                    {t("bug.submit", "Kirim Laporan")}
                   </>
                 )}
               </button>

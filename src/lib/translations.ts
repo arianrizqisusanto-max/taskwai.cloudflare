@@ -316,6 +316,39 @@ export const enTranslations: Record<string, string> = {
   "about.feat4.desc": "Your data is stored safely in Firestore cloud database, synced automatically.",
   "about.close": "Close",
   "about.featuresTitle": "Main Features & Uses",
-  "about.privacyTitle": "Data Confidentiality & Privacy"
+  "about.privacyTitle": "Data Confidentiality & Privacy",
+
+  // --- Bug Report ---
+  "bug.buttonTitle": "Report Bug / Issue",
+  "bug.modalTitle": "Report a Bug / Issue",
+  "bug.modalSubtitle": "Reports are sent directly to the Taskwai developer team",
+  "bug.senderIdentity": "Sender (Registered Identity)",
+  "bug.verified": "Verified",
+  "bug.yourEmail": "Your Email",
+  "bug.categoryLabel": "Issue Category",
+  "bug.subjectLabel": "Subject / Issue Summary",
+  "bug.subjectPlaceholder": "e.g., Save profit button does not respond when clicked",
+  "bug.descriptionLabel": "Issue Details / Steps to Reproduce",
+  "bug.descriptionPlaceholder": "Explain in detail what happened, page location, or any error messages...",
+  "bug.descriptionHint": "Please explain as clearly as possible",
+  "bug.characters": "characters",
+  "bug.cancel": "Cancel",
+  "bug.submitting": "Sending...",
+  "bug.submit": "Send Report",
+  "bug.successTitle": "Report Sent!",
+  "bug.successMessage": "Thank you for your report. Our developer team will review and address this issue as soon as possible.",
+  "bug.toastSuccess": "Bug report submitted successfully! Thank you for your feedback.",
+  "bug.toastError": "Failed to send bug report. Please try again.",
+  "bug.catUi": "🎨 UI / Layout",
+  "bug.catUiDesc": "Design, button, or layout responsiveness issues",
+  "bug.catCalc": "📊 Profit & Cost Calculation",
+  "bug.catCalcDesc": "Inaccurate figures or calculations",
+  "bug.catAuth": "🔐 Account & Login",
+  "bug.catAuthDesc": "Google authentication or Staff access issues",
+  "bug.catPerf": "⚡ Slow / Freeze",
+  "bug.catPerfDesc": "App is slow or not responding",
+  "bug.catOther": "💡 Other Issues / Feedback",
+  "bug.catOtherDesc": "General complaint or new feature suggestion"
 };
+
 
