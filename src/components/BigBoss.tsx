@@ -6,12 +6,14 @@ import { useToast } from "./Toast";
 import { 
   Building2, Plus, Trash2, ArrowLeft, TrendingUp, DollarSign, Award, Sparkles, 
   CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Sun, Moon, RotateCw, Globe, X,
-  ChevronDown, ChevronUp, BookOpen, Info, LogIn, LogOut, Calendar, Clock, Search
+  ChevronDown, ChevronUp, BookOpen, Info, LogIn, LogOut, Calendar, Clock, Search, Bug
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import TaskwaiLogo from "./TaskwaiLogo";
 import { calculateTotalExpenses } from "../lib/financialMath";
+import BugReportModal from "./BugReportModal";
+
 
 interface BranchData {
   id: string;
@@ -172,6 +174,8 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   // Isolated session state for Big Boss mode
   const [user, setUser] = useState<any | null>(null);
   const [authInitialized, setAuthInitialized] = useState(false);
+  const [showBugModal, setShowBugModal] = useState(false);
+
 
   const formatLocale = currency === "dollar" ? "en-US" : "id-ID";
 
@@ -779,9 +783,20 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-500" />}
             </button>
+
+            {/* Bug Report Button */}
+            <button
+              onClick={() => setShowBugModal(true)}
+              className="p-1.5 rounded-lg text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200/60 dark:border-rose-900/40 transition-all cursor-pointer bg-white dark:bg-zinc-900 shadow-sm flex items-center gap-1"
+              title="Laporkan Bug / Kendala"
+            >
+              <Bug className="w-4 h-4 text-rose-500 animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">Bug</span>
+            </button>
           </div>
         </div>
       </header>
+
 
       {/* Main Content Area */}
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4">
@@ -1653,6 +1668,15 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
           </div>
         )}
       </AnimatePresence>
+
+      {/* Bug Report Popup Modal for Big Boss */}
+      <BugReportModal
+        isOpen={showBugModal}
+        onClose={() => setShowBugModal(false)}
+        user={user}
+        staffSession={null}
+      />
     </div>
   );
 }
+

@@ -112,7 +112,23 @@ CREATE TABLE IF NOT EXISTS bigboss_links (
   UNIQUE(bossOwnerId, branchRestaurantId)
 );
 
+-- Tabel Laporan Bug & Masukan Pengguna
+CREATE TABLE IF NOT EXISTS bug_reports (
+  id TEXT PRIMARY KEY,
+  userEmail TEXT NOT NULL,
+  userId TEXT,
+  category TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  userAgent TEXT,
+  pageUrl TEXT,
+  status TEXT DEFAULT 'pending',
+  createdAt TEXT NOT NULL
+);
+
 -- Indeks Optimasi Kinerja Database (Cloudflare D1)
 CREATE INDEX IF NOT EXISTS idx_daily_profits_rest_date ON daily_profits(restaurantId, date);
 CREATE INDEX IF NOT EXISTS idx_expenses_rest_month ON expenses(restaurantId, month);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+CREATE INDEX IF NOT EXISTS idx_bug_reports_created ON bug_reports(createdAt);
+

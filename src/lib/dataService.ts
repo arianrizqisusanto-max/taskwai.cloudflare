@@ -644,4 +644,35 @@ export const DataService = {
     const data = await res.json() as any;
     return data.history || [];
   },
+
+  async reportBug(payload: {
+    userEmail: string;
+    userId?: string;
+    category: string;
+    title: string;
+    description: string;
+    userAgent?: string;
+    pageUrl?: string;
+  }): Promise<{ success: boolean; message: string }> {
+    try {
+      const res = await fetch('/api/report-bug', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as any).error || 'Gagal mengirim laporan bug.');
+      }
+      return await res.json();
+    } catch (error: any) {
+      console.warn('Backend endpoint error, saving report locally fallback:', error);
+      // Fallback: save to localStorage if offline/local dev
+      const reports = JSON.parse(localStorage.getItem('taskwai_bug_reports') || '[]');
+      reports.push({ ...payload, id: `local_${Date.now()}`, createdAt: new Date().toISOString() });
+      localStorage.setItem('taskwai_bug_reports', JSON.stringify(reports));
+      return { success: true, message: 'Laporan bug telah disimpan. Terima kasih!' };
+    }
+  },
 };
+

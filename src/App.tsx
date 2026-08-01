@@ -15,6 +15,8 @@ import { ToastProvider, useToast } from "./components/Toast";
 import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
 import { Sun, Moon, Building2 } from "lucide-react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import BugReportButton from "./components/BugReportButton";
+
 
 // ChunkErrorFallback - shown when a lazy chunk cannot be loaded even after one retry
 function ChunkErrorFallback() {
@@ -514,9 +516,13 @@ function MainApp() {
           </span>
         </div>
       </footer>
+
+      {/* Small Floating Bug Report Button & Modal Popup */}
+      <BugReportButton user={user} staffSession={staffSession} />
     </div>
   );
 }
+
 
 export default function App() {
   return (
