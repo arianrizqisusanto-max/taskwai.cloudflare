@@ -461,7 +461,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   };
 
   const handleUnlinkBranch = async (restaurantId: string, name: string) => {
-    if (!confirm(`Apakah Anda yakin ingin melepas kunci (unlock) dan menghapus pemantauan cabang "${name}"? Akun restoran tersebut akan dilepaskan (unfreeze).`)) {
+    if (!confirm(`Apakah Anda yakin ingin melepas kunci (unlock) dan menghapus pemantauan cabang "${name}"? Akun cabang tersebut akan dilepaskan (unfreeze).`)) {
       return;
     }
 
@@ -617,7 +617,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </span>
               </h2>
               <p className="text-zinc-550 dark:text-zinc-400 text-xs font-semibold mt-2.5 leading-relaxed">
-                {t("bigboss.loginSubtitle", "Kelola dan pantau kinerja keuangan seluruh cabang restoran Anda dalam satu dasbor terpadu.")}
+                {t("bigboss.loginSubtitle", "Kelola dan pantau kinerja keuangan seluruh cabang usaha Anda dalam satu dasbor terpadu.")}
               </p>
             </div>
           </div>
@@ -1172,7 +1172,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   {t("bigboss.loginModalTitle", "Login ke Big Boss")}
                 </h3>
                 <p className="text-xs font-semibold text-zinc-550 dark:text-zinc-400 leading-relaxed">
-                  {t("bigboss.loginModalDesc", "Untuk menautkan dan memantau cabang restoran ril Anda, silakan masuk menggunakan akun Google Anda terlebih dahulu.")}
+                  {t("bigboss.loginModalDesc", "Untuk menautkan dan memantau cabang usaha ril Anda, silakan masuk menggunakan akun Google Anda terlebih dahulu.")}
                 </p>
               </div>
 
@@ -1255,7 +1255,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                     🏢 {t("bigboss.guideFungsiTitle", "1. Fungsi Dasbor Big Boss")}
                   </h4>
                   <p className="text-zinc-550 dark:text-zinc-400 text-xs pl-5">
-                    {t("bigboss.guideFungsiDesc", "Halaman ini digunakan oleh pemilik usaha (owner) untuk memantau ringkasan omzet, laba kotor, laba bersih, dan statistik dari seluruh cabang restoran Anda secara terpadu.")}
+                    {t("bigboss.guideFungsiDesc", "Halaman ini digunakan oleh pemilik usaha (owner) untuk memantau ringkasan omzet, laba kotor, laba bersih, dan statistik dari seluruh cabang usaha Anda secara terpadu.")}
                   </p>
                 </div>
 
@@ -1264,7 +1264,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                     🔗 {t("bigboss.guideCaraTitle", "2. Cara Menautkan Cabang Baru")}
                   </h4>
                   <ol className="list-decimal pl-9 text-xs text-zinc-550 dark:text-zinc-400 space-y-1">
-                    <li>{t("bigboss.guideCaraStep1", "Buka aplikasi Taskwai pada akun restoran cabang yang hendak dipantau.")}</li>
+                    <li>{t("bigboss.guideCaraStep1", "Buka aplikasi Taskwai pada akun cabang yang hendak dipantau.")}</li>
                     <li>{t("bigboss.guideCaraStep2", "Masuk ke menu Pengaturan (Target) → pilih bagian Otorisasi Big Boss.")}</li>
                     <li>{t("bigboss.guideCaraStep3", "Klik Dapatkan Kode Otorisasi (kode acak 6-digit berlaku selama 15 menit).")}</li>
                     <li>{t("bigboss.guideCaraStep4", "Salin kode tersebut, lalu tempelkan pada kolom Hubungkan Cabang Baru di dasbor Big Boss ini.")}</li>

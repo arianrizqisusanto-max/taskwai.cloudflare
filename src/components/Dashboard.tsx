@@ -128,7 +128,7 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
     indicatorClass: "bg-zinc-400",
     textClass: "text-zinc-500 dark:text-zinc-400",
     icon: <CheckCircle className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />,
-    message: t("dashboard.messageNoTarget", "Restoran aktif. Anda belum menetapkan target laba bulanan.")
+    message: t("dashboard.messageNoTarget", "Usaha aktif. Anda belum menetapkan target laba bulanan.")
   } : statusConfigs[businessStatus];
 
   // 4. Data for Chart (Daily logs grouped by date and sorted ascending)

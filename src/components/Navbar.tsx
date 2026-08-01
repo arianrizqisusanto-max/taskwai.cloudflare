@@ -612,7 +612,7 @@ export default function Navbar({
                     : "text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-300"
                 }`}
               >
-                Owner Restoran
+                Owner Usaha
               </button>
               <button
                 type="button"
