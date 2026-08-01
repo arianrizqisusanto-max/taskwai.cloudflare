@@ -18,7 +18,29 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import BugReportButton from "./components/BugReportButton";
 
 
-// ChunkErrorFallback - shown when a lazy chunk cannot be loaded even after one retry
+// Helper to force a hard reload bypassing browser and CDN cache on chunk mismatch
+const forceHardReload = () => {
+  if (typeof window === "undefined") return;
+
+  // Clear any registered Service Workers and Cache Storage
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      registrations.forEach((reg) => reg.unregister());
+    });
+  }
+  if ("caches" in window) {
+    caches.keys().then((keys) => {
+      keys.forEach((key) => caches.delete(key));
+    });
+  }
+
+  // Force fetch fresh index.html with timestamp query parameter
+  const url = new URL(window.location.href);
+  url.searchParams.set("_v", Date.now().toString());
+  window.location.href = url.toString();
+};
+
+// ChunkErrorFallback - shown when a lazy chunk cannot be loaded even after retry
 function ChunkErrorFallback() {
   return (
     <div style={{
@@ -29,12 +51,12 @@ function ChunkErrorFallback() {
         Versi aplikasi telah diperbarui.
       </p>
       <p style={{ fontSize: "0.9rem", opacity: 0.7 }}>
-        Silakan muat ulang halaman untuk mendapatkan versi terbaru.
+        Memuat ulang otomatis untuk menyinkronkan versi terbaru...
       </p>
       <button
         onClick={() => {
           sessionStorage.removeItem("taskwai_chunk_reload");
-          window.location.reload();
+          forceHardReload();
         }}
         style={{
           marginTop: "0.5rem", padding: "0.75rem 2rem", borderRadius: "0.5rem",
@@ -42,35 +64,36 @@ function ChunkErrorFallback() {
           border: "none", cursor: "pointer"
         }}
       >
-        🔄 Muat Ulang
+        🔄 Muat Ulang Versi Terbaru
       </button>
     </div>
   );
 }
 
 // Helper: catch chunk load errors (hash mismatch after deploy).
-// Reload ONCE. If it still fails, show an error banner instead of infinite loop.
+// Automatically performs cache-busting reload to fetch the new deployment bundle.
 function safeLazy<T extends ComponentType<any>>(
   factory: () => Promise<{ default: T }>
 ) {
   return lazy(() =>
     factory().catch((error) => {
-      console.error("Failed to load chunk:", error);
+      console.error("Failed to load chunk due to new deploy, triggering hard reload:", error);
       if (typeof window !== "undefined") {
         const key = "taskwai_chunk_reload";
         const last = sessionStorage.getItem(key);
         const now = Date.now();
-        // Only auto-reload once per 30 seconds to prevent infinite loops
-        if (!last || now - parseInt(last, 10) > 30000) {
+        // Auto-reload with cache buster if not reloaded in the last 15 seconds
+        if (!last || now - parseInt(last, 10) > 15000) {
           sessionStorage.setItem(key, String(now));
-          window.location.reload();
+          forceHardReload();
+          return new Promise<{ default: T }>(() => {});
         }
       }
-      // If we already reloaded recently, render error fallback instead of blank
       return { default: ChunkErrorFallback as unknown as T };
     })
   );
 }
+
 
 // Lazy-loaded tab pages — only downloaded when the user navigates to them
 const InputProfit = safeLazy(() => import("./components/InputProfit"));
@@ -137,6 +160,16 @@ function MainApp() {
       sessionStorage.setItem("taskwai_active_tab", activeTab);
     }
   }, [activeTab]);
+
+  // Clean up cache-busting URL parameter _v if present after auto reload
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.search.includes("_v=")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("_v");
+      window.history.replaceState({}, "", url.pathname + (url.search ? url.search : "") + url.hash);
+    }
+  }, []);
+
 
   const toggleDark = () => setIsDark((prev) => !prev);
 
