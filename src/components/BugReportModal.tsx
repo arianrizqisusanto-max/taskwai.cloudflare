@@ -69,7 +69,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
 
       if (result.success) {
         setSubmitSuccess(true);
-        showToast("Laporan bug berhasil dikirim ke arianrisqi@gmail.com! Terima kasih.", "success");
+        showToast("Laporan bug berhasil dikirim! Terima kasih atas masukan Anda.", "success");
         setTimeout(() => {
           setSubmitSuccess(false);
           setTitle("");
@@ -103,10 +103,11 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
               <div>
                 <h3 className="text-lg font-bold tracking-tight">Laporkan Bug / Kendala</h3>
                 <p className="text-xs text-white/90">
-                  Laporan akan terkirim langsung ke pengembang (<span className="font-semibold underline underline-offset-2">arianrisqi@gmail.com</span>)
+                  Laporan akan terkirim langsung ke tim pengembang Taskwai
                 </p>
               </div>
             </div>
+
             <button
               onClick={onClose}
               className="p-1.5 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
