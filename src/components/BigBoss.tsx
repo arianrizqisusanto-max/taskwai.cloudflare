@@ -129,6 +129,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [showBreakdownModal, setShowBreakdownModal] = useState(false);
+  const [showLinkBranchModal, setShowLinkBranchModal] = useState(false);
 
   const formatLastUpdated = (date: Date, langStr: string) => {
     const locale = langStr === "en" ? "en-US" : "id-ID";
@@ -449,6 +450,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       await DataService.linkBigBossBranch(authCodeInput.trim());
       showToast("Cabang berhasil ditambahkan!", "success");
       setAuthCodeInput("");
+      setShowLinkBranchModal(false);
       fetchBranches();
     } catch (err: any) {
       console.error(err);
@@ -799,14 +801,28 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               </span>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowGuideModal(true)}
-            className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100/80 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-xs rounded-xl border border-emerald-200/60 dark:border-emerald-900/30 transition-all cursor-pointer shadow-sm"
-          >
-            <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>{t("bigboss.guideBtn", "Panduan & Aturan")}</span>
-          </button>
+          <div className="flex items-center gap-2.5 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setLinkingError("");
+                setShowLinkBranchModal(true);
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer border-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t("bigboss.addBranchButton", "Hubungkan Cabang")}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowGuideModal(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100/80 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-xs rounded-xl border border-emerald-200/60 dark:border-emerald-900/30 transition-all cursor-pointer shadow-sm"
+            >
+              <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>{t("bigboss.guideBtn", "Panduan & Aturan")}</span>
+            </button>
+          </div>
         </div>
 
       {loading ? (
@@ -911,61 +927,30 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             </div>
           )}
 
-          {/* 3. Link Branch Form & Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {/* Left Column: Link Branch Input Form */}
-            <div className="space-y-6">
-              <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm">
-                <h3 className="text-sm font-black uppercase tracking-wider text-zinc-950 dark:text-zinc-50 mb-2 flex items-center gap-1.5">
-                  <Plus className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
-                  {t("bigboss.addBranchTitle", "Hubungkan Cabang Baru")}
+          {/* 3. Linked Branches Dashboard */}
+          <div className="space-y-6">
+            {branches.length === 0 ? (
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-12 text-center shadow-sm">
+                <Building2 className="w-12 h-12 text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
+                <h3 className="text-sm font-black text-zinc-950 dark:text-zinc-50">
+                  {t("bigboss.noBranches", "Belum ada cabang terhubung.")}
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-normal mb-5">
-                  {t("bigboss.addBranchDesc", "Masukkan Kode Otorisasi dari menu Settings (Target) di akun cabang yang ingin dipantau.")}
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mt-2 leading-relaxed font-semibold">
+                  {t("bigboss.noBranchesDesc", "Mulai menautkan cabang dengan memasukkan kode otorisasi dari akun cabang Anda.")}
                 </p>
-
-                <form onSubmit={handleLinkBranch} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <input
-                      type="text"
-                      value={authCodeInput}
-                      onChange={(e) => setAuthCodeInput(e.target.value)}
-                      placeholder={t("bigboss.codePlaceholder", "Contoh: BRANCH-XYZ999")}
-                      className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono uppercase text-center tracking-widest"
-                    />
-                  </div>
-
-                  {linkingError && (
-                    <p className="text-[10px] text-red-600 dark:text-rose-450 font-bold leading-relaxed bg-red-50 dark:bg-rose-950/15 p-2 rounded-lg border border-red-100 dark:border-rose-900/30">
-                      ⚠️ {linkingError}
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isLinking || (!user?.isDemo && !authCodeInput.trim())}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0 disabled:opacity-55 disabled:cursor-not-allowed"
-                  >
-                    {isLinking ? "Menghubungkan..." : t("bigboss.addBranchButton", "Hubungkan Cabang")}
-                  </button>
-                </form>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLinkingError("");
+                    setShowLinkBranchModal(true);
+                  }}
+                  className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer border-0"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{t("bigboss.addBranchTitle", "Hubungkan Cabang Baru")}</span>
+                </button>
               </div>
-            </div>
-
-            {/* Right Column: Linked Branches List/Dashboard */}
-            <div className="lg:col-span-2 space-y-6">
-              {branches.length === 0 ? (
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-12 text-center shadow-sm">
-                  <Building2 className="w-12 h-12 text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
-                  <h3 className="text-sm font-black text-zinc-950 dark:text-zinc-50">
-                    {t("bigboss.noBranches", "Belum ada cabang terhubung.")}
-                  </h3>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mt-2 leading-relaxed font-semibold">
-                    {t("bigboss.noBranchesDesc", "Mulai menautkan cabang dengan memasukkan kode otorisasi dari akun cabang Anda.")}
-                  </p>
-                </div>
-              ) : (
+            ) : (
                 <>
                   {/* Branch Performance Comparison Chart */}
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-5 shadow-sm space-y-4">
@@ -1160,9 +1145,8 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 </>
               )}
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
       </div>
 
       {/* Login Required Modal for Big Boss */}
@@ -1583,6 +1567,96 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             </div>
           );
         })()}
+      </AnimatePresence>
+
+      {/* Link Branch Modal Pop-up */}
+      <AnimatePresence>
+        {showLinkBranchModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLinkBranchModal(false);
+                  setLinkingError("");
+                }}
+                className="absolute top-4 right-4 p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800/60 pb-4 mb-5">
+                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 rounded-xl text-emerald-600 dark:text-emerald-400">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
+                    {t("bigboss.addBranchTitle", "Hubungkan Cabang Baru")}
+                  </h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">
+                    {t("bigboss.addBranchDesc", "Masukkan Kode Otorisasi dari menu Settings (Target) di akun cabang yang ingin dipantau.")}
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleLinkBranch} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">
+                    Kode Otorisasi Cabang
+                  </label>
+                  <input
+                    type="text"
+                    value={authCodeInput}
+                    onChange={(e) => setAuthCodeInput(e.target.value)}
+                    placeholder={t("bigboss.codePlaceholder", "Contoh: BRANCH-XYZ999")}
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 focus:border-emerald-500 dark:focus:border-emerald-400 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 transition-all font-mono uppercase text-center tracking-widest"
+                    autoFocus
+                  />
+                </div>
+
+                {linkingError && (
+                  <p className="text-xs text-red-600 dark:text-rose-400 font-bold leading-relaxed bg-red-50 dark:bg-rose-950/20 p-2.5 rounded-xl border border-red-100 dark:border-rose-900/40">
+                    ⚠️ {linkingError}
+                  </p>
+                )}
+
+                <div className="pt-2 flex gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowLinkBranchModal(false);
+                      setLinkingError("");
+                    }}
+                    className="w-1/3 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold text-xs rounded-xl transition-colors cursor-pointer border-0"
+                  >
+                    {t("bigboss.guideClose", "Tutup")}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLinking || (!user?.isDemo && !authCodeInput.trim())}
+                    className="w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm cursor-pointer text-xs uppercase tracking-wider border-0 disabled:opacity-55 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isLinking ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Menghubungkan...</span>
+                      </>
+                    ) : (
+                      t("bigboss.addBranchButton", "Hubungkan Cabang")
+                    )}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );
