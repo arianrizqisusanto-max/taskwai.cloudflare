@@ -16,6 +16,7 @@ import { calculateTotalExpenses } from "../lib/financialMath";
 interface BranchData {
   id: string;
   name: string;
+  email?: string;
   monthlyTargetProfit: number;
   totalProfitMonth: number;
   profitWeek?: number;
@@ -38,6 +39,7 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
   {
     id: "demo_br_1",
     name: "Cabang Jakarta (Pusat)",
+    email: "cabang.jakarta@senjacoffee.id",
     monthlyTargetProfit: 50000000,
     totalProfitMonth: 62000000,
     profitWeek: 16500000,
@@ -58,6 +60,7 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
   {
     id: "demo_br_2",
     name: "Cabang Bandung",
+    email: "cabang.bandung@senjacoffee.id",
     monthlyTargetProfit: 40000000,
     totalProfitMonth: 68000000,
     profitWeek: 19200000,
@@ -77,6 +80,7 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
   {
     id: "demo_br_3",
     name: "Cabang Surabaya",
+    email: "cabang.surabaya@senjacoffee.id",
     monthlyTargetProfit: 60000000,
     totalProfitMonth: 25000000,
     profitWeek: 7200000,
@@ -482,7 +486,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
   // Filter & sort branches dynamically for scalable rendering
   const filteredBranches = branches
-    .filter(b => b.name.toLowerCase().includes(searchTerm.trim().toLowerCase()))
+    .filter(b => 
+      b.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+      (b.email && b.email.toLowerCase().includes(searchTerm.trim().toLowerCase()))
+    )
     .sort((a, b) => {
       const mA = getBranchMetrics(a, timeframe);
       const mB = getBranchMetrics(b, timeframe);
@@ -1077,8 +1084,17 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
                             return (
                               <tr key={branch.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
-                                <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-100">
-                                  {branch.name}
+                                <td className="py-3.5 px-4">
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-zinc-900 dark:text-zinc-100 leading-snug">
+                                      {branch.name}
+                                    </span>
+                                    {branch.email && (
+                                      <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 font-medium leading-tight mt-0.5">
+                                        {branch.email}
+                                      </span>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="py-3.5 px-4">
                                   <button
@@ -1498,7 +1514,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                       {t("bigboss.breakdownTitle", "Rincian Laba Kotor")}
                     </h3>
                     <p className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">
-                      {selectedBranch.name} • {timeframe === "daily" ? t("bigboss.breakdownDaily", "Hari Ini") : timeframe === "weekly" ? t("bigboss.breakdownWeekly", "Minggu Ini") : t("bigboss.breakdownMonthly", "Bulan Ini")}
+                      {selectedBranch.name} {selectedBranch.email ? `(${selectedBranch.email})` : ""} • {timeframe === "daily" ? t("bigboss.breakdownDaily", "Hari Ini") : timeframe === "weekly" ? t("bigboss.breakdownWeekly", "Minggu Ini") : t("bigboss.breakdownMonthly", "Bulan Ini")}
                     </p>
                   </div>
                 </div>

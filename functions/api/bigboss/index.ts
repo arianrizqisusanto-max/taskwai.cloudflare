@@ -38,6 +38,7 @@ export async function onRequest(context: any): Promise<Response> {
           r.id as id,
           r.name as name,
           r.monthlyTargetProfit as monthlyTargetProfit,
+          o.email as email,
           
           COALESCE(SUM(dp.profit), 0) as totalProfitMonth,
           COALESCE(SUM(dp.omzet), 0) as omzetMonth,
@@ -57,9 +58,10 @@ export async function onRequest(context: any): Promise<Response> {
           COUNT(DISTINCT dp.date) as daysEntered
         FROM bigboss_links bl
         JOIN restaurants r ON bl.branchRestaurantId = r.id
+        LEFT JOIN owners o ON r.ownerId = o.id
         LEFT JOIN daily_profits dp ON r.id = dp.restaurantId AND dp.date LIKE ?3
         WHERE bl.bossOwnerId = ?4
-        GROUP BY r.id, r.name, r.monthlyTargetProfit
+        GROUP BY r.id, r.name, r.monthlyTargetProfit, o.email
       `).bind(sevenDaysAgoStr, todayStr, `${monthPrefix}-%`, bossOwnerId).all();
 
       const branchStats = branchStatsQuery.results || [];
@@ -105,6 +107,7 @@ export async function onRequest(context: any): Promise<Response> {
         return {
           id: branch.id,
           name: branch.name,
+          email: branch.email || null,
           monthlyTargetProfit: branch.monthlyTargetProfit,
           totalProfitMonth: branch.totalProfitMonth,
           profitWeek: branch.profitWeek,
