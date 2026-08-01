@@ -952,20 +952,13 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               </div>
             ) : (
                 <>
-                  {/* Branch Performance Comparison Chart */}
-                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-5 shadow-sm space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+                  {/* 1. Branches Detail Table (TOP) */}
+                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="p-5 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-                            {t("bigboss.branchPerformance", "Perbandingan Performa Cabang")}
-                          </h3>
-                          {filteredBranches.length > 5 && (
-                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                              ↔ Scroll ({filteredBranches.length} Cabang)
-                            </span>
-                          )}
-                        </div>
+                        <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                          Rincian Performa Cabang ({filteredBranches.length})
+                        </h3>
                       </div>
 
                       {/* Search Bar & Sort Dropdown */}
@@ -1001,53 +994,6 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                           <option value="name">Nama: A → Z</option>
                         </select>
                       </div>
-                    </div>
-
-                    {/* Chart Container with Dynamic Min-Width Scroll */}
-                    {filteredBranches.length === 0 ? (
-                      <div className="py-12 text-center text-xs font-semibold text-zinc-400">
-                        Tidak ada cabang yang cocok dengan kata kunci "{searchTerm}".
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto scrollbar-thin pb-2">
-                        <div style={{ minWidth: filteredBranches.length > 5 ? `${filteredBranches.length * 110}px` : "100%", height: 260 }}>
-                          <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={3}>
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" className="dark:stroke-zinc-800/40" />
-                              <XAxis dataKey="name" stroke="#a1a1aa" fontSize={10} tickLine={false} interval={0} />
-                              <YAxis stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
-                              <Tooltip 
-                                contentStyle={{ 
-                                  background: 'var(--tooltip-bg, #ffffff)', 
-                                  border: '1px solid var(--tooltip-border, #e4e4e7)', 
-                                  color: 'var(--tooltip-text, #09090b)', 
-                                  fontSize: 11,
-                                  borderRadius: 12,
-                                  fontWeight: 'bold'
-                                }} 
-                              />
-                              <Legend wrapperStyle={{ fontSize: 10, fontWeight: 'bold' }} />
-                              <Bar dataKey={t("bigboss.labaKotor", "Laba Kotor")} fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={filteredBranches.length > 5 ? 14 : 18} />
-                              <Bar dataKey={t("bigboss.fixedCost", "Fixed Cost")} fill="#ef4444" radius={[4, 4, 0, 0]} barSize={filteredBranches.length > 5 ? 14 : 18} />
-                              <Bar dataKey={t("bigboss.labaMurni", "Laba Murni")} fill="#10b981" radius={[4, 4, 0, 0]} barSize={filteredBranches.length > 5 ? 14 : 18} />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Branches Detail Table */}
-                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm">
-                    <div className="p-5 border-b border-zinc-100 dark:border-zinc-800/60 flex justify-between items-center">
-                      <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-                        Rincian Performa Cabang ({filteredBranches.length})
-                      </h3>
-                      {searchTerm && (
-                        <span className="text-[10px] text-zinc-400 font-semibold">
-                          Filter: "{searchTerm}"
-                        </span>
-                      )}
                     </div>
 
                     <div className="overflow-x-auto">
@@ -1141,6 +1087,55 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         </tbody>
                       </table>
                     </div>
+                  </div>
+
+                  {/* 2. Branch Performance Comparison Chart (BOTTOM) */}
+                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-5 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                          {t("bigboss.branchPerformance", "Perbandingan Performa Cabang")}
+                        </h3>
+                        {filteredBranches.length > 5 && (
+                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
+                            ↔ Scroll ({filteredBranches.length} Cabang)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Chart Container with Dynamic Min-Width Scroll */}
+                    {filteredBranches.length === 0 ? (
+                      <div className="py-12 text-center text-xs font-semibold text-zinc-400">
+                        Tidak ada cabang yang cocok dengan kata kunci "{searchTerm}".
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto scrollbar-thin pb-2">
+                        <div style={{ minWidth: filteredBranches.length > 5 ? `${filteredBranches.length * 110}px` : "100%", height: 260 }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={3}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" className="dark:stroke-zinc-800/40" />
+                              <XAxis dataKey="name" stroke="#a1a1aa" fontSize={10} tickLine={false} interval={0} />
+                              <YAxis stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
+                              <Tooltip 
+                                contentStyle={{ 
+                                  background: 'var(--tooltip-bg, #ffffff)', 
+                                  border: '1px solid var(--tooltip-border, #e4e4e7)', 
+                                  color: 'var(--tooltip-text, #09090b)', 
+                                  fontSize: 11,
+                                  borderRadius: 12,
+                                  fontWeight: 'bold'
+                                }} 
+                              />
+                              <Legend wrapperStyle={{ fontSize: 10, fontWeight: 'bold' }} />
+                              <Bar dataKey={t("bigboss.labaKotor", "Laba Kotor")} fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={filteredBranches.length > 5 ? 14 : 18} />
+                              <Bar dataKey={t("bigboss.fixedCost", "Fixed Cost")} fill="#ef4444" radius={[4, 4, 0, 0]} barSize={filteredBranches.length > 5 ? 14 : 18} />
+                              <Bar dataKey={t("bigboss.labaMurni", "Laba Murni")} fill="#10b981" radius={[4, 4, 0, 0]} barSize={filteredBranches.length > 5 ? 14 : 18} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
