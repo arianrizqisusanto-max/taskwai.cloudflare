@@ -671,7 +671,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               <TaskwaiLogo size={34} />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-sans font-black text-lg tracking-tight text-zinc-900 dark:text-zinc-550">
+              <span className="font-sans font-black text-lg tracking-tight text-zinc-900 dark:text-zinc-50">
                 taskwai
               </span>
               <span 
@@ -711,7 +711,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             ) : (
               <>
                 <div className="hidden sm:block bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-lg px-3 py-0.5 text-right shadow-sm text-xs font-bold text-zinc-650 dark:text-zinc-300">
-                  <span className="block text-[8px] text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
+                  <span className="block text-[8px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                     {t("bigboss.loginHeader", "Login Big Boss")}
                   </span>
                   <span className="font-mono text-[11px]">{user.email}</span>
@@ -720,7 +720,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-3 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-250 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1.5"
+                  className="px-3 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs transition-colors cursor-pointer border-0 shadow-sm flex items-center gap-1.5"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>{t("nav.logout", "Keluar")}</span>
@@ -783,7 +783,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               {t("bigboss.title", "Dashboard Big Boss")}
             </h1>
             <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
-              <p className="text-zinc-550 dark:text-zinc-400 text-xs sm:text-sm font-medium">
+              <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm font-medium">
                 {t("bigboss.subtitle", "Pantau performa keuangan seluruh cabang Anda dalam satu dasbor terpadu.")}
               </p>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-900/40 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 font-mono shadow-2xs">
@@ -872,7 +872,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               {/* Card 1: Total Gross Profit */}
               <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400" />
-                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {t("bigboss.combinedProfit", "Total Laba Gabungan")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
                 </span>
                 <span className="font-mono text-2xl font-black tracking-tight text-zinc-950 dark:text-white block mt-3 tabular-nums">
@@ -883,7 +883,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               {/* Card 2: Total Operating Cost */}
               <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 to-red-400" />
-                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-550 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {t("bigboss.combinedExpenses", "Total Pengeluaran Operasional Gabungan")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
                 </span>
                 <span className="font-mono text-2xl font-black tracking-tight text-rose-600 dark:text-rose-450 block mt-3 tabular-nums">
@@ -894,7 +894,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
               {/* Card 3: Total Net Profit */}
               <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400" />
-                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-555 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {t("bigboss.combinedNetProfit", "Total Laba Bersih Murni")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
                 </span>
                 <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-450 block mt-3 tabular-nums">
