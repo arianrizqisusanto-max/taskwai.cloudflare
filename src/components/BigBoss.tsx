@@ -784,7 +784,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       </header>
 
       {/* Main Content Area */}
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4">
         <div className="pb-2 border-b border-zinc-200/60 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h1 className="font-sans font-black text-2xl sm:text-3xl tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5">
@@ -833,7 +833,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       ) : (
         <>
           {/* 1.5 Timeframe Filter Control Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-3.5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl py-2 px-3.5 shadow-sm">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl text-emerald-600 dark:text-emerald-400">
                 <Calendar className="w-4 h-4" />
@@ -891,36 +891,36 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
           {/* 2. Consolidated Totals Metric Cards */}
           {branches.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               {/* Card 1: Total Gross Profit */}
-              <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
+              <div className="p-4 sm:p-4.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400" />
                 <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {t("bigboss.combinedProfit", "Total Laba Gabungan")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
                 </span>
-                <span className="font-mono text-2xl font-black tracking-tight text-zinc-950 dark:text-white block mt-3 tabular-nums">
+                <span className="font-mono text-2xl font-black tracking-tight text-zinc-950 dark:text-white block mt-1.5 tabular-nums">
                   {formatRupiah(totalCombinedProfit)}
                 </span>
               </div>
 
               {/* Card 2: Total Operating Cost */}
-              <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
+              <div className="p-4 sm:p-4.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-rose-500 to-red-400" />
                 <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {t("bigboss.combinedExpenses", "Total Pengeluaran Operasional Gabungan")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
                 </span>
-                <span className="font-mono text-2xl font-black tracking-tight text-rose-600 dark:text-rose-450 block mt-3 tabular-nums">
+                <span className="font-mono text-2xl font-black tracking-tight text-rose-600 dark:text-rose-450 block mt-1.5 tabular-nums">
                   -{formatRupiah(totalCombinedExpenses)}
                 </span>
               </div>
 
               {/* Card 3: Total Net Profit */}
-              <div className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
+              <div className="p-4 sm:p-4.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400" />
                 <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {t("bigboss.combinedNetProfit", "Total Laba Bersih Murni")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
                 </span>
-                <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-450 block mt-3 tabular-nums">
+                <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-450 block mt-1.5 tabular-nums">
                   {formatRupiah(totalCombinedNetProfit)}
                 </span>
               </div>
@@ -928,7 +928,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
           )}
 
           {/* 3. Linked Branches Dashboard */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {branches.length === 0 ? (
               <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-12 text-center shadow-sm">
                 <Building2 className="w-12 h-12 text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
@@ -954,7 +954,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 <>
                   {/* 1. Branches Detail Table (TOP) */}
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm">
-                    <div className="p-5 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                       <div>
                         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                           Rincian Performa Cabang ({filteredBranches.length})
@@ -970,7 +970,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Cari cabang..."
-                            className="w-full pl-8 pr-7 py-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-emerald-500 transition-colors"
+                            className="w-full pl-8 pr-7 py-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-emerald-500 transition-colors"
                           />
                           {searchTerm && (
                             <button
@@ -986,7 +986,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         <select
                           value={sortBy}
                           onChange={(e) => setSortBy(e.target.value as any)}
-                          className="px-2.5 py-1.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                          className="px-2.5 py-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
                         >
                           <option value="profit_desc">Laba: High → Low</option>
                           <option value="profit_asc">Laba: Low → High</option>
@@ -1000,12 +1000,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                       <table className="w-full border-collapse text-left text-xs font-semibold text-zinc-650 dark:text-zinc-400">
                         <thead className="bg-zinc-50 dark:bg-zinc-950 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider border-b border-zinc-150 dark:border-zinc-850">
                           <tr>
-                            <th className="py-3 px-4">{t("bigboss.branchName", "Nama Cabang")}</th>
-                            <th className="py-3 px-4">{t("bigboss.labaKotor", "Laba Kotor")}</th>
-                            <th className="py-3 px-4">Fixed Cost</th>
-                            <th className="py-3 px-4">{t("bigboss.labaMurni", "Laba Murni")}</th>
-                            <th className="py-3 px-4">{t("bigboss.status", "Status")}</th>
-                            <th className="py-3 px-4 text-center">{t("bigboss.actions", "Aksi")}</th>
+                            <th className="py-2.5 px-3.5">{t("bigboss.branchName", "Nama Cabang")}</th>
+                            <th className="py-2.5 px-3.5">{t("bigboss.labaKotor", "Laba Kotor")}</th>
+                            <th className="py-2.5 px-3.5">Fixed Cost</th>
+                            <th className="py-2.5 px-3.5">{t("bigboss.labaMurni", "Laba Murni")}</th>
+                            <th className="py-2.5 px-3.5">{t("bigboss.status", "Status")}</th>
+                            <th className="py-2.5 px-3.5 text-center">{t("bigboss.actions", "Aksi")}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850 font-medium">
@@ -1015,7 +1015,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
                             return (
                               <tr key={branch.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
-                                <td className="py-3.5 px-4">
+                                <td className="py-2.5 px-3.5">
                                   <div className="flex flex-col">
                                     <span className="font-bold text-zinc-900 dark:text-zinc-100 leading-snug">
                                       {branch.name}
@@ -1027,7 +1027,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                     )}
                                   </div>
                                 </td>
-                                <td className="py-3.5 px-4">
+                                <td className="py-2.5 px-3.5">
                                   <button
                                     type="button"
                                     onClick={() => handleOpenBreakdown(branch)}
@@ -1038,7 +1038,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                     <Info className="w-3.5 h-3.5 text-blue-400 dark:text-blue-500/70 opacity-0 group-hover:opacity-100 transition-opacity" />
                                   </button>
                                 </td>
-                                <td className="py-3.5 px-4">
+                                <td className="py-2.5 px-3.5">
                                   <div className="flex items-center gap-1.5">
                                     <span 
                                       className={`font-mono tabular-nums text-rose-600 dark:text-rose-450 ${branch.historyCount && branch.historyCount > 1 ? 'cursor-pointer hover:underline underline-offset-4 decoration-rose-500/50' : ''}`}
@@ -1062,13 +1062,13 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                     ) : null}
                                   </div>
                                 </td>
-                                <td className="py-3.5 px-4 font-mono tabular-nums font-black text-emerald-600 dark:text-emerald-400">
+                                <td className="py-2.5 px-3.5 font-mono tabular-nums font-black text-emerald-600 dark:text-emerald-400">
                                   {formatRupiah(m.net)}
                                 </td>
-                                <td className="py-3.5 px-4">
+                                <td className="py-2.5 px-3.5">
                                   {getStatusBadge(status)}
                                 </td>
-                                <td className="py-3.5 px-4 text-center">
+                                <td className="py-2.5 px-3.5 text-center">
                                   <div className="flex items-center justify-center gap-2">
                                     <button
                                       type="button"
@@ -1090,8 +1090,8 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                   </div>
 
                   {/* 2. Branch Performance Comparison Chart (BOTTOM) */}
-                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-5 shadow-sm space-y-4">
-                    <div className="flex items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between gap-3 pb-2.5 border-b border-zinc-100 dark:border-zinc-800/60">
                       <div className="flex items-center gap-2">
                         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                           {t("bigboss.branchPerformance", "Perbandingan Performa Cabang")}
@@ -1106,12 +1106,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
                     {/* Chart Container with Dynamic Min-Width Scroll */}
                     {filteredBranches.length === 0 ? (
-                      <div className="py-12 text-center text-xs font-semibold text-zinc-400">
+                      <div className="py-8 text-center text-xs font-semibold text-zinc-400">
                         Tidak ada cabang yang cocok dengan kata kunci "{searchTerm}".
                       </div>
                     ) : (
-                      <div className="overflow-x-auto scrollbar-thin pb-2">
-                        <div style={{ minWidth: filteredBranches.length > 5 ? `${filteredBranches.length * 110}px` : "100%", height: 260 }}>
+                      <div className="overflow-x-auto scrollbar-thin pb-1">
+                        <div style={{ minWidth: filteredBranches.length > 5 ? `${filteredBranches.length * 110}px` : "100%", height: 210 }}>
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={3}>
                               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" className="dark:stroke-zinc-800/40" />
