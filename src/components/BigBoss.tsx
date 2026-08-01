@@ -556,27 +556,28 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       case "green":
         return (
           <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/35 uppercase select-none">
-            <CheckCircle className="w-3 h-3" /> Aman
+            <CheckCircle className="w-3 h-3" /> {t("dashboard.statusSafe", "Aman")}
           </span>
         );
       case "yellow":
         return (
           <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/35 uppercase select-none">
-            <AlertTriangle className="w-3 h-3" /> Waspada
+            <AlertTriangle className="w-3 h-3" /> {t("dashboard.statusCaution", "Waspada")}
           </span>
         );
       case "red":
         return (
           <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-455 border border-rose-100 dark:border-rose-900/35 uppercase select-none">
-            <AlertOctagon className="w-3 h-3" /> Bahaya
+            <AlertOctagon className="w-3 h-3" /> {t("dashboard.statusDanger", "Bahaya")}
           </span>
         );
       default:
         return (
           <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-zinc-50 dark:bg-zinc-800/40 text-zinc-500 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800/30 uppercase select-none">
-            <Building2 className="w-3 h-3" /> Aktif
+            <Building2 className="w-3 h-3" /> {t("dashboard.statusActive", "Aktif")}
           </span>
         );
+
     }
   };
 
@@ -960,7 +961,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                     <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                       <div>
                         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-                          Rincian Performa Cabang ({filteredBranches.length})
+                          {t("bigboss.rincianPerforma", "Rincian Performa Cabang")} ({filteredBranches.length})
                         </h3>
                       </div>
 
@@ -972,7 +973,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Cari cabang..."
+                            placeholder={t("bigboss.searchPlaceholder", "Cari cabang...")}
                             className="w-full pl-8 pr-7 py-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-emerald-500 transition-colors"
                           />
                           {searchTerm && (
@@ -991,10 +992,10 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                           onChange={(e) => setSortBy(e.target.value as any)}
                           className="px-2.5 py-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
                         >
-                          <option value="profit_desc">Laba: High → Low</option>
-                          <option value="profit_asc">Laba: Low → High</option>
-                          <option value="expense_desc">Fixed Cost: High → Low</option>
-                          <option value="name">Nama: A → Z</option>
+                          <option value="profit_desc">{t("bigboss.sortProfitDesc", "Laba: High → Low")}</option>
+                          <option value="profit_asc">{t("bigboss.sortProfitAsc", "Laba: Low → High")}</option>
+                          <option value="expense_desc">{t("bigboss.sortExpenseDesc", "Fixed Cost: High → Low")}</option>
+                          <option value="name">{t("bigboss.sortName", "Nama: A → Z")}</option>
                         </select>
                       </div>
                     </div>
@@ -1005,12 +1006,13 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                           <tr>
                             <th className="py-2.5 px-3.5">{t("bigboss.branchName", "Nama Cabang")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.labaKotor", "Laba Kotor")}</th>
-                            <th className="py-2.5 px-3.5">Fixed Cost</th>
+                            <th className="py-2.5 px-3.5">{t("bigboss.fixedCost", "Fixed Cost")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.labaMurni", "Laba Murni")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.status", "Status")}</th>
                             <th className="py-2.5 px-3.5 text-center">{t("bigboss.actions", "Aksi")}</th>
                           </tr>
                         </thead>
+
                         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-850 font-medium">
                           {filteredBranches.map((branch) => {
                             const m = getBranchMetrics(branch, timeframe);
