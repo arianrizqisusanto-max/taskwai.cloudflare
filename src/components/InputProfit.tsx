@@ -752,14 +752,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                                 {p.notes ? `"${p.notes}"` : t("profit.noNotes", "Tidak ada catatan")}
                               </div>
 
-                              {/* Metadata Info (Cabang, Operator, Waktu) */}
-                              <div className={`mt-2 grid ${p.branchName ? "grid-cols-3" : "grid-cols-2"} gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2`}>
-                                {p.branchName && (
-                                  <div>
-                                    <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Cabang</span>
-                                    <span className="text-zinc-800 dark:text-zinc-200 truncate block">🏢 {p.branchName}</span>
-                                  </div>
-                                )}
+                              {/* Metadata Info (Operator, Waktu) */}
+                              <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400 border-t border-zinc-100/50 dark:border-zinc-800/40 pt-2">
                                 <div>
                                   <span className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase block font-black mb-0.5">Operator</span>
                                   <span className="text-zinc-800 dark:text-zinc-200 truncate block">
