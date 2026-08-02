@@ -15,7 +15,7 @@ export default function BugReportButton({ user, staffSession }: BugReportButtonP
   return (
     <>
       {/* Minimal Floating Bug Button */}
-      <div className="fixed bottom-4 right-4 z-[9990] flex items-center group">
+      <div className="fixed bottom-[5.25rem] right-4 lg:bottom-4 lg:right-4 z-[9990] flex items-center group">
         {/* Tooltip on Hover */}
         <div className="mr-2 px-2.5 py-1 bg-zinc-900/80 dark:bg-zinc-800/90 text-white text-[11px] font-medium rounded-md shadow-md backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap translate-x-1 group-hover:translate-x-0 hidden sm:block tracking-wide">
           {t("bug.buttonTitle", "Laporkan Bug")}
