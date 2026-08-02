@@ -286,7 +286,7 @@ export const enTranslations: Record<string, string> = {
   "bigboss.loginHeader": "Big Boss Account",
   "bigboss.connectedBranchesLabel": "Connected Outlets",
   "bigboss.outletUnit": "Outlets",
-  "bigboss.addBranchButton": "+ Link Branch",
+  "bigboss.addBranchButton": "Link Branch",
   "bigboss.addBranchTitle": "Link New Branch",
   "bigboss.guideBtn": "Guide & Rules",
   "bigboss.timeframeLabel": "Branch Report Period:",
