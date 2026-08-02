@@ -122,7 +122,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   
   // Search & Filter state for scalable branch rendering
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<"profit_desc" | "profit_asc" | "expense_desc" | "name">("profit_desc");
+  const [sortBy, setSortBy] = useState<"profit_desc" | "profit_asc" | "target_desc" | "expense_desc" | "name">("profit_desc");
   
   // History Modal State
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -483,10 +483,21 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     }
   };
 
+  // Helper to get branch target adapted to selected timeframe
+  const getBranchTarget = (branch: BranchData, tf: "daily" | "weekly" | "monthly") => {
+    const baseTarget = branch.monthlyTargetProfit || 0;
+    if (baseTarget <= 0) return 0;
+    if (tf === "daily") return Math.round(baseTarget / 30);
+    if (tf === "weekly") return Math.round((baseTarget * 7) / 30);
+    return baseTarget;
+  };
+
   // Aggregated totals across all branches based on selected timeframe
   const totalCombinedProfit = branches.reduce((acc, b) => acc + getBranchMetrics(b, timeframe).gross, 0);
   const totalCombinedExpenses = branches.reduce((acc, b) => acc + getBranchMetrics(b, timeframe).exp, 0);
   const totalCombinedNetProfit = Math.max(0, totalCombinedProfit - totalCombinedExpenses);
+  const totalCombinedTarget = branches.reduce((acc, b) => acc + getBranchTarget(b, timeframe), 0);
+  const totalCombinedTargetPct = totalCombinedTarget > 0 ? Math.round((totalCombinedNetProfit / totalCombinedTarget) * 100) : 0;
 
   // Filter & sort branches dynamically for scalable rendering
   const filteredBranches = branches
@@ -500,6 +511,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       if (sortBy === "profit_desc") return mB.net - mA.net;
       if (sortBy === "profit_asc") return mA.net - mB.net;
       if (sortBy === "expense_desc") return mB.exp - mA.exp;
+      if (sortBy === "target_desc") return getBranchTarget(b, timeframe) - getBranchTarget(a, timeframe);
       return a.name.localeCompare(b.name);
     });
 
@@ -895,7 +907,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
 
           {/* 2. Consolidated Totals Metric Cards */}
           {branches.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
               {/* Card 1: Total Gross Profit */}
               <div className="p-4 sm:p-4.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400" />
@@ -927,6 +939,24 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-450 block mt-1.5 tabular-nums">
                   {formatRupiah(totalCombinedNetProfit)}
                 </span>
+              </div>
+
+              {/* Card 4: Total Combined Target Profit */}
+              <div className="p-4 sm:p-4.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 to-yellow-400" />
+                <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
+                  {t("bigboss.combinedTarget", "Total Target Laba Gabungan")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
+                </span>
+                <div className="flex items-baseline justify-between mt-1.5">
+                  <span className="font-mono text-2xl font-black tracking-tight text-amber-600 dark:text-amber-400 tabular-nums">
+                    {formatRupiah(totalCombinedTarget)}
+                  </span>
+                  {totalCombinedTarget > 0 && (
+                    <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full ${totalCombinedTargetPct >= 100 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60'}`}>
+                      {totalCombinedTargetPct}%
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -994,6 +1024,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         >
                           <option value="profit_desc">{t("bigboss.sortProfitDesc", "Laba: High → Low")}</option>
                           <option value="profit_asc">{t("bigboss.sortProfitAsc", "Laba: Low → High")}</option>
+                          <option value="target_desc">{t("bigboss.sortTargetDesc", "Target: High → Low")}</option>
                           <option value="expense_desc">{t("bigboss.sortExpenseDesc", "Fixed Cost: High → Low")}</option>
                           <option value="name">{t("bigboss.sortName", "Nama: A → Z")}</option>
                         </select>
@@ -1005,6 +1036,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         <thead className="bg-zinc-50 dark:bg-zinc-950 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider border-b border-zinc-150 dark:border-zinc-850">
                           <tr>
                             <th className="py-2.5 px-3.5">{t("bigboss.branchName", "Nama Cabang")}</th>
+                            <th className="py-2.5 px-3.5">{t("bigboss.targetProfit", "Target Laba")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.labaKotor", "Laba Kotor")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.fixedCost", "Fixed Cost")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.labaMurni", "Laba Murni")}</th>
@@ -1017,6 +1049,8 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                           {filteredBranches.map((branch) => {
                             const m = getBranchMetrics(branch, timeframe);
                             const status = getBranchStatus(branch);
+                            const targetVal = getBranchTarget(branch, timeframe);
+                            const achievementPct = targetVal > 0 ? Math.round((m.net / targetVal) * 100) : 0;
 
                             return (
                               <tr key={branch.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
@@ -1031,6 +1065,20 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                       </span>
                                     )}
                                   </div>
+                                </td>
+                                <td className="py-2.5 px-3.5">
+                                  {targetVal > 0 ? (
+                                    <div className="flex flex-col">
+                                      <span className="font-mono tabular-nums font-bold text-zinc-800 dark:text-zinc-200">
+                                        {formatRupiah(targetVal)}
+                                      </span>
+                                      <span className={`text-[10px] font-semibold ${achievementPct >= 100 ? "text-emerald-600 dark:text-emerald-400 font-bold" : achievementPct >= 80 ? "text-amber-600 dark:text-amber-400" : "text-zinc-400"}`}>
+                                        {achievementPct}% {t("bigboss.achieved", "tercapai")}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-zinc-400 dark:text-zinc-600 text-xs italic">-</span>
+                                  )}
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   <button
