@@ -16,18 +16,19 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
   const { t } = useTranslation();
 
   const [emailInput, setEmailInput] = useState("");
-  const [category, setCategory] = useState("UI/Tampilan");
+  const [category, setCategory] = useState("Feature");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const bugCategories = [
-    { id: "UI/Tampilan",  label: t("bug.catUi",   "🎨 Tampilan / Layout"),          desc: t("bug.catUiDesc",   "Desain, tombol, atau respon halaman") },
-    { id: "Kalkulasi",   label: t("bug.catCalc",  "📊 Kalkulasi Profit & Biaya"),    desc: t("bug.catCalcDesc", "Angka atau perhitungan tidak akurat") },
-    { id: "Auth/Session",label: t("bug.catAuth",  "🔐 Akun & Login"),                desc: t("bug.catAuthDesc", "Autentikasi Google atau akses Staff") },
-    { id: "Performa",    label: t("bug.catPerf",  "⚡ Lambat / Freeze"),             desc: t("bug.catPerfDesc", "Aplikasi lemot atau tidak merespon") },
-    { id: "Lainnya",     label: t("bug.catOther", "💡 Kendala Lain / Masukan"),      desc: t("bug.catOtherDesc","Keluhan atau saran fitur baru") },
+    { id: "Feature",     label: t("bug.catFeature", "✨ Request Fitur Baru"),        desc: t("bug.catFeatureDesc", "Usulkan fitur baru atau ide pengembangan yang Anda butuhkan") },
+    { id: "UI/Tampilan",  label: t("bug.catUi",      "🎨 Tampilan / Layout"),          desc: t("bug.catUiDesc",      "Desain, tombol, atau respon halaman") },
+    { id: "Kalkulasi",   label: t("bug.catCalc",     "📊 Perhitungan Profit & Biaya"), desc: t("bug.catCalcDesc",    "Angka atau rumus yang tidak akurat") },
+    { id: "Auth/Session",label: t("bug.catAuth",     "🔐 Akun & Login"),                desc: t("bug.catAuthDesc",    "Autentikasi Google atau akses Staff") },
+    { id: "Performa",    label: t("bug.catPerf",     "⚡ Lambat / Freeze"),             desc: t("bug.catPerfDesc",    "Aplikasi lemot atau tidak merespon") },
+    { id: "Lainnya",     label: t("bug.catOther",    "💡 Masukan & Saran"),            desc: t("bug.catOtherDesc",   "Masukan umum atau masukan lainnya") },
   ];
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
   if (!isOpen) return null;
 
   const selectedCat = bugCategories.find(c => c.id === category);
+  const isFeature = category === "Feature";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +57,8 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
       const payload = {
         userEmail: emailInput.trim(),
         userId: user?.uid || (staffSession ? `staff_${staffSession.restaurantId}` : undefined),
-        category,
-        title: title.trim() || `Laporan Kendala ${category}`,
+        category: isFeature ? "Request Fitur Baru" : category,
+        title: title.trim() || (isFeature ? "Usulan Fitur Baru" : `Laporan Kendala ${category}`),
         description: description.trim(),
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
         pageUrl: typeof window !== "undefined" ? window.location.href : ""
@@ -64,7 +66,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
       const result = await DataService.reportBug(payload);
       if (result.success) {
         setSubmitSuccess(true);
-        showToast(t("bug.toastSuccess", "Laporan bug berhasil dikirim! Terima kasih."), "success");
+        showToast(t("bug.toastSuccess", "Terima kasih! Pesan berhasil dikirim."), "success");
         setTimeout(() => {
           setSubmitSuccess(false);
           setTitle("");
@@ -72,7 +74,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
           onClose();
         }, 2000);
       } else {
-        throw new Error(result.message || "Gagal mengirim laporan");
+        throw new Error(result.message || "Gagal mengirim pesan");
       }
     } catch (err: any) {
       showToast(err.message || t("bug.toastError", "Gagal mengirim. Coba lagi."), "error");
@@ -98,10 +100,10 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 leading-tight">
-              {t("bug.modalTitle", "Laporkan Bug / Kendala")}
+              {t("bug.modalTitle", "Bantuan, Bug & Usulan Fitur")}
             </h3>
             <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5 leading-tight">
-              {t("bug.modalSubtitle", "Laporan terkirim ke tim pengembang Taskwai")}
+              {t("bug.modalSubtitle", "Kirim kendala teknis atau ide fitur baru langsung ke tim pengembang Taskwai")}
             </p>
           </div>
           <button
@@ -120,10 +122,10 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
             </div>
             <div>
               <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
-                {t("bug.successTitle", "Laporan Terkirim!")}
+                {t("bug.successTitle", "Pesan Terkirim!")}
               </p>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 max-w-xs mx-auto leading-relaxed">
-                {t("bug.successMessage", "Terima kasih. Tim kami akan segera meninjau laporan ini.")}
+                {t("bug.successMessage", "Terima kasih. Tim kami akan segera meninjau pesan ini.")}
               </p>
             </div>
           </div>
@@ -194,7 +196,11 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
                   type="text"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  placeholder={t("bug.subjectPlaceholder", "Ringkasan singkat masalah...")}
+                  placeholder={
+                    isFeature
+                      ? t("bug.featureSubjectPlaceholder", "Contoh: Usul fitur cetak nota ke printer thermal Bluetooth")
+                      : t("bug.subjectPlaceholder", "Ringkasan singkat kendala...")
+                  }
                   className="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 transition-shadow"
                 />
               </div>
@@ -202,14 +208,18 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
               {/* Detail */}
               <div className="space-y-1.5">
                 <label className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                  {t("bug.descriptionLabel", "Detail Keluhan")} <span className="text-rose-400">*</span>
+                  {isFeature ? t("bug.featureDescLabel", "Detail Usulan Fitur") : t("bug.descriptionLabel", "Detail Keluhan / Bug")} <span className="text-rose-400">*</span>
                 </label>
                 <textarea
                   required
                   rows={4}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder={t("bug.descriptionPlaceholder", "Jelaskan apa yang terjadi, halaman mana, pesan error apa...")}
+                  placeholder={
+                    isFeature
+                      ? t("bug.featureDescPlaceholder", "Jelaskan ide fitur yang Anda inginkan, bagaimana cara kerjanya, dan mengapa fitur ini berguna untuk usaha Anda...")
+                      : t("bug.descriptionPlaceholder", "Jelaskan apa yang terjadi, lokasi halaman, atau pesan error yang muncul...")
+                  }
                   className="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 resize-none transition-shadow"
                 />
                 <div className="flex justify-between text-[10px] text-zinc-400">
@@ -242,7 +252,7 @@ export default function BugReportModal({ isOpen, onClose, user, staffSession }: 
                 ) : (
                   <>
                     <Send className="w-3.5 h-3.5" />
-                    {t("bug.submit", "Kirim Laporan")}
+                    {isFeature ? t("bug.submitFeature", "Kirim Usulan Fitur") : t("bug.submit", "Kirim Laporan")}
                   </>
                 )}
               </button>
