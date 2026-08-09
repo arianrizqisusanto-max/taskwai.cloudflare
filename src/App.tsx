@@ -479,7 +479,7 @@ function MainApp() {
       case "bigboss":
         return <BigBoss setActiveTab={setActiveTab} isDark={isDark} toggleDark={toggleDark} />;
       case "laporan":
-        return <Laporan profits={profits} restaurant={restaurant} />;
+        return <Laporan profits={profits} restaurant={restaurant} user={user} />;
       case "target":
         return (
           <Target

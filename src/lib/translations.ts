@@ -128,8 +128,11 @@ export const enTranslations: Record<string, string> = {
   "profit.deleteTitle": "Delete Profit History",
   "profit.deleteConfirmCustom": "Are you sure you want to delete the profit data for {date}?",
   "profit.deleteButton": "Delete Data",
+  "profit.dateLockedError": "Data for past months is locked and cannot be modified.",
+  "profit.locked": "Locked",
 
   // --- Biaya Operasional (Biaya) ---
+  "biaya.lockedNotice": "Past month's operating cost report is locked and cannot be modified.",
   "biaya.title": "Set Fixed Monthly Operating Costs",
   "biaya.subtitle": "Enter your business's estimated monthly fixed expenses.",
   "biaya.rentNotice": "Note: All values below are monthly expenses. If rent or other costs are paid annually, please divide by 12 before inputting.",
@@ -195,6 +198,17 @@ export const enTranslations: Record<string, string> = {
   "laporan.tableHpp": "COGS",
   "laporan.noLogsForFilter": 'No profit logs found for filter "{filter}".',
   "laporan.noLogsForFilterDesc": "Please add profit data or change the filter range above.",
+  "laporan.ratingTitle": "Monthly Performance Rating",
+  "laporan.copsTitle": "Fixed Operating Cost Details",
+  "laporan.labaMurniText": "Net Profit",
+  "laporan.perfAmazing": "Profit exceeds target by a wide margin (>150%)!",
+  "laporan.perfExcellent": "Profit exceeds target excellently (>120%)!",
+  "laporan.statusBaik": "Good (Safe) ✅",
+  "laporan.perfBaik": "Profit successfully reached or exceeded target!",
+  "laporan.statusWaspada": "Caution ⚠️",
+  "laporan.perfWaspada": "Profit is close to target but not fully achieved yet (85%-99%).",
+  "laporan.statusBuruk": "Danger 🚨",
+  "laporan.perfBuruk": "Profit is far below target this month (<85%).",
 
   // --- Pengaturan (Settings / Target) ---
   "target.title": "Profile & Target Settings",

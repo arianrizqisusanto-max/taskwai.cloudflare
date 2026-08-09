@@ -24,6 +24,16 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
   const isDollar = currency === "dollar";
   const formatLocale = isDollar ? "en-US" : "id-ID";
 
+  const isMonthLocked = (monthStr: string) => {
+    const d = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); // UTC+7 WIB
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const currentMonth = `${year}-${month}`;
+    return monthStr < currentMonth;
+  };
+
+  const isLocked = isMonthLocked(expensesMonth);
+
   // Individual states for all expenses
   const [sewaTempat, setSewaTempat] = useState(new Intl.NumberFormat(formatLocale).format(expenses.sewaTempat));
   const [gajiKaryawan, setGajiKaryawan] = useState(new Intl.NumberFormat(formatLocale).format(expenses.gajiKaryawan));
@@ -93,6 +103,10 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLocked) {
+      showToast(t("biaya.lockedNotice", "Laporan biaya bulan lalu telah dikunci & tidak dapat diubah."), "error");
+      return;
+    }
     setIsSaving(true);
 
     const updatedData: Partial<Expenses> = {
@@ -237,7 +251,7 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <fieldset disabled={isLocked} className="grid grid-cols-1 sm:grid-cols-2 gap-5 border-0 p-0 m-0">
             {/* Sewa Tempat */}
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">{t("biaya.sewa", "Sewa Tempat")}</label>
@@ -377,17 +391,23 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
                 />
               </div>
             </div>
-          </div>
+          </fieldset>
 
           <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800/80 flex justify-end">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-semibold py-2.5 px-6 rounded-xl transition-all shadow-sm disabled:opacity-50 text-sm cursor-pointer"
-            >
-              <Save className="w-4 h-4" />
-              <span>{isSaving ? t("biaya.saving", "Menyimpan...") : t("biaya.save", "Simpan Perubahan Biaya")}</span>
-            </button>
+            {isLocked ? (
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-rose-500/10 dark:bg-rose-500/20 border border-rose-200/40 dark:border-rose-900/30 text-rose-600 dark:text-rose-455 rounded-xl text-xs font-bold font-sans">
+                <span>🔒 {t("biaya.lockedNotice", "Laporan biaya bulan lalu telah dikunci & tidak dapat diubah.")}</span>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-950 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-semibold py-2.5 px-6 rounded-xl transition-all shadow-sm disabled:opacity-50 text-sm cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isSaving ? t("biaya.saving", "Menyimpan...") : t("biaya.save", "Simpan Perubahan Biaya")}</span>
+              </button>
+            )}
           </div>
         </div>
       </form>

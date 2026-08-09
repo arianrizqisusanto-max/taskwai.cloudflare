@@ -125,6 +125,18 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check if date belongs to a past month
+    const targetMonth = date.substring(0, 7);
+    const d = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); // Jakarta WIB
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const currentMonth = `${year}-${month}`;
+
+    if (targetMonth < currentMonth) {
+      showToast(t("profit.dateLockedError", "Data untuk bulan-bulan lalu telah dikunci dan tidak dapat diubah."), "error");
+      return;
+    }
+    
     if (omzetVal <= 0) {
       showToast(t("profit.invalidOmzet", "Harap masukkan nilai omzet yang valid (lebih besar dari 0)"), "warning");
       return;
@@ -772,14 +784,28 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                               <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono">
                                 ID: {p.id}
                               </span>
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(p.id, p.date)}
-                                className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/45 text-rose-600 dark:text-rose-450 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                                <span>{t("profit.deleteButton", "Hapus Data")}</span>
-                              </button>
+                              {(() => {
+                                const logMonth = p.date.substring(0, 7);
+                                const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+                                const currentMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+                                const isLogLocked = logMonth < currentMonth;
+
+                                return isLogLocked ? (
+                                  <div className="flex items-center gap-1 text-[11px] font-bold text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/50 dark:border-zinc-850 px-2 py-0.5 rounded-lg">
+                                    <span>🔒</span>
+                                    <span>{t("profit.locked", "Terkunci")}</span>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDelete(p.id, p.date)}
+                                    className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/45 text-rose-600 dark:text-rose-455 text-xs font-bold rounded-lg border border-rose-100 dark:border-rose-900/30 transition-all cursor-pointer"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    <span>{t("profit.deleteButton", "Hapus Data")}</span>
+                                  </button>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>

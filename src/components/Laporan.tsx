@@ -1,30 +1,94 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DailyProfit, Restaurant } from "../types";
 import { formatRupiah, formatIndoDate } from "../lib/utils";
-import { FileText, Download, Calendar, Filter, ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
+import { FileText, Download, Calendar, Filter, ArrowUpRight, ArrowDownRight, TrendingUp, Sparkles, Award, CheckCircle, AlertTriangle, AlertOctagon, HelpCircle } from "lucide-react";
 import { useToast } from "./Toast";
 import { motion } from "motion/react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useTranslation } from "../lib/LanguageContext";
+import { DataService } from "../lib/dataService";
 
-import { calculateDailyProfitBreakdown } from "../lib/financialMath";
+import { calculateDailyProfitBreakdown, calculateTotalExpenses } from "../lib/financialMath";
 
 interface LaporanProps {
   profits: DailyProfit[];
   restaurant: Restaurant | null;
+  user: any | null;
 }
 
 type FilterType = "hari" | "minggu" | "bulan";
 
-export default function Laporan({ profits, restaurant }: LaporanProps) {
+export default function Laporan({ profits, restaurant, user }: LaporanProps) {
   const { showToast } = useToast();
-  const { lang, t } = useTranslation();
+  const { lang, t, currencySymbol } = useTranslation();
   const [filter, setFilter] = useState<FilterType>("bulan");
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().substring(0, 7));
 
+  const [monthlyExpenses, setMonthlyExpenses] = useState<any | null>(null);
+  const [loadingExpenses, setLoadingExpenses] = useState(false);
+
+  useEffect(() => {
+    if (filter === "bulan" && restaurant) {
+      setLoadingExpenses(true);
+      const userId = user?.uid || "demo";
+      DataService.getExpenses(userId, restaurant.id, selectedMonth)
+        .then((data) => {
+          setMonthlyExpenses(data);
+        })
+        .catch((err) => {
+          console.error("Gagal mengambil biaya operasional:", err);
+          setMonthlyExpenses(null);
+        })
+        .finally(() => {
+          setLoadingExpenses(false);
+        });
+    } else {
+      setMonthlyExpenses(null);
+    }
+  }, [selectedMonth, filter, restaurant, user]);
+
   const todayObj = new Date();
   const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
+
+  const getMonthlyPerformanceRating = (netProfit: number, target: number) => {
+    if (target <= 0) return { label: t("dashboard.statusActive", "Aktif"), color: "text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-800/30", desc: t("dashboard.messageNoTarget", "Bisnis berjalan aktif tanpa target bulanan.") };
+    
+    const pct = (netProfit / target) * 100;
+    if (pct >= 150) {
+      return { 
+        label: "Amazing! 🏆", 
+        color: "text-amber-700 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-950/20 border-amber-500/20 dark:border-amber-900/30", 
+        desc: t("laporan.perfAmazing", "Laba melampaui target sangat jauh (>150%)!") 
+      };
+    }
+    if (pct >= 120) {
+      return { 
+        label: "Excellent! ⭐", 
+        color: "text-blue-700 dark:text-blue-400 bg-blue-500/10 dark:bg-blue-950/20 border-blue-500/20 dark:border-blue-900/30", 
+        desc: t("laporan.perfExcellent", "Laba melampaui target dengan sangat baik (>120%)!") 
+      };
+    }
+    if (pct >= 100) {
+      return { 
+        label: t("laporan.statusBaik", "Baik (Aman) ✅"), 
+        color: "text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-950/20 border-emerald-500/20 dark:border-emerald-900/30", 
+        desc: t("laporan.perfBaik", "Laba berhasil mencapai atau melampaui target!") 
+      };
+    }
+    if (pct >= 85) {
+      return { 
+        label: t("laporan.statusWaspada", "Waspada ⚠️"), 
+        color: "text-amber-600 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-950/20 border-amber-500/20 dark:border-amber-900/30", 
+        desc: t("laporan.perfWaspada", "Laba mendekati target tapi belum sepenuhnya tercapai (85%-99%).") 
+      };
+    }
+    return { 
+      label: t("laporan.statusBuruk", "Buruk (Bahaya) 🚨"), 
+      color: "text-rose-700 dark:text-rose-455 bg-rose-500/10 dark:bg-rose-950/20 border-rose-500/20 dark:border-rose-900/30", 
+      desc: t("laporan.perfBuruk", "Laba jauh di bawah target bulan ini (<85%).") 
+    };
+  };
 
   // Helper: check if date is within past N days
   const isWithinPastDays = (dateStr: string, days: number): boolean => {
@@ -351,6 +415,124 @@ export default function Laporan({ profits, restaurant }: LaporanProps) {
           </span>
         </div>
       </div>
+
+      {/* Monthly Detailed Summary & Performance Rating */}
+      {filter === "bulan" && monthlyExpenses && (
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          
+          {/* Column 1: Financial Overview & Performance Rating (3 Cols) */}
+          <div className="lg:col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] space-y-6">
+            <div>
+              <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider mb-1">
+                {t("laporan.ratingTitle", "Analisis & Evaluasi Kinerja Bulanan")}
+              </h3>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                Evaluasi performa usaha untuk bulan {formatIndoDate(selectedMonth + "-01", lang).replace(/^[0-9]+\s+/, '')}
+              </p>
+            </div>
+
+            {/* Performance Rating Card */}
+            {(() => {
+              const totalBiayaVal = calculateTotalExpenses(monthlyExpenses);
+              const netProfitVal = Math.max(0, totalProfit - totalBiayaVal);
+              const targetProfit = restaurant?.monthlyTargetProfit || 0;
+              const rating = getMonthlyPerformanceRating(netProfitVal, targetProfit);
+              const achievementPct = targetProfit > 0 ? Math.round((netProfitVal / targetProfit) * 100) : 0;
+
+              return (
+                <div className="space-y-4">
+                  {/* Rating Badge Box */}
+                  <div className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${rating.color}`}>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest opacity-70">
+                        Status Performa
+                      </span>
+                      <h4 className="text-lg font-black tracking-tight leading-tight">
+                        {rating.label}
+                      </h4>
+                      <p className="text-xs font-semibold opacity-90 leading-normal">
+                        {rating.desc}
+                      </p>
+                    </div>
+                    {targetProfit > 0 && (
+                      <div className="flex flex-col items-start sm:items-end bg-white/30 dark:bg-black/20 px-3 py-2 rounded-lg shrink-0">
+                        <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Persentase Target</span>
+                        <span className="text-base font-black font-mono tracking-tight">{achievementPct}%</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Financial Math Summary */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/40 rounded-xl">
+                      <span className="text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase block tracking-wider">Laba Kotor</span>
+                      <span className="font-mono text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-100 mt-1 block">
+                        {formatRupiah(totalProfit)}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/40 rounded-xl">
+                      <span className="text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase block tracking-wider">Biaya Operasional</span>
+                      <span className="font-mono text-xs sm:text-sm font-bold text-rose-500 dark:text-rose-450 mt-1 block">
+                        -{formatRupiah(totalBiayaVal)}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/40 rounded-xl">
+                      <span className="text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase block tracking-wider">Laba Bersih Murni</span>
+                      <span className="font-mono text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 mt-1 block">
+                        {formatRupiah(netProfitVal)}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800/40 rounded-xl">
+                      <span className="text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase block tracking-wider">Target Laba</span>
+                      <span className="font-mono text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-350 mt-1 block">
+                        {targetProfit > 0 ? formatRupiah(targetProfit) : "—"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Column 2: Detailed Costs (2 Cols) */}
+          <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100 uppercase tracking-wider mb-3">
+                {t("laporan.copsTitle", "Rincian Biaya Operasional Tetap")}
+              </h3>
+              
+              <div className="space-y-2 text-xs font-semibold text-zinc-650 dark:text-zinc-450">
+                {[
+                  { label: t("biaya.sewa", "Sewa Tempat"), value: monthlyExpenses.sewaTempat },
+                  { label: t("biaya.gaji", "Gaji Karyawan"), value: monthlyExpenses.gajiKaryawan },
+                  { label: t("biaya.royalti", "Royalti Franchise"), value: monthlyExpenses.royaltiFranchise },
+                  { label: t("biaya.listrik", "Listrik"), value: monthlyExpenses.listrik },
+                  { label: t("biaya.air", "Air"), value: monthlyExpenses.air },
+                  { label: t("biaya.internet", "Internet"), value: monthlyExpenses.internet },
+                  { label: t("biaya.marketing", "Marketing"), value: monthlyExpenses.marketing },
+                  { label: t("biaya.pajak", "Pajak"), value: monthlyExpenses.pajak },
+                  { label: t("biaya.cicilanBank", "Cicilan Bank"), value: monthlyExpenses.cicilanBank },
+                  { label: t("biaya.lain", "Biaya Lain-Lain"), value: monthlyExpenses.biayaLain },
+                ].map((item, idx) => {
+                  if (!item.value) return null;
+                  return (
+                    <div key={idx} className="flex justify-between border-b border-zinc-100/50 dark:border-zinc-800/30 pb-1.5 pt-0.5">
+                      <span className="text-zinc-550 dark:text-zinc-500">{item.label}</span>
+                      <span className="font-mono text-zinc-800 dark:text-zinc-200">{formatRupiah(item.value)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3.5 border-t border-zinc-100 dark:border-zinc-800/40 flex justify-between items-center text-xs font-black text-zinc-900 dark:text-zinc-100">
+              <span>{t("biaya.total", "Total Biaya Operasional")}:</span>
+              <span className="font-mono text-sm text-rose-500 dark:text-rose-400">{formatRupiah(calculateTotalExpenses(monthlyExpenses))}</span>
+            </div>
+          </div>
+
+        </div>
+      )}
 
       {/* Logs Table */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.01),0_10px_24px_-10px_rgba(0,0,0,0.04)]">

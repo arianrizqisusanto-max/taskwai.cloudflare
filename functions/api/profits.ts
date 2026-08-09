@@ -1,5 +1,12 @@
 import { verifySession, jsonResponse, handleOptions } from './_helper';
 
+const getJakartaYearMonth = () => {
+  const d = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
 export async function onRequest(context: any): Promise<Response> {
   const { request, env } = context;
 
@@ -34,6 +41,12 @@ export async function onRequest(context: any): Promise<Response> {
 
       if (!date || profit === undefined) {
         return jsonResponse({ error: 'Date and profit are required' }, 400);
+      }
+
+      const targetYearMonth = date.substring(0, 7);
+      const currentYearMonth = getJakartaYearMonth();
+      if (targetYearMonth < currentYearMonth) {
+        return jsonResponse({ error: 'Data untuk bulan-bulan lalu telah dikunci dan tidak dapat diubah.' }, 403);
       }
 
       const cleanBranch = branchName ? branchName.trim() : '';
@@ -97,6 +110,21 @@ export async function onRequest(context: any): Promise<Response> {
 
       if (!id) {
         return jsonResponse({ error: 'ID is required' }, 400);
+      }
+
+      // Check if entry belongs to a past month
+      const existing = await db.prepare(
+        'SELECT date FROM daily_profits WHERE id = ? AND restaurantId = ?'
+      ).bind(id, restaurantId).first();
+
+      if (!existing) {
+        return jsonResponse({ error: 'Entry not found' }, 404);
+      }
+
+      const targetYearMonth = existing.date.substring(0, 7);
+      const currentYearMonth = getJakartaYearMonth();
+      if (targetYearMonth < currentYearMonth) {
+        return jsonResponse({ error: 'Data untuk bulan-bulan lalu telah dikunci dan tidak dapat diubah.' }, 403);
       }
 
       await db.prepare(

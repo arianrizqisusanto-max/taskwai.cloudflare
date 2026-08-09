@@ -1,5 +1,12 @@
 import { verifySession, jsonResponse, handleOptions } from './_helper';
 
+const getJakartaYearMonth = () => {
+  const d = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
 export async function onRequest(context: any): Promise<Response> {
   const { request, env } = context;
 
@@ -16,7 +23,7 @@ export async function onRequest(context: any): Promise<Response> {
   const url = new URL(request.url);
 
   // Default to current month "YYYY-MM"
-  const month = url.searchParams.get('month') || new Date().toISOString().substring(0, 7);
+  const month = url.searchParams.get('month') || getJakartaYearMonth();
 
   try {
     if (request.method === 'GET') {
@@ -70,6 +77,12 @@ export async function onRequest(context: any): Promise<Response> {
     if (request.method === 'POST') {
       const body = await request.json() as any;
       const postMonth = body.month || month;
+
+      const currentYearMonth = getJakartaYearMonth();
+      if (postMonth < currentYearMonth) {
+        return jsonResponse({ error: 'Data untuk bulan-bulan lalu telah dikunci dan tidak dapat diubah.' }, 403);
+      }
+
       const expId = `${restaurantId}_${postMonth}`;
       const nowStr = new Date().toISOString();
 
