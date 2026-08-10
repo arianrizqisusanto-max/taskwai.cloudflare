@@ -215,7 +215,6 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
           t("laporan.tableDate", "Tanggal"), 
           t("laporan.tableDay", "Hari"), 
           t("laporan.tableGrossProfit", "Laba Kotor / Profit"), 
-          "Cabang",
           "Penginput",
           t("laporan.tableNotes", "Catatan")
         ]];
@@ -227,7 +226,6 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
             p.date,
             weekday,
             formatRupiah(p.profit),
-            p.branchName || "-",
             p.inputterName || "-",
             p.notes || "-"
           ];
@@ -250,12 +248,11 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
           },
           columnStyles: {
             0: { cellWidth: 10, halign: "center" },
-            1: { cellWidth: 24 },
-            2: { cellWidth: 24 },
-            3: { cellWidth: 35, halign: "right" },
-            4: { cellWidth: 30 },
-            5: { cellWidth: 25 },
-            6: { cellWidth: "auto" }
+            1: { cellWidth: 28 },
+            2: { cellWidth: 28 },
+            3: { cellWidth: 42, halign: "right" },
+            4: { cellWidth: 32 },
+            5: { cellWidth: "auto" }
           },
           alternateRowStyles: {
             fillColor: [248, 250, 252] // Slate-50
@@ -546,7 +543,6 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
                   <th className="py-3 px-4">{t("laporan.tableDate", "Tanggal")}</th>
                   <th className="py-3 px-4">{t("laporan.tableDay", "Hari")}</th>
                   <th className="py-3 px-4">{t("laporan.tableGrossProfitShort", "Laba Kotor")}</th>
-                  <th className="py-3 px-4">Cabang</th>
                   <th className="py-3 px-4">Penginput</th>
                   <th className="py-3 px-4">{t("laporan.tableNotes", "Catatan")}</th>
                 </tr>
@@ -565,7 +561,6 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
                       <td className="py-3.5 px-4 font-mono font-bold text-zinc-500 dark:text-zinc-400 text-xs">{p.date}</td>
                       <td className="py-3.5 px-4 font-bold text-zinc-800 dark:text-zinc-200">{weekday}</td>
                       <td className="py-3.5 px-4 font-mono font-black text-zinc-950 dark:text-zinc-50">{formatRupiah(p.profit)}</td>
-                      <td className="py-3.5 px-4 text-xs font-semibold text-zinc-700 dark:text-zinc-300">{p.branchName || "-"}</td>
                       <td className="py-3.5 px-4 text-xs font-semibold text-zinc-500 dark:text-zinc-400">{p.inputterName || "-"}</td>
                       <td className="py-3.5 px-4 text-xs text-zinc-500 dark:text-zinc-400 max-w-xs truncate italic font-medium">
                         {p.notes ? `"${p.notes}"` : "-"}
