@@ -43,6 +43,14 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
   
   const todayObj = new Date();
   const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
+  
+  const getMinDateString = () => {
+    const d = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); // Jakarta WIB
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    return `${year}-${month}-01`;
+  };
+
   const [date, setDate] = useState(todayStr);
   const [omzetInput, setOmzetInput] = useState("");
   const [useHpp, setUseHpp] = useState(() => {
@@ -292,6 +300,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
+                  min={getMinDateString()}
                   required
                   className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 focus:border-zinc-950 dark:focus:border-zinc-300 focus:bg-white dark:focus:bg-zinc-900 rounded-xl text-sm font-semibold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 dark:focus:ring-white/5 transition-all font-mono"
                 />
