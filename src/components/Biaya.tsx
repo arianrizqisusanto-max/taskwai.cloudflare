@@ -17,7 +17,7 @@ interface BiayaProps {
 
 export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpensesMonthChange, setActiveTab }: BiayaProps) {
   const { showToast } = useToast();
-  const { t, currency, currencySymbol } = useTranslation();
+  const { lang, t, currency, currencySymbol } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
   const [showNote, setShowNote] = useState(false);
 
@@ -173,44 +173,20 @@ export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpen
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium leading-relaxed">
                 {t("biaya.subtitle", "Masukkan taksiran pengeluaran tetap bulanan usaha Anda.")}
               </p>
-              {/* Month & Year Selectors */}
-              <div className="flex items-center gap-2 mt-3">
-                <select
-                  value={expensesMonth.substring(5, 7)}
-                  onChange={(e) => {
-                    const year = expensesMonth.substring(0, 4);
-                    onExpensesMonthChange(`${year}-${e.target.value}`);
-                  }}
-                  className="pl-3 pr-8 py-1.5 text-xs font-bold bg-zinc-100 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 rounded-xl focus:outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:14px] bg-[right_8px_center] bg-no-repeat"
-                >
-                  <option value="01">Januari</option>
-                  <option value="02">Februari</option>
-                  <option value="03">Maret</option>
-                  <option value="04">April</option>
-                  <option value="05">Mei</option>
-                  <option value="06">Juni</option>
-                  <option value="07">Juli</option>
-                  <option value="08">Agustus</option>
-                  <option value="09">September</option>
-                  <option value="10">Oktober</option>
-                  <option value="11">November</option>
-                  <option value="12">Desember</option>
-                </select>
-
-                <select
-                  value={expensesMonth.substring(0, 4)}
-                  onChange={(e) => {
-                    const month = expensesMonth.substring(5, 7);
-                    onExpensesMonthChange(`${e.target.value}-${month}`);
-                  }}
-                  className="pl-3 pr-8 py-1.5 text-xs font-bold bg-zinc-100 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-100 rounded-xl focus:outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:14px] bg-[right_8px_center] bg-no-repeat"
-                >
-                  <option value="2024">2024</option>
-                  <option value="2025">2025</option>
-                  <option value="2026">2026</option>
-                  <option value="2027">2027</option>
-                  <option value="2028">2028</option>
-                </select>
+              {/* Month Display Badge */}
+              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200/40 dark:border-zinc-800/30 text-zinc-800 dark:text-zinc-200 font-bold rounded-xl text-xs">
+                <span>📅</span>
+                <span>
+                  {new Date(
+                    Number(expensesMonth.substring(0, 4)),
+                    Number(expensesMonth.substring(5, 7)) - 1,
+                    1
+                  ).toLocaleDateString(lang === "en" ? "en-US" : "id-ID", {
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+                <span className="text-zinc-400 dark:text-zinc-500 font-normal">({t("biaya.currentMonthOnly", "Bulan Aktif")})</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-bold rounded-xl text-xs font-mono shadow-sm self-start sm:self-center">

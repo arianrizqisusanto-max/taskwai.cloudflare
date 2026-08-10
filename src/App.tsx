@@ -179,7 +179,12 @@ function MainApp() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [profits, setProfits] = useState<DailyProfit[]>([]);
   const [expenses, setExpenses] = useState<Expenses | null>(null);
-  const [expensesMonth, setExpensesMonth] = useState(new Date().toISOString().substring(0, 7));
+  const [expensesMonth, setExpensesMonth] = useState(() => {
+    const d = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
