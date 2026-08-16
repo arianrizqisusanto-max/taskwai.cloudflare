@@ -184,9 +184,6 @@ export default function Navbar({
   // Prefetch component chunks on hover to make navigation feel instant
   const handlePrefetch = (tabId: string) => {
     switch (tabId) {
-      case "dashboard":
-        import("./Dashboard");
-        break;
       case "input":
         import("./InputProfit");
         break;

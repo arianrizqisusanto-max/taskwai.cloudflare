@@ -13,7 +13,6 @@ import Dashboard from "./components/Dashboard";
 import SkeletonLoader from "./components/SkeletonLoader";
 import { ToastProvider, useToast } from "./components/Toast";
 import { LanguageProvider, useTranslation } from "./lib/LanguageContext";
-import { Sun, Moon, Building2 } from "lucide-react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import BugReportButton from "./components/BugReportButton";
 

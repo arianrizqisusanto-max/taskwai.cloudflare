@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Expenses } from "../types";
 import { formatRupiah } from "../lib/utils";
-import { Landmark, Save, Calculator, HelpCircle, CheckCircle } from "lucide-react";
+import { Landmark, Save, Calculator, HelpCircle } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
