@@ -25,6 +25,9 @@ interface BranchData {
   daysEntered: number;
   totalExpenses: number;
   historyCount?: number;
+  hasEnteredToday?: boolean;
+  inputterToday?: string;
+  inputTimeToday?: string;
   omzetToday?: number;
   hppToday?: number;
   otherExpensesToday?: number;
@@ -48,6 +51,9 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     daysEntered: 18,
     totalExpenses: 15000000,
     historyCount: 2,
+    hasEnteredToday: true,
+    inputterToday: "Staff Rudi (Barista)",
+    inputTimeToday: "18:45 WIB",
     omzetToday: 5000000,
     hppToday: 1800000,
     otherExpensesToday: 700000,
@@ -68,6 +74,9 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     profitToday: 3800000,
     daysEntered: 18,
     totalExpenses: 12000000,
+    hasEnteredToday: true,
+    inputterToday: "Staff Siti (Kasir)",
+    inputTimeToday: "19:15 WIB",
     omzetToday: 7000000,
     hppToday: 2450000,
     otherExpensesToday: 750000,
@@ -85,12 +94,13 @@ const MOCK_DEMO_BRANCHES: BranchData[] = [
     monthlyTargetProfit: 60000000,
     totalProfitMonth: 25000000,
     profitWeek: 7200000,
-    profitToday: 1100000,
-    daysEntered: 18,
+    profitToday: 0,
+    daysEntered: 17,
     totalExpenses: 18500000,
-    omzetToday: 3000000,
-    hppToday: 1200000,
-    otherExpensesToday: 700000,
+    hasEnteredToday: false,
+    omzetToday: 0,
+    hppToday: 0,
+    otherExpensesToday: 0,
     omzetWeek: 18000000,
     hppWeek: 7200000,
     otherExpensesWeek: 3600000,
@@ -122,7 +132,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   
   // Search & Filter state for scalable branch rendering
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState<"profit_desc" | "profit_asc" | "target_desc" | "expense_desc" | "name">("profit_desc");
+  const [sortBy, setSortBy] = useState<"profit_desc" | "profit_asc" | "target_desc" | "expense_desc" | "name" | "not_entered">("profit_desc");
   
   // History Modal State
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -493,11 +503,31 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
   };
 
   // Aggregated totals across all branches based on selected timeframe
+  const totalCombinedOmzet = branches.reduce((acc, b) => {
+    if (timeframe === "daily") return acc + (b.omzetToday ?? (b.profitToday > 0 ? b.profitToday * 2 : 0));
+    if (timeframe === "weekly") return acc + (b.omzetWeek ?? ((b.profitWeek || 0) * 2));
+    return acc + (b.omzetMonth ?? (b.totalProfitMonth * 2));
+  }, 0);
+
+  const totalCombinedHPP = branches.reduce((acc, b) => {
+    if (timeframe === "daily") return acc + (b.hppToday ?? 0);
+    if (timeframe === "weekly") return acc + (b.hppWeek ?? 0);
+    return acc + (b.hppMonth ?? 0);
+  }, 0);
+
   const totalCombinedProfit = branches.reduce((acc, b) => acc + getBranchMetrics(b, timeframe).gross, 0);
   const totalCombinedExpenses = branches.reduce((acc, b) => acc + getBranchMetrics(b, timeframe).exp, 0);
   const totalCombinedNetProfit = Math.max(0, totalCombinedProfit - totalCombinedExpenses);
   const totalCombinedTarget = branches.reduce((acc, b) => acc + getBranchTarget(b, timeframe), 0);
   const totalCombinedTargetPct = totalCombinedTarget > 0 ? Math.round((totalCombinedNetProfit / totalCombinedTarget) * 100) : 0;
+  const totalCombinedMargin = totalCombinedOmzet > 0 ? Math.round((totalCombinedNetProfit / totalCombinedOmzet) * 100) : (totalCombinedProfit > 0 ? Math.round((totalCombinedNetProfit / totalCombinedProfit) * 100) : 0);
+
+  // Daily Input Status Tracking
+  const branchesEnteredToday = branches.filter(b => b.hasEnteredToday || (b.profitToday || 0) > 0);
+  const branchesEnteredTodayCount = branchesEnteredToday.length;
+  const totalBranchesCount = branches.length;
+  const isAllEnteredToday = branchesEnteredTodayCount === totalBranchesCount && totalBranchesCount > 0;
+  const unenteredBranches = branches.filter(b => !b.hasEnteredToday && (b.profitToday || 0) <= 0);
 
   // Filter & sort branches dynamically for scalable rendering
   const filteredBranches = branches
@@ -508,6 +538,11 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     .sort((a, b) => {
       const mA = getBranchMetrics(a, timeframe);
       const mB = getBranchMetrics(b, timeframe);
+      if (sortBy === "not_entered") {
+        const enteredA = a.hasEnteredToday || (a.profitToday || 0) > 0 ? 1 : 0;
+        const enteredB = b.hasEnteredToday || (b.profitToday || 0) > 0 ? 1 : 0;
+        return enteredA - enteredB;
+      }
       if (sortBy === "profit_desc") return mB.net - mA.net;
       if (sortBy === "profit_asc") return mA.net - mB.net;
       if (sortBy === "expense_desc") return mB.exp - mA.exp;
@@ -905,6 +940,92 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
             </div>
           </div>
 
+          {/* 1.6 Daily Input Status Alert Banner */}
+          {branches.length > 0 && (
+            <div className={`p-3.5 sm:p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm ${
+              isAllEnteredToday 
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:text-emerald-300 dark:bg-emerald-950/25" 
+                : "bg-amber-500/10 border-amber-500/25 text-amber-900 dark:text-amber-300 dark:bg-amber-950/25"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-xl shrink-0 ${
+                  isAllEnteredToday ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
+                }`}>
+                  {isAllEnteredToday ? <CheckCircle className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider">
+                      {isAllEnteredToday ? "Status Input Hari Ini: Lengkap 100%" : "Status Input Hari Ini: Belum Lengkap"}
+                    </span>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white/60 dark:bg-black/40">
+                      {branchesEnteredTodayCount}/{totalBranchesCount} Cabang
+                    </span>
+                  </div>
+                  <p className="text-xs font-medium opacity-90 mt-0.5">
+                    {isAllEnteredToday 
+                      ? "Semua cabang telah mencatatkan omzet & laba hari ini. Rekapitulasi finansial realtime dan akurat." 
+                      : `Ada ${unenteredBranches.length} cabang yang belum input hari ini: ${unenteredBranches.map(b => b.name).join(", ")}.`}
+                  </p>
+                </div>
+              </div>
+              {!isAllEnteredToday && (
+                <button
+                  type="button"
+                  onClick={() => setSortBy("not_entered")}
+                  className="self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-sm cursor-pointer border-0 shrink-0"
+                >
+                  Lihat Cabang Belum Input
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* 1.7 Consolidated Executive Financial Math Bar */}
+          {branches.length > 0 && (
+            <div className="p-4 sm:p-5 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl shadow-sm space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800/60 pb-3">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 block">
+                    Ringkasan Finansial Konsolidasian Seluruh Cabang ({timeframe === "daily" ? "Per Hari" : timeframe === "weekly" ? "Per Minggu" : "Per Bulan"})
+                  </span>
+                  <h2 className="text-base font-black text-zinc-950 dark:text-zinc-50 tracking-tight mt-0.5">
+                    Laba Bersih Konsolidasian: {formatRupiah(totalCombinedNetProfit)}
+                  </h2>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                    Margin Bersih: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-black">{totalCombinedMargin}%</span>
+                  </span>
+                  <span className="text-xs text-zinc-300 dark:text-zinc-700">•</span>
+                  <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                    Target Tercapai: <span className="font-mono text-zinc-900 dark:text-zinc-100 font-black">{totalCombinedTargetPct}%</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Consolidated Equation Bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+                <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-150 dark:border-zinc-800/60">
+                  <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase block">Total Omzet Gabungan</span>
+                  <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100 block mt-0.5">{formatRupiah(totalCombinedOmzet)}</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-150 dark:border-zinc-800/60">
+                  <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase block">Total HPP / Bahan Baku</span>
+                  <span className="font-mono font-bold text-rose-500 dark:text-rose-450 block mt-0.5">-{formatRupiah(totalCombinedHPP)}</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-150 dark:border-zinc-800/60">
+                  <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase block">Total Biaya Operasional</span>
+                  <span className="font-mono font-bold text-rose-600 dark:text-rose-400 block mt-0.5">-{formatRupiah(totalCombinedExpenses)}</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
+                  <span className="text-[9px] font-black uppercase block opacity-75">Laba Bersih Murni</span>
+                  <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 block mt-0.5">{formatRupiah(totalCombinedNetProfit)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* 2. Consolidated Totals Metric Cards */}
           {branches.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
@@ -936,7 +1057,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                 <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {t("bigboss.combinedNetProfit", "Total Laba Bersih Murni")} ({timeframe === "daily" ? t("bigboss.timeframeDaily", "Per Hari") : timeframe === "weekly" ? t("bigboss.timeframeWeekly", "Per Minggu") : t("bigboss.timeframeMonthly", "Per Bulan")})
                 </span>
-                <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-450 block mt-1.5 tabular-nums">
+                <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-400 block mt-1.5 tabular-nums">
                   {formatRupiah(totalCombinedNetProfit)}
                 </span>
               </div>
@@ -1022,6 +1143,7 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                           onChange={(e) => setSortBy(e.target.value as any)}
                           className="px-2.5 py-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
                         >
+                          <option value="not_entered">⚠️ Belum Input Hari Ini (Prioritas)</option>
                           <option value="profit_desc">{t("bigboss.sortProfitDesc", "Laba: High → Low")}</option>
                           <option value="profit_asc">{t("bigboss.sortProfitAsc", "Laba: Low → High")}</option>
                           <option value="target_desc">{t("bigboss.sortTargetDesc", "Target: High → Low")}</option>
@@ -1036,11 +1158,12 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                         <thead className="bg-zinc-50 dark:bg-zinc-950 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider border-b border-zinc-150 dark:border-zinc-850">
                           <tr>
                             <th className="py-2.5 px-3.5">{t("bigboss.branchName", "Nama Cabang")}</th>
+                            <th className="py-2.5 px-3.5">Status Hari Ini</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.targetProfit", "Target Laba")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.labaKotor", "Laba Kotor")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.fixedCost", "Fixed Cost")}</th>
                             <th className="py-2.5 px-3.5">{t("bigboss.labaMurni", "Laba Murni")}</th>
-                            <th className="py-2.5 px-3.5">{t("bigboss.status", "Status")}</th>
+                            <th className="py-2.5 px-3.5">{t("bigboss.status", "Status Kinerja")}</th>
                             <th className="py-2.5 px-3.5 text-center">{t("bigboss.actions", "Aksi")}</th>
                           </tr>
                         </thead>
@@ -1065,6 +1188,22 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
                                       </span>
                                     )}
                                   </div>
+                                </td>
+                                <td className="py-2.5 px-3.5">
+                                  {branch.hasEnteredToday || (branch.profitToday || 0) > 0 ? (
+                                    <div className="flex flex-col">
+                                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-900/40 w-fit">
+                                        <CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> Sudah Catat
+                                      </span>
+                                      <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 font-semibold mt-0.5">
+                                        +{formatRupiah(branch.profitToday)} {branch.inputterToday ? `• ${branch.inputterToday}` : ''}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded-md border border-rose-200/60 dark:border-rose-900/40 w-fit">
+                                      <AlertTriangle className="w-3 h-3 text-rose-600 dark:text-rose-400" /> Belum Input
+                                    </span>
+                                  )}
                                 </td>
                                 <td className="py-2.5 px-3.5">
                                   {targetVal > 0 ? (

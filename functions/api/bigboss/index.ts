@@ -18,14 +18,14 @@ export async function onRequest(context: any): Promise<Response> {
   }
 
   const bossOwnerId = session.userId; // Google Sub ID or Owner UUID
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0');
-  const todayStr = `${currentYear}-${currentMonthStr}-${String(now.getDate()).padStart(2, '0')}`;
+  const jakartaNow = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  const currentYear = jakartaNow.getUTCFullYear();
+  const currentMonthStr = String(jakartaNow.getUTCMonth() + 1).padStart(2, '0');
+  const todayStr = `${currentYear}-${currentMonthStr}-${String(jakartaNow.getUTCDate()).padStart(2, '0')}`;
   const monthPrefix = `${currentYear}-${currentMonthStr}`;
 
-  const sevenDaysAgo = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
-  const sevenDaysAgoStr = `${sevenDaysAgo.getFullYear()}-${String(sevenDaysAgo.getMonth() + 1).padStart(2, '0')}-${String(sevenDaysAgo.getDate()).padStart(2, '0')}`;
+  const sevenDaysAgo = new Date(jakartaNow.getTime() - 6 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgoStr = `${sevenDaysAgo.getUTCFullYear()}-${String(sevenDaysAgo.getUTCMonth() + 1).padStart(2, '0')}-${String(sevenDaysAgo.getUTCDate()).padStart(2, '0')}`;
 
   try {
     // ==========================================
@@ -55,6 +55,10 @@ export async function onRequest(context: any): Promise<Response> {
           COALESCE(SUM(CASE WHEN dp.date = ?2 THEN dp.hppVal ELSE 0 END), 0) as hppToday,
           COALESCE(SUM(CASE WHEN dp.date = ?2 THEN dp.otherExpenses ELSE 0 END), 0) as otherExpensesToday,
           
+          COUNT(CASE WHEN dp.date = ?2 THEN 1 ELSE NULL END) as hasEnteredTodayCount,
+          MAX(CASE WHEN dp.date = ?2 THEN dp.inputterName ELSE NULL END) as inputterToday,
+          MAX(CASE WHEN dp.date = ?2 THEN dp.createdAt ELSE NULL END) as inputTimeToday,
+
           COUNT(DISTINCT dp.date) as daysEntered
         FROM bigboss_links bl
         JOIN restaurants r ON bl.branchRestaurantId = r.id
@@ -116,6 +120,10 @@ export async function onRequest(context: any): Promise<Response> {
           totalExpenses: expData.total,
           historyCount: expData.historyCount,
           
+          hasEnteredToday: (branch.hasEnteredTodayCount || 0) > 0,
+          inputterToday: branch.inputterToday || null,
+          inputTimeToday: branch.inputTimeToday || null,
+
           omzetToday: branch.omzetToday,
           hppToday: branch.hppToday,
           otherExpensesToday: branch.otherExpensesToday,
