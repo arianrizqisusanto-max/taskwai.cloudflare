@@ -2,7 +2,7 @@ import React from "react";
 import { DailyProfit, Expenses, Restaurant } from "../types";
 import { formatIndoDate, formatRupiah } from "../lib/utils";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, ArrowUpRight, ArrowDownRight, Sparkles, Award, Plus, FileText, Calculator, Settings } from "lucide-react";
+import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, ArrowUpRight, ArrowDownRight, Sparkles, Award } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslation } from "../lib/LanguageContext";
 
@@ -174,120 +174,6 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
           </span>
         </div>
       </div>
-
-      {/* 1.5 Quick Actions Bar */}
-      {setActiveTab && (
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-3 sm:p-3.5 shadow-sm space-y-2">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              {t("dashboard.quickActions", "Aksi Cepat")}
-            </span>
-            {profitToday === 0 ? (
-              <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-800/60 animate-pulse">
-                ⚠️ Belum Catat Omzet Hari Ini
-              </span>
-            ) : (
-              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                ✅ Hari Ini Tercatat {formatRupiah(profitToday)}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
-            {/* Action 1: Catat Profit */}
-            <button
-              type="button"
-              onClick={() => setActiveTab("input")}
-              className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-1 group ${
-                profitToday === 0 
-                  ? "bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30 text-emerald-900 dark:text-emerald-300 shadow-sm"
-                  : "bg-zinc-50/70 hover:bg-zinc-100/80 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60 border-zinc-200/60 dark:border-zinc-800/60 text-zinc-800 dark:text-zinc-200"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className={`p-1.5 rounded-lg ${profitToday === 0 ? "bg-emerald-500 text-white shadow-sm" : "bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-emerald-500 group-hover:text-white transition-colors"}`}>
-                  <Plus className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <div>
-                <span className="text-xs font-black block tracking-tight">
-                  {t("nav.input", "Catat Profit")}
-                </span>
-                <span className="text-[10px] opacity-70 font-medium line-clamp-1">
-                  {profitToday === 0 ? "Input omzet & HPP hari ini" : "Tambah log transaksi baru"}
-                </span>
-              </div>
-            </button>
-
-            {/* Action 2: Biaya Operasional */}
-            <button
-              type="button"
-              onClick={() => setActiveTab("biaya")}
-              className="p-3 rounded-xl bg-zinc-50/70 hover:bg-zinc-100/80 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800/60 text-zinc-800 dark:text-zinc-200 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-1 group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-1.5 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-rose-500 group-hover:text-white transition-colors">
-                  <Calculator className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <div>
-                <span className="text-xs font-black block tracking-tight">
-                  {t("nav.biaya", "Biaya Operasional")}
-                </span>
-                <span className="text-[10px] opacity-70 font-medium line-clamp-1">
-                  Sewa, gaji & beban tetap
-                </span>
-              </div>
-            </button>
-
-            {/* Action 3: Laporan Bulanan */}
-            <button
-              type="button"
-              onClick={() => setActiveTab("laporan")}
-              className="p-3 rounded-xl bg-zinc-50/70 hover:bg-zinc-100/80 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800/60 text-zinc-800 dark:text-zinc-200 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-1 group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-1.5 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <div>
-                <span className="text-xs font-black block tracking-tight">
-                  {t("nav.laporan", "Laporan Bulanan")}
-                </span>
-                <span className="text-[10px] opacity-70 font-medium line-clamp-1">
-                  Rekap bulanan & cetak PDF
-                </span>
-              </div>
-            </button>
-
-            {/* Action 4: Pengaturan Target */}
-            <button
-              type="button"
-              onClick={() => setActiveTab("target")}
-              className="p-3 rounded-xl bg-zinc-50/70 hover:bg-zinc-100/80 dark:bg-zinc-950/40 dark:hover:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800/60 text-zinc-800 dark:text-zinc-200 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-1 group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-1.5 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                  <Settings className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <div>
-                <span className="text-xs font-black block tracking-tight">
-                  {t("nav.target", "Target & Akun Staff")}
-                </span>
-                <span className="text-[10px] opacity-70 font-medium line-clamp-1">
-                  Atur goal & akses kasir
-                </span>
-              </div>
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 2. Utama: Hari ini Untung Berapa & Bulan ini Untung Berapa */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
