@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DailyProfit, Restaurant } from "../types";
 import { formatRupiah, formatIndoDate } from "../lib/utils";
-import { FileText, Download, Calendar, ArrowUpRight, ArrowDownRight, Award, TrendingUp, DollarSign } from "lucide-react";
+import { FileText, Download, Calendar, ArrowUpRight, ArrowDownRight, Award } from "lucide-react";
 import { useToast } from "./Toast";
 import { motion } from "motion/react";
 import jsPDF from "jspdf";

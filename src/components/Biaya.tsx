@@ -11,11 +11,9 @@ interface BiayaProps {
   expenses: Expenses;
   onSaveExpenses: (data: Partial<Expenses>) => Promise<void>;
   expensesMonth: string;
-  onExpensesMonthChange: (month: string) => void;
-  setActiveTab?: (tab: string) => void;
 }
 
-export default function Biaya({ expenses, onSaveExpenses, expensesMonth, onExpensesMonthChange, setActiveTab }: BiayaProps) {
+export default function Biaya({ expenses, onSaveExpenses, expensesMonth }: BiayaProps) {
   const { showToast } = useToast();
   const { lang, t, currency, currencySymbol } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);

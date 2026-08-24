@@ -457,7 +457,6 @@ function MainApp() {
             restaurant={restaurant} 
             profits={profits} 
             expenses={expenses} 
-            setActiveTab={setActiveTab}
           />
         );
       case "input":
@@ -477,8 +476,6 @@ function MainApp() {
             expenses={expenses} 
             onSaveExpenses={handleSaveExpenses} 
             expensesMonth={expensesMonth}
-            onExpensesMonthChange={setExpensesMonth}
-            setActiveTab={setActiveTab}
           />
         );
       case "bigboss":
@@ -505,7 +502,6 @@ function MainApp() {
             restaurant={restaurant} 
             profits={profits} 
             expenses={expenses} 
-            setActiveTab={setActiveTab}
           />
         );
       default:
@@ -514,7 +510,6 @@ function MainApp() {
             restaurant={restaurant} 
             profits={profits} 
             expenses={expenses} 
-            setActiveTab={setActiveTab}
           />
         );
     }

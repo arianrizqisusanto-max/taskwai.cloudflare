@@ -12,10 +12,9 @@ interface DashboardProps {
   restaurant: Restaurant;
   profits: DailyProfit[];
   expenses: Expenses;
-  setActiveTab?: (tab: string) => void;
 }
 
-export default function Dashboard({ restaurant, profits, expenses, setActiveTab }: DashboardProps) {
+export default function Dashboard({ restaurant, profits, expenses }: DashboardProps) {
   const { lang, t, currencySymbol } = useTranslation();
   // 1. Core Date Setup
   const today = new Date();
