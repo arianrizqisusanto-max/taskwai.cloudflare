@@ -26,7 +26,13 @@ export async function onRequest(context: any): Promise<Response> {
     `).bind(todayStr, todayStr).first();
 
     const totalBigBossRes = await db.prepare("SELECT COUNT(DISTINCT id) as count FROM owners WHERE accountType = 'bigboss' OR id IN (SELECT bossOwnerId FROM bigboss_links)").first();
-    const activeBigBossRes = await db.prepare("SELECT COUNT(DISTINCT bossOwnerId) as count FROM bigboss_links").first();
+    const activeBigBossRes = await db.prepare(`
+      SELECT COUNT(DISTINCT userId) as count FROM sessions 
+      WHERE createdAt LIKE ? || '%' 
+      AND userId IN (
+        SELECT id FROM owners WHERE accountType = 'bigboss' OR id IN (SELECT bossOwnerId FROM bigboss_links)
+      )
+    `).bind(todayStr).first();
 
     return jsonResponse({
       totalRestaurants: totalRes ? totalRes.count : 0,
