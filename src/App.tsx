@@ -207,6 +207,32 @@ function MainApp() {
       }
     };
     checkAuth();
+
+    // Register Native Android WebView Bridge Callbacks
+    (window as any).handleNativeGoogleLogin = async (idToken: string, accountType: 'regular' | 'bigboss' = 'regular') => {
+      try {
+        const data = await DataService.loginGoogle(idToken, accountType);
+        setUser(data.user);
+        if (data.user?.email === "arianrisqi@gmail.com") {
+          setActiveTab("admin");
+        } else {
+          setActiveTab("dashboard");
+        }
+        showToast("Berhasil masuk menggunakan akun Google!", "success");
+        return { success: true, user: data.user };
+      } catch (err: any) {
+        console.error("Native Google Login failed:", err);
+        showToast(err.message || "Gagal masuk dengan Google.", "error");
+        return { success: false, error: err.message };
+      }
+    };
+
+    (window as any).handleCredentialResponse = (response: any) => {
+      const idToken = typeof response === "string" ? response : response?.credential;
+      if (idToken && typeof idToken === "string") {
+        return (window as any).handleNativeGoogleLogin(idToken);
+      }
+    };
   }, []);
 
   // 2. Fetch data based on User Session (Real D1 vs Demo vs Staff) with Auto-Revalidation

@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.Taskwai" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#10B981</item>
+    </style>
+</resources>
