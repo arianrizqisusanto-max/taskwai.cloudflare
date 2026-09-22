@@ -17,10 +17,8 @@ class TaskwaiWebInterface(
         scope.launch {
             val idToken = signInManager.signIn()
             if (idToken != null) {
-                // Send ID token back to the web app
-                // This assumes the web app has a function 'onNativeGoogleLogin'
                 launch(Dispatchers.Main) {
-                    webView.evaluateJavascript("window.onNativeGoogleLogin('$idToken')", null)
+                    webView.evaluateJavascript("window.handleNativeGoogleLogin('$idToken', 'regular');", null)
                 }
             }
         }

@@ -117,10 +117,15 @@ fun TaskwaiWebView(
                             return false
                         }
                         
-                        // If it's a Google Auth URL that somehow escaped hijacking, 
-                        // we'll let it load normally as a fallback
-                        if (requestUrl.contains("accounts.google.com")) {
-                            return false 
+                        // Intercept Google Auth URL as backup to hijacking
+                        if (requestUrl.contains("accounts.google.com") && requestUrl.contains("oauth")) {
+                            scope.launch {
+                                val idToken = signInManager.signIn()
+                                if (idToken != null) {
+                                    view?.evaluateJavascript("window.handleNativeGoogleLogin('$idToken', 'regular');", null)
+                                }
+                            }
+                            return true // Intercept
                         }
 
                         // Handle external intents (mailto/tel)
