@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { DailyProfit, Expenses, Restaurant } from "../types";
 import { formatIndoDate, formatRupiah } from "../lib/utils";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, ArrowUpRight, ArrowDownRight, Sparkles, Award } from "lucide-react";
-import { motion } from "motion/react";
+import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, ArrowUpRight, ArrowDownRight, Sparkles, Award, Compass, X, Check, ChevronRight, Landmark, Target, DollarSign } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "../lib/LanguageContext";
 
 import { calculateTotalExpenses, calculateMonthlySummary } from "../lib/financialMath";
@@ -12,9 +12,10 @@ interface DashboardProps {
   restaurant: Restaurant;
   profits: DailyProfit[];
   expenses: Expenses;
+  setActiveTab?: (tab: string) => void;
 }
 
-export default function Dashboard({ restaurant, profits, expenses }: DashboardProps) {
+export default function Dashboard({ restaurant, profits, expenses, setActiveTab }: DashboardProps) {
   const { lang, t, currencySymbol } = useTranslation();
   // 1. Core Date Setup
   const today = new Date();
@@ -156,23 +157,244 @@ export default function Dashboard({ restaurant, profits, expenses }: DashboardPr
   // Fallback if chartData is empty
   const hasChartData = chartData.length > 0;
 
+  // Quick Start Guide setup & steps
+  const isStep1Done = totalExpenses > 0;
+  const isStep2Done = restaurant.monthlyTargetProfit > 0;
+  const isStep3Done = profits.length > 0;
+
+  const completedStepsCount = (isStep1Done ? 1 : 0) + (isStep2Done ? 1 : 0) + (isStep3Done ? 1 : 0);
+  const isAllStepsDone = completedStepsCount === 3;
+
+  const [showGuide, setShowGuide] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("taskwai_guide_collapsed");
+      if (saved === "true") return false;
+      if (saved === "false") return true;
+      // Default for new account: open if not all steps are done!
+      return !isAllStepsDone;
+    }
+    return false;
+  });
+
+  const handleToggleGuide = () => {
+    setShowGuide(prev => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("taskwai_guide_collapsed", (!next).toString());
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="space-y-4">
       {/* 1. Greeting & Date Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/60 dark:border-zinc-800">
         <div>
-          <h1 className="font-sans font-black text-3xl sm:text-4xl tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="font-sans font-black text-2xl sm:text-4xl tracking-tight text-zinc-900 dark:text-zinc-50">
             {t("dashboard.hello", "Halo")}, {restaurant.ownerId === "demo" ? "Owner " : ""}{restaurant.name} 👋
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-0.5 font-medium">{t("dashboard.welcome", "Selamat datang kembali di dashboard keuangan Anda.")}</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm mt-0.5 font-medium">{t("dashboard.welcome", "Selamat datang kembali di dashboard keuangan Anda.")}</p>
         </div>
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-2xl px-4 py-2 text-right self-start sm:self-center shadow-sm">
-          <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 block uppercase tracking-widest mb-0.5">{t("dashboard.todayDate", "Tanggal Hari Ini")}</span>
-          <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {formatIndoDate(todayStr, lang)}
-          </span>
+        <div className="flex items-center gap-2 self-start sm:self-center">
+          {/* Tombol Panduan Pengguna Ramping */}
+          <button
+            type="button"
+            onClick={handleToggleGuide}
+            className={`flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition-all shadow-sm cursor-pointer border ${
+              showGuide
+                ? "bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/20"
+                : "bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400 border-zinc-200/70 dark:border-zinc-800 hover:border-emerald-300 dark:hover:border-emerald-700/60"
+            }`}
+            title={showGuide ? t("dashboard.guideBtnClose", "Tutup Panduan") : t("dashboard.guideBtnOpen", "Panduan Pengguna")}
+          >
+            <Compass className={`w-3.5 h-3.5 ${showGuide ? "rotate-45" : "text-emerald-500"} transition-transform duration-200`} />
+            <span className="whitespace-nowrap">{showGuide ? t("dashboard.guideBtnClose", "Tutup Panduan") : t("dashboard.guideBtnOpen", "Panduan Pengguna")}</span>
+            {!isAllStepsDone && !showGuide && (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+            )}
+          </button>
+
+          {/* Tanggal Hari Ini */}
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 rounded-xl sm:rounded-2xl px-3.5 py-1.5 sm:py-2 text-right shadow-sm">
+            <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 block uppercase tracking-widest leading-none mb-0.5">{t("dashboard.todayDate", "Tanggal Hari Ini")}</span>
+            <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono leading-none">
+              {formatIndoDate(todayStr, lang)}
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* Interactive Quick Start Guide Banner */}
+      <AnimatePresence>
+        {showGuide && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, y: -8 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="relative p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50 dark:from-zinc-900 dark:via-zinc-900/95 dark:to-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/50 shadow-sm space-y-3.5">
+              {/* Top Accent Strip */}
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 rounded-t-2xl" />
+
+              {/* Guide Header */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-emerald-100/80 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 shrink-0">
+                    <Compass className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm sm:text-base font-black text-zinc-950 dark:text-white flex items-center gap-2 flex-wrap">
+                      <span>{t("dashboard.guideTitle", "Panduan Cepat Memulai Taskwai")}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100/90 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-800/60 font-mono">
+                        {completedStepsCount}/3 {t("dashboard.guideStepDone", "Selesai")}
+                      </span>
+                    </h2>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-0.5 leading-relaxed">
+                      {isAllStepsDone 
+                        ? t("dashboard.guideAllDone", "Semua langkah awal selesai! Sistem otomatis siap memantau performa bisnis Anda.") 
+                        : t("dashboard.guideSubtitle", "Selesaikan 3 langkah awal ini agar sistem kalkulasi finansial bisnis Anda berjalan optimal.")
+                      }
+                    </p>
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={handleToggleGuide}
+                  className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
+                  title={t("dashboard.guideBtnClose", "Tutup Panduan")}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* 3 Steps Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                {/* Step 1: Biaya Operasional */}
+                <div className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
+                  isStep1Done
+                    ? "bg-white/90 dark:bg-zinc-900/90 border-emerald-200 dark:border-emerald-900/40"
+                    : "bg-white dark:bg-zinc-900/60 border-zinc-200/70 dark:border-zinc-800/80 shadow-sm"
+                }`}>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                        <Landmark className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span>{t("dashboard.guideStep1Title", "1. Biaya Operasional Rutin")}</span>
+                      </div>
+                      {isStep1Done ? (
+                        <span className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-md">
+                          <Check className="w-3 h-3" /> {t("dashboard.guideStepDone", "Selesai")}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded-md">
+                          {t("dashboard.guideStepPending", "Belum diatur")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                      {t("dashboard.guideStep1Desc", "Sewa tempat, gaji karyawan, listrik & wifi bulanan agar estimasi laba bersih akurat.")}
+                    </p>
+                  </div>
+                  <div className="pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab?.("biaya")}
+                      className="w-full flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-zinc-100 hover:bg-emerald-50 dark:bg-zinc-800 dark:hover:bg-emerald-950/40 text-zinc-800 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer border border-zinc-200/60 dark:border-zinc-700"
+                    >
+                      <span>{t("dashboard.guideStep1Btn", "Atur Biaya Operasional")}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Step 2: Target Laba Bulanan */}
+                <div className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
+                  isStep2Done
+                    ? "bg-white/90 dark:bg-zinc-900/90 border-emerald-200 dark:border-emerald-900/40"
+                    : "bg-white dark:bg-zinc-900/60 border-zinc-200/70 dark:border-zinc-800/80 shadow-sm"
+                }`}>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                        <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span>{t("dashboard.guideStep2Title", "2. Target Laba Bulanan")}</span>
+                      </div>
+                      {isStep2Done ? (
+                        <span className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-md">
+                          <Check className="w-3 h-3" /> {t("dashboard.guideStepDone", "Selesai")}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded-md">
+                          {t("dashboard.guideStepPending", "Belum diatur")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                      {t("dashboard.guideStep2Desc", "Target profit bersih untuk memantau progress bar dan status pencapaian harian.")}
+                    </p>
+                  </div>
+                  <div className="pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab?.("target")}
+                      className="w-full flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-zinc-100 hover:bg-emerald-50 dark:bg-zinc-800 dark:hover:bg-emerald-950/40 text-zinc-800 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer border border-zinc-200/60 dark:border-zinc-700"
+                    >
+                      <span>{t("dashboard.guideStep2Btn", "Tentukan Target Laba")}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Step 3: Catat Profit Harian */}
+                <div className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
+                  isStep3Done
+                    ? "bg-white/90 dark:bg-zinc-900/90 border-emerald-200 dark:border-emerald-900/40"
+                    : "bg-white dark:bg-zinc-900/60 border-zinc-200/70 dark:border-zinc-800/80 shadow-sm"
+                }`}>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                        <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span>{t("dashboard.guideStep3Title", "3. Catat Profit Hari Ini")}</span>
+                      </div>
+                      {isStep3Done ? (
+                        <span className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-md">
+                          <Check className="w-3 h-3" /> {t("dashboard.guideStepDone", "Selesai")}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded-md">
+                          {t("dashboard.guideStepPending", "Belum diisi")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                      {t("dashboard.guideStep3Desc", "Masukkan omzet dan biaya harian pertama untuk melihat pergerakan grafik profit.")}
+                    </p>
+                  </div>
+                  <div className="pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab?.("input")}
+                      className="w-full flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-zinc-100 hover:bg-emerald-50 dark:bg-zinc-800 dark:hover:bg-emerald-950/40 text-zinc-800 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer border border-zinc-200/60 dark:border-zinc-700"
+                    >
+                      <span>{t("dashboard.guideStep3Btn", "Catat Profit Sekarang")}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 2. Utama: Hari ini Untung Berapa & Bulan ini Untung Berapa */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">

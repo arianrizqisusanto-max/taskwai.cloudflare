@@ -483,6 +483,7 @@ function MainApp() {
             restaurant={restaurant} 
             profits={profits} 
             expenses={expenses} 
+            setActiveTab={setActiveTab}
           />
         );
       case "input":
