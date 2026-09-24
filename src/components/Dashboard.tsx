@@ -197,23 +197,23 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
           <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm mt-0.5 font-medium">{t("dashboard.welcome", "Selamat datang kembali di dashboard keuangan Anda.")}</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-center">
-          {/* Tombol Panduan Pengguna Ramping */}
+          {/* Tombol Simbol Panduan Pengguna (Icon Only) */}
           <button
             type="button"
             onClick={handleToggleGuide}
-            className={`flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition-all shadow-sm cursor-pointer border ${
+            className={`relative p-2.5 rounded-xl sm:rounded-2xl transition-all shadow-sm cursor-pointer border flex items-center justify-center shrink-0 ${
               showGuide
                 ? "bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/20"
                 : "bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400 border-zinc-200/70 dark:border-zinc-800 hover:border-emerald-300 dark:hover:border-emerald-700/60"
             }`}
             title={showGuide ? t("dashboard.guideBtnClose", "Tutup Panduan") : t("dashboard.guideBtnOpen", "Panduan Pengguna")}
+            aria-label={t("dashboard.guideBtnOpen", "Panduan Pengguna")}
           >
-            <Compass className={`w-3.5 h-3.5 ${showGuide ? "rotate-45" : "text-emerald-500"} transition-transform duration-200`} />
-            <span className="whitespace-nowrap">{showGuide ? t("dashboard.guideBtnClose", "Tutup Panduan") : t("dashboard.guideBtnOpen", "Panduan Pengguna")}</span>
+            <Compass className={`w-4 h-4 ${showGuide ? "rotate-45" : "text-emerald-600 dark:text-emerald-400"} transition-transform duration-200`} />
             {!isAllStepsDone && !showGuide && (
-              <span className="relative flex h-2 w-2">
+              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
               </span>
             )}
           </button>
