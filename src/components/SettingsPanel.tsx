@@ -360,7 +360,7 @@ export default function SettingsPanel({ restaurant, onSaveRestaurant, onSaveStaf
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${userEmail ? "bg-emerald-500" : "bg-amber-400"}`} />
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">
                   {userEmail
-                    ? <><span className="font-bold text-zinc-700 dark:text-zinc-300">{userEmail}</span> · Cloud Firestore</>
+                    ? <><span className="font-bold text-zinc-700 dark:text-zinc-300">{userEmail}</span> · Cloud Taskwai</>
                     : t("target.demoModeText", "Mode Demo – data hanya tersimpan di browser.")}
                 </p>
               </div>

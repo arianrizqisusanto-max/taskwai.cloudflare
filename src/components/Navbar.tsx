@@ -533,7 +533,7 @@ export default function Navbar({
                   <Cloud className="w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-zinc-900 dark:text-zinc-50">{t("about.feat4.title", "Penyimpanan Aman Cloud")}</span>
-                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat4.desc", "Sinkronisasi otomatis ke cloud Firestore atau simpan secara lokal jika mode demo.")}</span>
+                    <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-normal">{t("about.feat4.desc", "Sinkronisasi otomatis ke Cloud Taskwai atau simpan secara lokal jika mode demo.")}</span>
                   </div>
                 </div>
               </div>
