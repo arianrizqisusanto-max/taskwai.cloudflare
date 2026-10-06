@@ -353,7 +353,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
                   </div>
                 </div>
 
-                {/* Step 3: Catat Profit Harian */}
+                {/* Step 3: Catat Omzet Harian */}
                 <div className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
                   isStep3Done
                     ? "bg-white/90 dark:bg-zinc-900/90 border-emerald-200 dark:border-emerald-900/40"
@@ -363,7 +363,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-800 dark:text-zinc-200">
                         <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>{t("dashboard.guideStep3Title", "3. Catat Profit Hari Ini")}</span>
+                        <span>{t("dashboard.guideStep3Title", "3. Catat Omzet Hari Ini")}</span>
                       </div>
                       {isStep3Done ? (
                         <span className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-md">
@@ -385,7 +385,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
                       onClick={() => setActiveTab?.("input")}
                       className="w-full flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-zinc-100 hover:bg-emerald-50 dark:bg-zinc-800 dark:hover:bg-emerald-950/40 text-zinc-800 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer border border-zinc-200/60 dark:border-zinc-700"
                     >
-                      <span>{t("dashboard.guideStep3Btn", "Catat Profit Sekarang")}</span>
+                      <span>{t("dashboard.guideStep3Btn", "Catat Omzet Sekarang")}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>

@@ -1,7 +1,7 @@
 export const enTranslations: Record<string, string> = {
   // --- Navbar ---
   "nav.dashboard": "Dashboard",
-  "nav.input": "Log Profit",
+  "nav.input": "Log Turnover",
   "nav.biaya": "Operating Costs",
   "nav.laporan": "Reports",
   "nav.target": "Settings",
@@ -38,9 +38,9 @@ export const enTranslations: Record<string, string> = {
   "dashboard.guideStep2Title": "2. Set Monthly Net Profit Target",
   "dashboard.guideStep2Desc": "Target profit you want to achieve this month to enable the achievement progress bar.",
   "dashboard.guideStep2Btn": "Set Target",
-  "dashboard.guideStep3Title": "3. Record First Profit Today",
+  "dashboard.guideStep3Title": "3. Record First Turnover Today",
   "dashboard.guideStep3Desc": "Enter your daily turnover and operational expenses to watch your daily profit trend chart.",
-  "dashboard.guideStep3Btn": "Record Profit",
+  "dashboard.guideStep3Btn": "Record Turnover",
   "dashboard.guideStepsCompleted": "{count} of 3 steps completed",
   "dashboard.guideAllDone": "Awesome! All 3 initial steps are complete. Taskwai is actively monitoring your business.",
   "dashboard.guideStepDone": "Completed",
@@ -101,8 +101,8 @@ export const enTranslations: Record<string, string> = {
   "dashboard.insightNetProfitText": "After deducting Fixed Costs of {expenses}, your projected month-end net profit is around {net}.",
   "dashboard.insightFooter": "Automatically updated every time daily profit inputs are saved.",
 
-  // --- Catat Profit (InputProfit) ---
-  "profit.title": "Record New Profit",
+  // --- Catat Omzet (InputProfit) ---
+  "profit.title": "Record Daily Turnover",
   "profit.subtitleFormulaWithHpp": "Based on brief formula: Turnover - COGS - Other Expenses",
   "profit.subtitleFormulaWithoutHpp": "Based on brief formula: Turnover - Other Expenses",
   "profit.date": "Operational Date",

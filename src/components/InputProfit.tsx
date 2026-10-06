@@ -271,7 +271,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800/60">
             <div>
               <h2 className="text-lg font-black text-zinc-950 dark:text-zinc-50 tracking-tight">
-                {t("profit.title", "Pencatatan Laba Baru")}
+                {t("profit.title", "Catat Omzet Harian")}
               </h2>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
                 {useHpp 
