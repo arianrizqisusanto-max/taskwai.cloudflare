@@ -110,7 +110,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
       indicatorClass: "bg-amber-500",
       textClass: "text-amber-600 dark:text-amber-400",
       icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />,
-      message: t("dashboard.messageCaution", "Profit harian perlu naik sekitar {diff} agar target tercapai.").replace("{diff}", formatRupiah(Math.max(0, targetDailyProfitTomorrow - averageDailyProfit)))
+      message: t("dashboard.messageCaution", "Laba harian perlu naik sekitar {diff} agar target tercapai.").replace("{diff}", formatRupiah(Math.max(0, targetDailyProfitTomorrow - averageDailyProfit)))
     },
     red: {
       label: t("dashboard.statusDanger", "Bahaya"),
@@ -118,7 +118,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
       indicatorClass: "bg-rose-500",
       textClass: "text-rose-600 dark:text-rose-400",
       icon: <AlertOctagon className="w-5 h-5 text-rose-600 dark:text-rose-400" />,
-      message: t("dashboard.messageDanger", "Kinerja profit saat ini jauh di bawah target bulanan. Perlu optimasi penjualan atau efisiensi biaya segera.")
+      message: t("dashboard.messageDanger", "Kinerja laba saat ini jauh di bawah target bulanan. Perlu optimasi omzet penjualan atau efisiensi biaya segera.")
     }
   };
 
@@ -150,7 +150,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
       return {
         dateFull: formatIndoDate(dateKey, lang),
         label: `${day}/${month}`,
-        "Profit Harian": profitSum,
+        "Laba Kotor Harian": profitSum,
       };
     });
 
@@ -399,7 +399,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
       {/* 2. Utama: Hari ini Untung Berapa & Bulan ini Untung Berapa */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
         
-        {/* Card 1: Profit Hari Ini */}
+        {/* Card 1: Laba Kotor Hari Ini */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -409,7 +409,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
           {/* Accent top border */}
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400 rounded-t-2xl" />
           <div className="flex justify-between items-start">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.profitToday", "Profit Hari Ini")}</span>
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.profitToday", "Laba Kotor Hari Ini")}</span>
             {profitToday > 0 ? (
               <span className="flex items-center gap-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-900/30">
                 <ArrowUpRight className="w-3.5 h-3.5" /> {t("dashboard.filled", "Terisi")}
@@ -425,12 +425,12 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
               {formatRupiah(profitToday)}
             </span>
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-1 block leading-relaxed">
-              {t("dashboard.profitTodayDesc", "Laba kotor operasional harian usaha Anda")}
+              {t("dashboard.profitTodayDesc", "Omzet dikurangi HPP & biaya harian")}
             </span>
           </div>
         </motion.div>
 
-        {/* Card 2: Profit Bulan Ini */}
+        {/* Card 2: Laba Kotor Bulan Ini */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -441,7 +441,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
           {/* Accent top border */}
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400 rounded-t-2xl" />
           <div className="flex justify-between items-start">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.profitMonth", "Profit Bulan Ini")}</span>
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.profitMonth", "Laba Kotor Bulan Ini")}</span>
             <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
               {t("dashboard.daysEntered", "{count} entri hari").replace("{count}", String(currentMonthProfits.length))}
             </span>
@@ -481,7 +481,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
           {/* Accent top border */}
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-violet-500 to-purple-400 rounded-t-2xl" />
           <div className="flex justify-between items-start">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.targetProfit", "Target Bulanan")}</span>
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.targetProfit", "Target Laba Bulanan")}</span>
             <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/50 px-2 py-0.5 rounded-full">
               {t("dashboard.goalOwner", "Goal Owner")}
             </span>
@@ -598,7 +598,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
             <p className="font-bold text-zinc-600 dark:text-zinc-300">
               {remainingTarget > 0 
                 ? t("dashboard.remainingTargetText", "{diff} lagi untuk mencapai target.").replace("{diff}", formatRupiah(remainingTarget)) 
-                : t("dashboard.targetAchieved", "Selamat! Target profit bulan ini telah tercapai! 🎉")
+                : t("dashboard.targetAchieved", "Selamat! Target laba bulan ini telah tercapai! 🎉")
               }
             </p>
           </div>
@@ -632,7 +632,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
         </div>
 
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-4 sm:p-4.5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-          <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.targetDaily", "Minimal Profit Harian Mulai Besok")}</span>
+          <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.targetDaily", "Minimal Laba Harian Mulai Besok")}</span>
           <div className="my-2">
             <span className={`font-mono block tracking-tight tabular-nums ${hasTarget ? "text-3xl font-black text-zinc-950 dark:text-white" : "text-xl font-bold text-zinc-400 dark:text-zinc-500"}`}>
               {hasTarget ? formatRupiah(targetDailyProfitTomorrow) : t("dashboard.targetNotSet", "Belum Diatur")}
@@ -647,7 +647,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
         </div>
 
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl p-4 sm:p-4.5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)] hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-          <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.prediction", "Estimasi Profit Akhir Bulan")}</span>
+          <span className="text-[11px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t("dashboard.prediction", "Estimasi Laba Akhir Bulan")}</span>
           <div className="my-2">
             <span className="font-mono text-3xl font-black text-zinc-950 dark:text-white block tracking-tight tabular-nums">
               {formatRupiah(predictionProfit)}
@@ -665,7 +665,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
         <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 p-4 sm:p-4.5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_28px_-10px_rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-widest">{t("dashboard.chartTitle", "Trend Profit Harian")}</h3>
+              <h3 className="text-sm font-black text-zinc-900 dark:text-zinc-50 uppercase tracking-widest">{t("dashboard.chartTitle", "Trend Laba Kotor Harian")}</h3>
               <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5">{t("dashboard.chartTitleDesc", "Grafik pergerakan laba kotor harian bulan ini")}</p>
             </div>
              <div className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-lg px-2.5 py-1">
@@ -713,11 +713,11 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
                       }
                       return label;
                     }}
-                    formatter={(value: any) => [formatRupiah(Number(value)), t("dashboard.netProfit", "Net Profit")]}
+                    formatter={(value: any) => [formatRupiah(Number(value)), t("dashboard.grossProfit", "Laba Kotor")]}
                   />
                   <Area 
                     type="monotone" 
-                    dataKey="Profit Harian" 
+                    dataKey="Laba Kotor Harian" 
                     stroke="#10B981" 
                     strokeWidth={3}
                     fillOpacity={1} 
@@ -729,7 +729,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
               <div className="flex flex-col items-center justify-center h-full text-zinc-400 dark:text-zinc-500 bg-zinc-50/50 dark:bg-zinc-950/20 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800/80">
                 <HelpCircle className="w-8 h-8 text-zinc-300 dark:text-zinc-600 mb-2" />
                 <p className="text-xs font-semibold text-zinc-500">{t("dashboard.noChartData", "Belum ada data grafik untuk bulan ini.")}</p>
-                <p className="text-[10px] mt-1 text-zinc-400">{t("dashboard.noChartDataDesc", "Silakan tambahkan profit harian terlebih dahulu.")}</p>
+                <p className="text-[10px] mt-1 text-zinc-400">{t("dashboard.noChartDataDesc", "Silakan catat omzet harian terlebih dahulu.")}</p>
               </div>
             )}
           </div>
@@ -752,8 +752,8 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
                 <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
                   {hasTarget ? (
                     businessStatus === "green" 
-                      ? t("dashboard.insightStatusSafe", "Target profit bulanan Anda dalam status aman dan sangat mungkin tercapai.") 
-                      : t("dashboard.insightStatusCaution", "Laju profit saat ini kurang optimal untuk mencapai target bulanan {target}.").replace("{target}", formatRupiah(targetProfit))
+                      ? t("dashboard.insightStatusSafe", "Target laba bulanan Anda dalam status aman dan sangat mungkin tercapai.") 
+                      : t("dashboard.insightStatusCaution", "Laju perolehan laba saat ini kurang optimal untuk mencapai target bulanan {target}.").replace("{target}", formatRupiah(targetProfit))
                   ) : (
                     t("dashboard.insightNoTarget", "Anda belum menetapkan target laba bulanan. Set target di Settings jika ingin memantau sisa pencapaian usaha.")
                   )}
@@ -768,8 +768,8 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
                   </div>
                   <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-relaxed">
                     {remainingTarget > 0 
-                      ? t("dashboard.insightTargetDailyText", "Perlu mencapai minimal {daily} per hari selama sisa {days} hari ke depan.").replace("{daily}", formatRupiah(targetDailyProfitTomorrow)).replace("{days}", String(daysRemaining))
-                      : t("dashboard.insightTargetMetText", "Luar biasa! Seluruh target profit bulan ini sudah tercapai sepenuhnya. Semua profit berikutnya adalah bonus bersih.")
+                      ? t("dashboard.insightTargetDailyText", "Perlu mencapai minimal laba {daily} per hari selama sisa {days} hari ke depan.").replace("{daily}", formatRupiah(targetDailyProfitTomorrow)).replace("{days}", String(daysRemaining))
+                      : t("dashboard.insightTargetMetText", "Luar biasa! Seluruh target laba bulan ini sudah tercapai sepenuhnya. Semua pencapaian berikutnya adalah bonus bersih.")
                     }
                   </div>
                 </div>
@@ -798,7 +798,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
           </div>
 
           <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2.5 pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 text-center font-medium">
-            {t("dashboard.insightFooter", "Pembaruan otomatis tiap input profit harian disimpan.")}
+            {t("dashboard.insightFooter", "Pembaruan otomatis tiap input omzet harian disimpan.")}
           </div>
         </div>
       </div>
