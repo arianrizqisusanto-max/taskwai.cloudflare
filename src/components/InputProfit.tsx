@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { DailyProfit, Restaurant, Expenses } from "../types";
 import { formatRupiah, formatIndoDate } from "../lib/utils";
-import { Save, Calendar, Coins, AlignLeft, Trash2, HelpCircle, Sparkles, Percent, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Save, Calendar, Coins, AlignLeft, Trash2, HelpCircle, Sparkles, Percent, AlertCircle, ChevronDown, ChevronUp, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useToast } from "./Toast";
 import { useTranslation } from "../lib/LanguageContext";
@@ -77,6 +77,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showHppHelp, setShowHppHelp] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
 
   const toggleExpand = (id: string) => {
@@ -330,8 +331,23 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
             {/* Toggle HPP Feature Switch */}
             <div className="flex items-center justify-between p-3.5 bg-zinc-50/50 dark:bg-zinc-950/45 border border-zinc-200/50 dark:border-zinc-800/60 rounded-xl">
               <div className="flex flex-col pr-2">
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t("profit.hppFeature", "Aktifkan Fitur HPP")}</span>
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium leading-normal">{t("profit.hppFeatureDesc", "Kalkulasi modal / bahan baku per porsi dagangan")}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                    {t("profit.hppFeature", "Hitung Modal Produk / Bahan Baku (HPP)")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowHppHelp(true)}
+                    className="p-1 rounded-full text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors cursor-pointer"
+                    title={t("profit.hppHelpTooltip", "Penjelasan apa itu HPP")}
+                    aria-label="Penjelasan apa itu HPP"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium leading-normal mt-0.5">
+                  {t("profit.hppFeatureDesc", "Aktifkan jika ingin omzet langsung dipotong belanja bahan / modal kulakan.")}
+                </span>
               </div>
               <button
                 type="button"
@@ -353,7 +369,7 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
               <div className="space-y-2 bg-zinc-50/50 dark:bg-zinc-950/25 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800/60">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                    {t("profit.hpp", "HPP (Cost of Goods Sold)")}
+                    {t("profit.hpp", "Potongan Modal / Bahan Baku")}
                   </label>
                   {/* Segmented control toggle */}
                   <div className="flex bg-zinc-200/80 dark:bg-zinc-800 p-0.5 rounded-lg text-[10px] font-bold">
@@ -415,8 +431,8 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                 )}
                 <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1.5 block leading-normal">
                   {hppType === "percentage" 
-                    ? t("profit.hppPercentDesc", "Bahan baku otomatis dikalkulasi dari % dikali Omzet.") 
-                    : t("profit.hppNominalDesc", "Masukkan nominal belanja bahan baku / modal porsi hari ini.")}
+                    ? t("profit.hppPercentDesc", "Contoh: 35% modal bahan baku dari total omzet hari ini.") 
+                    : t("profit.hppNominalDesc", "Contoh: Masukkan total belanja bahan atau modal kulakan hari ini.")}
                 </span>
               </div>
             )}
@@ -966,6 +982,100 @@ export default function InputProfit({ profits, onSaveProfit, onDeleteProfit, isS
                     {t("profit.deleteButton", "Hapus Data")}
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Educational Modal: Penjelasan HPP untuk Orang Awam */}
+      <AnimatePresence>
+        {showHppHelp && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.15 }}
+              className="relative w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 backdrop-blur-xl p-5 sm:p-6 shadow-2xl border border-zinc-200/80 dark:border-zinc-800 space-y-4 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-150 dark:border-zinc-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
+                      Apa itu Fitur HPP?
+                    </h3>
+                    <p className="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">
+                      Panduan simpel untuk pemilik usaha
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowHppHelp(false)}
+                  className="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  aria-label="Tutup"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
+                <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200/60 dark:border-zinc-800/60 space-y-1.5">
+                  <p className="font-bold text-zinc-850 dark:text-zinc-100">
+                    💡 HPP = Modal Pokok / Belanja Bahan
+                  </p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                    HPP singkatan dari <strong>Harga Pokok Penjualan</strong>. Sederhananya, ini adalah uang modal yang keluar untuk barang/makanan yang laku terjual hari ini.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="font-bold text-zinc-800 dark:text-zinc-200">
+                    Contoh Nyata:
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 text-[11px]">
+                    <div className="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                      <strong className="text-emerald-700 dark:text-emerald-400 block mb-0.5">🍜 Usaha Kuliner / Warung:</strong>
+                      Jual nasi goreng Rp 15.000. Modal beras, telur, ayam, minyak & bumbu per porsi adalah Rp 6.000 (40%). Maka laba kotor Anda per porsi adalah Rp 9.000.
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+                      <strong className="text-blue-700 dark:text-blue-400 block mb-0.5">🏪 Toko Kelontong / Retail:</strong>
+                      Jual deterjen Rp 20.000, modal kulakannya Rp 17.000. Maka modal kulakan tersebut adalah HPP Anda.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <p className="font-bold text-zinc-800 dark:text-zinc-200">
+                    Dua Cara Mengisi:
+                  </p>
+                  <ul className="list-disc pl-4 space-y-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                    <li>
+                      <strong className="text-zinc-700 dark:text-zinc-300">Nominal (Rp):</strong> Masukkan total uang belanja bahan atau belanja pasar hari ini.
+                    </li>
+                    <li>
+                      <strong className="text-zinc-700 dark:text-zinc-300">Persen (%):</strong> Jika tidak sempat hitung belanja harian, pakai perkiraan persentase modal per porsi (misal 35% atau 40%).
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 text-[11px] text-amber-800 dark:text-amber-300 font-medium">
+                  ✂️ <em>Usaha Jasa (seperti potong rambut, laundry jasa, servis) boleh <strong>matikan</strong> fitur ini jika tidak ada bahan dagangan yang terjual.</em>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowHppHelp(false)}
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors cursor-pointer shadow-sm shadow-emerald-600/10"
+                >
+                  Saya Paham
+                </button>
               </div>
             </motion.div>
           </div>
