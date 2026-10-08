@@ -46,10 +46,13 @@ function ChunkErrorFallback() {
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       minHeight: "60vh", padding: "2rem", textAlign: "center", gap: "1rem"
     }}>
-      <p style={{ fontSize: "1.1rem", fontWeight: 600 }}>
+      <p style={{ fontSize: "1.2rem", fontWeight: 700 }}>
         Versi aplikasi telah diperbarui.
       </p>
-      <p style={{ fontSize: "0.9rem", opacity: 0.7 }}>
+      <p style={{ fontSize: "0.95rem", fontWeight: 600, color: "#10B981" }}>
+        Harap Bersabar... proses pembaharuan web sedang berlangsung
+      </p>
+      <p style={{ fontSize: "0.85rem", opacity: 0.75 }}>
         Memuat ulang otomatis untuk menyinkronkan versi terbaru...
       </p>
       <button
