@@ -529,6 +529,37 @@ export const DataService = {
     }
   },
 
+  async getAdminUsers(page = 1, limit = 15, query = ''): Promise<{
+    users: Array<{
+      id: string;
+      email: string;
+      ownerName: string;
+      picture?: string;
+      createdAt: string;
+      accountType?: string;
+      restaurantName?: string;
+      restaurantId?: string;
+      lastActiveProfitDate?: string;
+      lastLoginDate?: string;
+    }>;
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }> {
+    const encodedQ = encodeURIComponent(query.trim());
+    const res = await fetch(`/api/admin/users?page=${page}&limit=${limit}&q=${encodedQ}`, {
+      headers: getHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json() as any;
+      throw new Error(err.error || 'Gagal memuat daftar pengguna.');
+    }
+    return await res.json();
+  },
+
   async getBigBossAuthStatus(): Promise<{ isFrozen: boolean; bossName?: string; bossEmail?: string; linkedAt?: string; code?: string | null; expiresAt?: string | null }> {
     const res = await fetch('/api/restaurant/auth-code', {
       headers: getHeaders()
