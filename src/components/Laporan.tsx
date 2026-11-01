@@ -103,6 +103,22 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
     const breakdown = calculateDailyProfitBreakdown(curr);
     return acc + breakdown.netProfit;
   }, 0);
+
+  const totalOmzet = filteredProfits.reduce((acc, curr) => {
+    const breakdown = calculateDailyProfitBreakdown(curr);
+    return acc + (breakdown.hasBreakdown ? breakdown.omzet : breakdown.netProfit);
+  }, 0);
+
+  const totalHpp = filteredProfits.reduce((acc, curr) => {
+    const breakdown = calculateDailyProfitBreakdown(curr);
+    return acc + breakdown.hppVal;
+  }, 0);
+
+  const totalBiayaHarian = filteredProfits.reduce((acc, curr) => {
+    const breakdown = calculateDailyProfitBreakdown(curr);
+    return acc + breakdown.otherExpenses;
+  }, 0);
+
   const averageProfit = totalDays > 0 ? Math.round(totalProfit / totalDays) : 0;
   
   const maxProfitEntry = totalDays > 0 ? [...filteredProfits].sort((a, b) => calculateDailyProfitBreakdown(b).netProfit - calculateDailyProfitBreakdown(a).netProfit)[0] : null;
@@ -139,77 +155,231 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
 
         const primaryColor: [number, number, number] = [16, 185, 129];
 
-        // ── Header Branding ──────────────────────────────────
+        // ── 1. Top Decorative Ribbon & Header Branding ────────
+        doc.setFillColor(16, 185, 129);
+        doc.rect(0, 0, 210, 3.5, "F");
+
         doc.setFont("Helvetica", "bold");
-        doc.setFontSize(9);
+        doc.setFontSize(10);
         doc.setTextColor(16, 185, 129);
-        doc.text(t("laporan.pdfBranding", "Taskwai.com - Dashboard Usaha Anda"), 14, 12);
+        doc.text("TASKWAI", 14, 11);
 
-        doc.setDrawColor(16, 185, 129);
-        doc.setLineWidth(0.8);
-        doc.line(14, 14, 196, 14);
-
-        // ── Main Title ───────────────────────────────────────
-        doc.setFont("Helvetica", "bold");
-        doc.setFontSize(18);
-        doc.setTextColor(30, 41, 59);
-        doc.text(t("laporan.pdfTitle", "LAPORAN KEUANGAN BULANAN"), 14, 23);
-
-        doc.setFontSize(9.5);
         doc.setFont("Helvetica", "normal");
+        doc.setFontSize(8);
         doc.setTextColor(100, 116, 139);
-        doc.text(`${t("laporan.businessName", "Nama Usaha")}: ${restaurant?.name || t("laporan.notSet", "Belum Diatur")}`, 14, 29);
-        doc.text(`Periode Bulan: ${monthName}`, 14, 34);
-        doc.text(`${t("laporan.printDate", "Tanggal Cetak")}: ${formatIndoDate(todayStr, lang)}`, 14, 39);
+        doc.text("•  SISTEM PENCATATAN & LAPORAN KEUANGAN USAHA", 35, 11);
 
-        // Divider Line
-        doc.setDrawColor(226, 232, 240);
-        doc.setLineWidth(0.5);
-        doc.line(14, 43, 196, 43);
-
-        // ── Summary Section ──────────────────────────────────
+        // ── 2. Main Title ─────────────────────────────────────
         doc.setFont("Helvetica", "bold");
-        doc.setFontSize(11);
+        doc.setFontSize(15);
         doc.setTextColor(15, 23, 42);
-        doc.text(t("laporan.summaryTitle", "Ringkasan Finansial Eksekutif"), 14, 50);
+        doc.text(t("laporan.pdfTitle", "LAPORAN KEUANGAN BULANAN"), 14, 19);
+
+        // ── 3. Business Metadata Box ──────────────────────────
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.4);
+        doc.roundedRect(14, 23, 182, 16, 2, 2, "FD");
+
+        // Left Metadata
+        doc.setFontSize(8);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(71, 85, 105);
+        doc.text(t("laporan.businessName", "Nama Usaha"), 18, 29);
+        doc.text("Periode Laporan", 18, 35);
 
         doc.setFont("Helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(51, 65, 85);
+        doc.setTextColor(15, 23, 42);
+        doc.text(`:  ${restaurant?.name || t("laporan.notSet", "Belum Diatur")}`, 42, 29);
+        doc.text(`:  ${monthName}`, 42, 35);
 
-        const labelX = 14;
-        const colonX = 52;
-        const valueX = 55;
+        // Right Metadata
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(71, 85, 105);
+        doc.text(t("laporan.printDate", "Tanggal Cetak"), 110, 29);
+        doc.text("Status Kinerja", 110, 35);
 
-        doc.text("Laba Kotor (Omzet Bersih Harian)", labelX, 56);
-        doc.text(":", colonX, 56);
-        doc.text(formatRupiah(totalProfit), valueX, 56);
-
-        doc.text("Total Biaya Operasional Tetap", labelX, 62);
-        doc.text(":", colonX, 62);
-        doc.text(`-${formatRupiah(totalBiayaVal)}`, valueX, 62);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(15, 23, 42);
+        doc.text(`:  ${formatIndoDate(todayStr, lang)}`, 134, 29);
 
         doc.setFont("Helvetica", "bold");
-        doc.setTextColor(16, 185, 129);
-        doc.text("Laba Bersih Murni (Net Profit)", labelX, 68);
-        doc.text(":", colonX, 68);
-        doc.text(formatRupiah(netProfitMurni), valueX, 68);
+        if (rating.label.includes("Baik") || rating.label.includes("Amazing") || rating.label.includes("Excellent")) {
+          doc.setTextColor(5, 150, 105);
+        } else if (rating.label.includes("Waspada")) {
+          doc.setTextColor(217, 119, 6);
+        } else {
+          doc.setTextColor(225, 29, 72);
+        }
+        doc.text(`:  ${rating.label}`, 134, 35);
+
+        // ── 4. Executive Metric Cards (4 Cards Grid) ──────────
+        // w = 42.5mm each, gap = 4mm -> total = 42.5*4 + 12 = 182mm (x = 14 to 196)
+        const cardY = 42;
+        const cardH = 18.5;
+
+        // Card 1: Total Omzet
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(226, 232, 240);
+        doc.roundedRect(14, cardY, 42.5, cardH, 2, 2, "FD");
+        doc.setFontSize(6.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(100, 116, 139);
+        doc.text("TOTAL OMZET (KOTOR)", 17, cardY + 5);
+        doc.setFontSize(9);
+        doc.setTextColor(15, 23, 42);
+        doc.text(formatRupiah(totalOmzet), 17, cardY + 11);
+        doc.setFontSize(5.8);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(148, 163, 184);
+        doc.text("Penjualan kotor bulan ini", 17, cardY + 15.5);
+
+        // Card 2: HPP & Biaya Harian
+        doc.setFillColor(255, 241, 242);
+        doc.setDrawColor(254, 205, 211);
+        doc.roundedRect(60.5, cardY, 42.5, cardH, 2, 2, "FD");
+        doc.setFontSize(6.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(225, 29, 72);
+        doc.text("MODAL / BIAYA HARIAN", 63.5, cardY + 5);
+        doc.setFontSize(9);
+        doc.setTextColor(225, 29, 72);
+        doc.text(`-${formatRupiah(totalHpp + totalBiayaHarian)}`, 63.5, cardY + 11);
+        doc.setFontSize(5.8);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(148, 163, 184);
+        doc.text("Bahan baku & belanja harian", 63.5, cardY + 15.5);
+
+        // Card 3: Total Laba Kotor
+        doc.setFillColor(240, 253, 250);
+        doc.setDrawColor(204, 251, 241);
+        doc.roundedRect(107, cardY, 42.5, cardH, 2, 2, "FD");
+        doc.setFontSize(6.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(13, 148, 136);
+        doc.text("TOTAL LABA KOTOR", 110, cardY + 5);
+        doc.setFontSize(9);
+        doc.setTextColor(13, 148, 136);
+        doc.text(formatRupiah(totalProfit), 110, cardY + 11);
+        doc.setFontSize(5.8);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(148, 163, 184);
+        doc.text("Omzet - modal bahan", 110, cardY + 15.5);
+
+        // Card 4: Laba Bersih Murni
+        doc.setFillColor(236, 253, 245);
+        doc.setDrawColor(167, 243, 208);
+        doc.roundedRect(153.5, cardY, 42.5, cardH, 2, 2, "FD");
+        doc.setFontSize(6.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(5, 150, 105);
+        doc.text("LABA BERSIH MURNI", 156.5, cardY + 5);
+        doc.setFontSize(9.5);
+        doc.setTextColor(5, 150, 105);
+        doc.text(formatRupiah(netProfitMurni), 156.5, cardY + 11);
+        doc.setFontSize(5.8);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(148, 163, 184);
+        doc.text("Setelah potong biaya tetap", 156.5, cardY + 15.5);
+
+        // ── 5. Detailed Financial Summary Panel (Dual Box) ────
+        // Left Box: Operasional Harian (x = 14 to 103, w = 89mm)
+        // Right Box: Beban Tetap & Target (x = 107 to 196, w = 89mm)
+        const panelY = 63.5;
+        const panelH = 26;
+
+        // Left Panel Box
+        doc.setFillColor(255, 255, 255);
+        doc.setDrawColor(226, 232, 240);
+        doc.roundedRect(14, panelY, 89, panelH, 2, 2, "FD");
+
+        doc.setFontSize(7.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text("Rincian Laba Operasional Harian", 18, panelY + 5);
+
+        // Left Panel Rows (Right-aligned values to prevent ANY overlap)
+        doc.setFontSize(7);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text("Total Omzet Penjualan", 18, panelY + 10);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text(formatRupiah(totalOmzet), 99, panelY + 10, { align: "right" });
 
         doc.setFont("Helvetica", "normal");
-        doc.setTextColor(51, 65, 85);
-        doc.text("Target Laba Bulanan", labelX, 74);
-        doc.text(":", colonX, 74);
-        doc.text(targetProfit > 0 ? `${formatRupiah(targetProfit)} (${achievementPct}%)` : "Tidak Ditentukan", valueX, 74);
+        doc.setTextColor(71, 85, 105);
+        doc.text("Potongan HPP / Belanja Bahan", 18, panelY + 14.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(225, 29, 72);
+        doc.text(`-${formatRupiah(totalHpp)}`, 99, panelY + 14.5, { align: "right" });
 
-        doc.text("Rata-rata Profit Harian", labelX, 80);
-        doc.text(":", colonX, 80);
-        doc.text(`${formatRupiah(averageProfit)} (${totalDays} hari tercatat)`, valueX, 80);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text("Pengeluaran Lain-lain Harian", 18, panelY + 19);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(217, 119, 6);
+        doc.text(`-${formatRupiah(totalBiayaHarian)}`, 99, panelY + 19, { align: "right" });
 
-        // ── Table ────────────────────────────────────────────
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.3);
+        doc.line(18, panelY + 21, 99, panelY + 21);
+
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(5, 150, 105);
+        doc.text("Total Laba Kotor Operasional", 18, panelY + 24.5);
+        doc.text(formatRupiah(totalProfit), 99, panelY + 24.5, { align: "right" });
+
+        // Right Panel Box
+        doc.setFillColor(255, 255, 255);
+        doc.setDrawColor(226, 232, 240);
+        doc.roundedRect(107, panelY, 89, panelH, 2, 2, "FD");
+
+        doc.setFontSize(7.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text("Beban Tetap Bulanan & Sasaran", 111, panelY + 5);
+
+        // Right Panel Rows (Right-aligned values to prevent ANY overlap)
+        doc.setFontSize(7);
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text("Biaya Operasional Tetap Bulanan", 111, panelY + 10);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(225, 29, 72);
+        doc.text(`-${formatRupiah(totalBiayaVal)}`, 192, panelY + 10, { align: "right" });
+
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text("Target Laba Bulanan", 111, panelY + 14.5);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text(targetProfit > 0 ? `${formatRupiah(targetProfit)} (${achievementPct}%)` : "Belum Diatur", 192, panelY + 14.5, { align: "right" });
+
+        doc.setFont("Helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text("Rata-rata Laba Kotor / Hari", 111, panelY + 19);
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text(`${formatRupiah(averageProfit)} (${totalDays} hari)`, 192, panelY + 19, { align: "right" });
+
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.3);
+        doc.line(111, panelY + 21, 192, panelY + 21);
+
+        doc.setFont("Helvetica", "bold");
+        doc.setTextColor(13, 148, 136);
+        doc.text("Estimasi Laba Bersih Murni", 111, panelY + 24.5);
+        doc.text(formatRupiah(netProfitMurni), 192, panelY + 24.5, { align: "right" });
+
+        // ── 6. Daily Transactions Table (autoTable) ───────────
         const headers = [[
           t("laporan.tableNo", "No"), 
           t("laporan.tableDate", "Tanggal"), 
           t("laporan.tableDay", "Hari"), 
+          "Omzet",
+          "HPP / Modal",
+          "Biaya Harian",
           t("laporan.tableGrossProfitShort", "Laba Kotor"), 
           "Penginput",
           t("laporan.tableNotes", "Catatan")
@@ -218,53 +388,85 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
         const tableData = filteredProfits.map((p, index) => {
           const dateObj = new Date(p.date);
           const weekday = dateObj.toLocaleDateString(lang === "en" ? "en-US" : "id-ID", { weekday: "long" });
+          const b = calculateDailyProfitBreakdown(p);
           return [
             (index + 1).toString(),
             p.date,
             weekday,
-            formatRupiah(p.profit),
+            b.hasBreakdown ? formatRupiah(b.omzet) : "-",
+            b.hasBreakdown ? (b.hppVal > 0 ? `-${formatRupiah(b.hppVal)}` : "Rp 0") : "-",
+            b.hasBreakdown ? (b.otherExpenses > 0 ? `-${formatRupiah(b.otherExpenses)}` : "Rp 0") : "-",
+            formatRupiah(b.netProfit),
             p.inputterName || "Owner",
             p.notes || "-"
           ];
         });
 
         autoTable(doc, {
-          startY: 86,
+          startY: 93,
+          margin: { left: 14, right: 14 },
+          tableWidth: 182,
           head: headers,
           body: tableData,
+          foot: [[
+            "",
+            "TOTAL",
+            `${totalDays} Hari`,
+            formatRupiah(totalOmzet),
+            `-${formatRupiah(totalHpp)}`,
+            `-${formatRupiah(totalBiayaHarian)}`,
+            formatRupiah(totalProfit),
+            "",
+            ""
+          ]],
+          showFoot: "lastPage",
           theme: "striped",
           headStyles: {
             fillColor: primaryColor,
             textColor: [255, 255, 255],
-            fontStyle: "bold"
+            fontStyle: "bold",
+            fontSize: 7.5,
+            cellPadding: 2.2,
+            halign: "center"
           },
-          styles: {
-            fontSize: 8.5,
+          bodyStyles: {
+            fontSize: 7.5,
             font: "Helvetica",
-            cellPadding: 3
+            cellPadding: 2,
+            textColor: [51, 65, 85]
+          },
+          footStyles: {
+            fillColor: [241, 245, 249],
+            textColor: [15, 23, 42],
+            fontStyle: "bold",
+            fontSize: 7.5,
+            cellPadding: 2.2
           },
           columnStyles: {
-            0: { cellWidth: 10, halign: "center" },
-            1: { cellWidth: 26 },
-            2: { cellWidth: 26 },
-            3: { cellWidth: 38, halign: "right" },
-            4: { cellWidth: 30 },
-            5: { cellWidth: "auto" }
+            0: { cellWidth: 8, halign: "center" },
+            1: { cellWidth: 20, halign: "center" },
+            2: { cellWidth: 16, halign: "left" },
+            3: { cellWidth: 25, halign: "right" },
+            4: { cellWidth: 22, halign: "right" },
+            5: { cellWidth: 22, halign: "right" },
+            6: { cellWidth: 26, halign: "right", fontStyle: "bold", textColor: [5, 150, 105] },
+            7: { cellWidth: 18, halign: "left" },
+            8: { cellWidth: 25, halign: "left" }
           },
           alternateRowStyles: {
             fillColor: [248, 250, 252]
           },
           didDrawPage: (data) => {
             doc.setFont("Helvetica", "normal");
-            doc.setFontSize(8);
-            doc.setTextColor(156, 163, 175);
+            doc.setFontSize(7.5);
+            doc.setTextColor(148, 163, 184);
             const pageH = doc.internal.pageSize.height;
             const pageW = doc.internal.pageSize.width;
             doc.setDrawColor(226, 232, 240);
             doc.setLineWidth(0.3);
-            doc.line(14, pageH - 12, pageW - 14, pageH - 12);
-            doc.text(t("laporan.pdfBranding", "Taskwai.com - Dashboard Usaha Anda"), 14, pageH - 8);
-            doc.text(t("laporan.pdfPage", "Halaman {num}").replace("{num}", String(data.pageNumber)), pageW - 25, pageH - 8);
+            doc.line(14, pageH - 10, pageW - 14, pageH - 10);
+            doc.text("Taskwai.com • Sistem Pembukuan & Laporan Keuangan Usaha", 14, pageH - 6);
+            doc.text(t("laporan.pdfPage", "Halaman {num}").replace("{num}", String(data.pageNumber)), pageW - 14, pageH - 6, { align: "right" });
           }
         });
 
@@ -275,7 +477,7 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
         console.error("Export Error:", error);
         showToast(t("laporan.exportError", "Terjadi kesalahan saat mengunduh dokumen."), "error");
       }
-    }, 1200);
+    }, 1000);
   };
 
   return (
@@ -536,35 +738,72 @@ export default function Laporan({ profits, restaurant, user }: LaporanProps) {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                  <th className="py-3 px-4">{t("laporan.tableDate", "Tanggal")}</th>
-                  <th className="py-3 px-4">{t("laporan.tableDay", "Hari")}</th>
-                  <th className="py-3 px-4">{t("laporan.tableGrossProfitShort", "Laba Kotor")}</th>
-                  <th className="py-3 px-4">Penginput</th>
-                  <th className="py-3 px-4">{t("laporan.tableNotes", "Catatan")}</th>
+                  <th className="py-3 px-3.5">{t("laporan.tableDate", "Tanggal")}</th>
+                  <th className="py-3 px-3.5">{t("laporan.tableDay", "Hari")}</th>
+                  <th className="py-3 px-3.5 text-right">Omzet</th>
+                  <th className="py-3 px-3.5 text-right">HPP / Modal</th>
+                  <th className="py-3 px-3.5 text-right">Biaya Harian</th>
+                  <th className="py-3 px-3.5 text-right">{t("laporan.tableGrossProfitShort", "Laba Kotor")}</th>
+                  <th className="py-3 px-3.5">Penginput</th>
+                  <th className="py-3 px-3.5">{t("laporan.tableNotes", "Catatan")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
                 {filteredProfits.map((p) => {
                   const dateObj = new Date(p.date);
                   const weekday = dateObj.toLocaleDateString(lang === "en" ? "en-US" : "id-ID", { weekday: "long" });
+                  const b = calculateDailyProfitBreakdown(p);
                   return (
                     <motion.tr
                       key={p.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 text-sm transition-colors"
+                      className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 text-xs sm:text-sm transition-colors"
                     >
-                      <td className="py-3.5 px-4 font-mono font-bold text-zinc-500 dark:text-zinc-400 text-xs">{p.date}</td>
-                      <td className="py-3.5 px-4 font-bold text-zinc-800 dark:text-zinc-200">{weekday}</td>
-                      <td className="py-3.5 px-4 font-mono font-black text-zinc-950 dark:text-zinc-50">{formatRupiah(p.profit)}</td>
-                      <td className="py-3.5 px-4 text-xs font-semibold text-zinc-500 dark:text-zinc-400">{p.inputterName || "Owner"}</td>
-                      <td className="py-3.5 px-4 text-xs text-zinc-500 dark:text-zinc-400 max-w-xs truncate italic font-medium">
+                      <td className="py-3 px-3.5 font-mono font-bold text-zinc-500 dark:text-zinc-400 text-xs">{p.date}</td>
+                      <td className="py-3 px-3.5 font-bold text-zinc-800 dark:text-zinc-200 text-xs">{weekday}</td>
+                      <td className="py-3 px-3.5 font-mono font-bold text-zinc-900 dark:text-zinc-100 text-right text-xs">
+                        {b.hasBreakdown ? formatRupiah(b.omzet) : "-"}
+                      </td>
+                      <td className="py-3 px-3.5 font-mono font-bold text-rose-600 dark:text-rose-450 text-right text-xs">
+                        {b.hasBreakdown ? (b.hppVal > 0 ? `-${formatRupiah(b.hppVal)}` : "Rp 0") : "-"}
+                      </td>
+                      <td className="py-3 px-3.5 font-mono font-bold text-amber-600 dark:text-amber-450 text-right text-xs">
+                        {b.hasBreakdown ? (b.otherExpenses > 0 ? `-${formatRupiah(b.otherExpenses)}` : "Rp 0") : "-"}
+                      </td>
+                      <td className="py-3 px-3.5 font-mono font-black text-emerald-600 dark:text-emerald-450 text-right text-xs sm:text-sm">
+                        {formatRupiah(b.netProfit)}
+                      </td>
+                      <td className="py-3 px-3.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                        {p.inputterName || "Owner"}
+                      </td>
+                      <td className="py-3 px-3.5 text-xs text-zinc-500 dark:text-zinc-400 max-w-xs truncate italic font-medium">
                         {p.notes ? `"${p.notes}"` : "-"}
                       </td>
                     </motion.tr>
                   );
                 })}
               </tbody>
+              <tfoot className="border-t-2 border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-950/40 text-xs font-bold font-mono">
+                <tr>
+                  <td colSpan={2} className="py-3 px-3.5 text-zinc-700 dark:text-zinc-300">
+                    TOTAL ({totalDays} HARI)
+                  </td>
+                  <td className="py-3 px-3.5 text-right text-zinc-900 dark:text-zinc-100">
+                    {formatRupiah(totalOmzet)}
+                  </td>
+                  <td className="py-3 px-3.5 text-right text-rose-600 dark:text-rose-450">
+                    -{formatRupiah(totalHpp)}
+                  </td>
+                  <td className="py-3 px-3.5 text-right text-amber-600 dark:text-amber-450">
+                    -{formatRupiah(totalBiayaHarian)}
+                  </td>
+                  <td className="py-3 px-3.5 text-right font-black text-emerald-600 dark:text-emerald-450 text-xs sm:text-sm">
+                    {formatRupiah(totalProfit)}
+                  </td>
+                  <td colSpan={2} className="py-3 px-3.5"></td>
+                </tr>
+              </tfoot>
             </table>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/20">
