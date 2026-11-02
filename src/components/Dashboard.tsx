@@ -6,7 +6,7 @@ import { TrendingUp, HelpCircle, CheckCircle, AlertTriangle, AlertOctagon, Arrow
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "../lib/LanguageContext";
 
-import { calculateTotalExpenses, calculateMonthlySummary } from "../lib/financialMath";
+import { calculateTotalExpenses, calculateMonthlySummary, determineBusinessStatus } from "../lib/financialMath";
 
 interface DashboardProps {
   restaurant: Restaurant;
@@ -44,7 +44,10 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
     predictionProfit,
     targetDailyProfitTomorrow,
     daysRemaining,
-    totalDaysInMonth
+    totalDaysInMonth,
+    idealDailyTarget,
+    expectedTargetToDate,
+    targetPacePercent
   } = summary;
 
   // Profit Hari Ini (Sum of all branch profits logged today)
@@ -54,28 +57,18 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
   // Target Profit Bulanan (Laba Bersih yang diinginkan owner)
   const targetProfit = restaurant.monthlyTargetProfit;
 
-  // 3. Status Bisnis Definition
-  // Amazing: Prediksi >= Target * 1.5
-  // Excellent: Prediksi >= Target * 1.2
-  // Hijau (Safe): Prediksi >= Target
-  // Kuning (Caution): Prediksi >= Target * 0.85 && Prediksi < Target (Dekat target)
-  // Merah (Danger): Prediksi < Target * 0.85 (Jauh dari target)
-  let businessStatus: "green" | "yellow" | "red" | "excellent" | "amazing" = "green";
-  if (predictionProfit >= targetProfit * 1.5) {
-    businessStatus = "amazing";
-  } else if (predictionProfit >= targetProfit * 1.2) {
-    businessStatus = "excellent";
-  } else if (predictionProfit >= targetProfit) {
-    businessStatus = "green";
-  } else if (predictionProfit >= targetProfit * 0.85) {
-    businessStatus = "yellow";
-  } else {
-    businessStatus = "red";
-  }
+  // 3. Status Bisnis Definition Berbasis Target Harian Prorata Kumulatif (Run-Rate)
+  const businessStatus = determineBusinessStatus({
+    totalProfitMonth,
+    targetProfit,
+    targetDailyProfitTomorrow,
+    idealDailyTarget,
+    expectedTargetToDate
+  });
 
   const statusConfigs = {
     amazing: {
-      label: t("dashboard.statusAmazing", "Luar Biasa!"),
+      label: t("dashboard.statusAmazing", "Luar Biasa! 🏆"),
       bgClass: "border-[#C5A028]/70 text-zinc-900 dark:text-zinc-50",
       bgStyle: {
         background: "linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(255,215,0,0.10) 40%, rgba(197,160,40,0.06) 100%)",
@@ -86,39 +79,41 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
       textClass: "font-extrabold",
       textStyle: { background: "linear-gradient(135deg, #B8860B 0%, #FFD700 40%, #D4AF37 70%, #C5A028 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" } as React.CSSProperties,
       icon: <Sparkles className="w-5 h-5 animate-bounce" style={{ color: "#D4AF37" }} />,
-      message: t("dashboard.messageAmazing", "Luar biasa! Pertumbuhan bisnis Anda sangat pesat dan melampaui seluruh estimasi target.")
+      message: `Pencapaian laba sangat pesat (${targetPacePercent}% dari target harian). Pertumbuhan bisnis Anda luar biasa!`
     },
     excellent: {
-      label: t("dashboard.statusExcellent", "Sangat Baik"),
+      label: t("dashboard.statusExcellent", "Sangat Baik ⭐"),
       bgClass: "bg-blue-50/50 dark:bg-blue-950/10 border-blue-200/60 dark:border-blue-900/30 text-blue-900 dark:text-blue-100 shadow-[0_1px_3px_rgba(59,130,246,0.03)]",
       indicatorClass: "bg-blue-500",
       textClass: "text-blue-600 dark:text-blue-400",
       icon: <Award className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
-      message: t("dashboard.messageExcellent", "Kinerja bisnis sangat baik! Proyeksi profit melampaui target bulanan Anda.")
+      message: `Kinerja laba di atas target kumulatif (${targetPacePercent}%). Laju bisnis sangat konsisten dan solid!`
     },
     green: {
-      label: t("dashboard.statusSafe", "Aman"),
+      label: t("dashboard.statusSafe", "Aman ✅"),
       bgClass: "bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-200/60 dark:border-emerald-900/30 text-emerald-900 dark:text-emerald-100 shadow-[0_1px_3px_rgba(16,185,129,0.03)]",
       indicatorClass: "bg-emerald-500",
       textClass: "text-emerald-600 dark:text-emerald-400",
       icon: <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,
-      message: t("dashboard.messageSafe", "Target bulan ini masih aman di jalur yang benar. Pertahankan performa usaha Anda!")
+      message: targetPacePercent >= 85
+        ? `Target bulan ini aman di jalur yang tepat (${targetPacePercent}% target kumulatif). Pertahankan performa baik ini!`
+        : `Target bulan ini aman di jalur realistis. Butuh sekitar ${formatRupiah(targetDailyProfitTomorrow)}/hari dengan sisa ${daysRemaining} hari ke depan.`
     },
     yellow: {
-      label: t("dashboard.statusCaution", "Waspada"),
+      label: t("dashboard.statusCaution", "Waspada ⚠️"),
       bgClass: "bg-amber-50/50 dark:bg-amber-950/10 border-amber-200/60 dark:border-amber-900/30 text-amber-900 dark:text-amber-100 shadow-[0_1px_3px_rgba(245,158,11,0.03)]",
       indicatorClass: "bg-amber-500",
       textClass: "text-amber-600 dark:text-amber-400",
       icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />,
-      message: t("dashboard.messageCaution", "Laba harian perlu naik sekitar {diff} agar target tercapai.").replace("{diff}", formatRupiah(Math.max(0, targetDailyProfitTomorrow - averageDailyProfit)))
+      message: `Laba sedikit di bawah target kumulatif. Usahakan minimal ${formatRupiah(targetDailyProfitTomorrow)}/hari mulai besok.`
     },
     red: {
-      label: t("dashboard.statusDanger", "Bahaya"),
+      label: t("dashboard.statusDanger", "Bahaya 🚨"),
       bgClass: "bg-rose-50/50 dark:bg-rose-950/10 border-rose-200/60 dark:border-rose-900/30 text-rose-900 dark:text-rose-100 shadow-[0_1px_3px_rgba(244,63,94,0.03)]",
       indicatorClass: "bg-rose-500",
       textClass: "text-rose-600 dark:text-rose-400",
       icon: <AlertOctagon className="w-5 h-5 text-rose-600 dark:text-rose-400" />,
-      message: t("dashboard.messageDanger", "Kinerja laba saat ini jauh di bawah target bulanan. Perlu optimasi omzet penjualan atau efisiensi biaya segera.")
+      message: `Target harian mulai besok (${formatRupiah(targetDailyProfitTomorrow)}/hari) melonjak jauh. Perlu optimasi omzet atau efisiensi biaya segera.`
     }
   };
 
@@ -639,7 +634,7 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
             </span>
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-1 block leading-relaxed">
               {hasTarget 
-                ? t("dashboard.targetDailyDesc", "Harus tercapai setiap hari agar target bulanan aman.")
+                ? `Harus tercapai setiap hari agar target bulanan aman (Target ideal: ${formatRupiah(idealDailyTarget)}/hari).`
                 : t("dashboard.noTargetDailyDesc", "Target harian belum ditentukan.")
               }
             </span>

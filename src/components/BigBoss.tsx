@@ -11,7 +11,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import TaskwaiLogo from "./TaskwaiLogo";
-import { calculateTotalExpenses } from "../lib/financialMath";
+import { calculateTotalExpenses, determineBusinessStatus } from "../lib/financialMath";
 
 
 interface BranchData {
@@ -566,17 +566,23 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
     const today = new Date();
     const currentDateNum = today.getDate();
     const totalDaysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    
-    // Proyeksi linear realistis berdasarkan hari berjalan: (totalProfitMonth / currentDateNum) * totalDaysInMonth
-    const prediction = currentDateNum > 0 ? (branch.totalProfitMonth / currentDateNum) * totalDaysInMonth : 0;
-    const target = branch.monthlyTargetProfit;
+    const daysRemaining = Math.max(1, totalDaysInMonth - currentDateNum);
+    const target = branch.monthlyTargetProfit || 0;
 
     if (target <= 0) return "active";
-    if (prediction >= target * 1.5) return "amazing";
-    if (prediction >= target * 1.2) return "excellent";
-    if (prediction >= target) return "green";
-    if (prediction >= target * 0.85) return "yellow";
-    return "red";
+
+    const idealDailyTarget = Math.round(target / totalDaysInMonth);
+    const expectedTargetToDate = idealDailyTarget * currentDateNum;
+    const remainingTarget = Math.max(0, target - branch.totalProfitMonth);
+    const targetDailyProfitTomorrow = Math.round(remainingTarget / daysRemaining);
+
+    return determineBusinessStatus({
+      totalProfitMonth: branch.totalProfitMonth,
+      targetProfit: target,
+      targetDailyProfitTomorrow,
+      idealDailyTarget,
+      expectedTargetToDate
+    });
   };
 
   const getStatusBadge = (status: string) => {

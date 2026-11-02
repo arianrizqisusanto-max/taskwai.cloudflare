@@ -89,6 +89,11 @@ export function calculateMonthlySummary(
   const predictionProfit = Math.round(averageDailyProfit * totalDaysInMonth);
   const targetDailyProfitTomorrow = remainingTarget > 0 ? Math.round(remainingTarget / daysRemaining) : 0;
 
+  // Target Harian Prorata Kumulatif (Daily Benchmark)
+  const idealDailyTarget = totalDaysInMonth > 0 ? Math.round(target / totalDaysInMonth) : 0;
+  const expectedTargetToDate = idealDailyTarget * currentDateNum;
+  const targetPacePercent = expectedTargetToDate > 0 ? Math.round((totalProfitMonth / expectedTargetToDate) * 100) : 0;
+
   return {
     monthProfits,
     totalProfitMonth,
@@ -100,6 +105,67 @@ export function calculateMonthlySummary(
     predictionProfit,
     targetDailyProfitTomorrow,
     daysRemaining,
-    totalDaysInMonth
+    totalDaysInMonth,
+    idealDailyTarget,
+    expectedTargetToDate,
+    targetPacePercent
   };
+}
+
+/**
+ * Evaluates business status based on daily run-rate benchmark and remaining daily burden.
+ * Prevents early-month false alarm panic ("Bahaya" at day 1-3).
+ */
+export function determineBusinessStatus(params: {
+  totalProfitMonth: number;
+  targetProfit: number;
+  targetDailyProfitTomorrow: number;
+  idealDailyTarget: number;
+  expectedTargetToDate: number;
+}): "amazing" | "excellent" | "green" | "yellow" | "red" {
+  const {
+    totalProfitMonth,
+    targetProfit,
+    targetDailyProfitTomorrow,
+    idealDailyTarget,
+    expectedTargetToDate
+  } = params;
+
+  if (targetProfit <= 0) return "green";
+
+  // Rasio Pace terhadap Target Kumulatif s/d hari ini (contoh: tgl 3 target 6jt, dapat 9jt = 1.5 / 150%)
+  const paceRatio = expectedTargetToDate > 0 ? totalProfitMonth / expectedTargetToDate : 0;
+
+  // Rasio beban harian mulai besok vs target harian standar
+  // (contoh: target harian 2jt, besok butuh 2,1jt = 1.05 / 105%)
+  const burdenRatio = idealDailyTarget > 0 ? targetDailyProfitTomorrow / idealDailyTarget : 1;
+
+  // 1. Luar Biasa (Amazing): Laba melampaui >= 150% dari target kumulatif harian
+  if (paceRatio >= 1.5) {
+    return "amazing";
+  }
+
+  // 2. Sangat Baik (Excellent): Laba melampaui >= 120% dari target kumulatif harian
+  if (paceRatio >= 1.2) {
+    return "excellent";
+  }
+
+  // 3. Aman (Green / On Track):
+  // - Pencapaian harian kumulatif aman (>= 85%)
+  // - ATAU beban harian mulai besok masih sangat wajar (burdenRatio <= 1.15 / hanya naik <= 15%)
+  //   karena sisa hari masih panjang sehingga target sangat realistis dicapai
+  if (paceRatio >= 0.85 || burdenRatio <= 1.15) {
+    return "green";
+  }
+
+  // 4. Waspada (Yellow):
+  // - Pace masih di kisaran 60% - 84%
+  // - ATAU beban harian mulai besok belum melonjak ekstrem (burdenRatio <= 1.40)
+  if (paceRatio >= 0.6 || burdenRatio <= 1.4) {
+    return "yellow";
+  }
+
+  // 5. Bahaya (Red):
+  // Beban harian sudah melonjak tajam (> 140%) dan pace di bawah 60%
+  return "red";
 }
