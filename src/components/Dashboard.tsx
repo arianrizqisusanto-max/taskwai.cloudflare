@@ -63,7 +63,9 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
     targetProfit,
     targetDailyProfitTomorrow,
     idealDailyTarget,
-    expectedTargetToDate
+    expectedTargetToDate,
+    currentDateNum,
+    totalDaysInMonth
   });
 
   const statusConfigs = {
@@ -105,7 +107,9 @@ export default function Dashboard({ restaurant, profits, expenses, setActiveTab 
       indicatorClass: "bg-amber-500",
       textClass: "text-amber-600 dark:text-amber-400",
       icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />,
-      message: `Laba sedikit di bawah target kumulatif. Usahakan minimal ${formatRupiah(targetDailyProfitTomorrow)}/hari mulai besok.`
+      message: expectedTargetToDate > 0
+        ? `Laba terkumpul ${formatRupiah(totalProfitMonth)} dari target seharusnya ${formatRupiah(expectedTargetToDate)} s/d hari ini (${targetPacePercent}%). Butuh ${formatRupiah(targetDailyProfitTomorrow)}/hari mulai besok agar target tercapai.`
+        : `Laba saat ini tertinggal dari target. Usahakan minimal ${formatRupiah(targetDailyProfitTomorrow)}/hari mulai besok.`
     },
     red: {
       label: t("dashboard.statusDanger", "Bahaya 🚨"),

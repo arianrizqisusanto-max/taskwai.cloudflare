@@ -581,7 +581,9 @@ export default function BigBoss({ setActiveTab, isDark, toggleDark }: BigBossPro
       targetProfit: target,
       targetDailyProfitTomorrow,
       idealDailyTarget,
-      expectedTargetToDate
+      expectedTargetToDate,
+      currentDateNum,
+      totalDaysInMonth
     });
   };
 

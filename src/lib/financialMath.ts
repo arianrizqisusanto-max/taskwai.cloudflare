@@ -113,8 +113,9 @@ export function calculateMonthlySummary(
 }
 
 /**
- * Evaluates business status based on daily run-rate benchmark and remaining daily burden.
- * Prevents early-month false alarm panic ("Bahaya" at day 1-3).
+ * Evaluates business status based on daily run-rate benchmark (target kumulatif harian).
+ * Opsi A: Jika laba tertinggal dari target kumulatif harian, berikan peringatan "Waspada" (Kuning).
+ * Status hanya menjadi "Bahaya" (Merah) jika sudah paruh akhir bulan dan beban melonjak ekstrem.
  */
 export function determineBusinessStatus(params: {
   totalProfitMonth: number;
@@ -122,13 +123,17 @@ export function determineBusinessStatus(params: {
   targetDailyProfitTomorrow: number;
   idealDailyTarget: number;
   expectedTargetToDate: number;
+  currentDateNum?: number;
+  totalDaysInMonth?: number;
 }): "amazing" | "excellent" | "green" | "yellow" | "red" {
   const {
     totalProfitMonth,
     targetProfit,
     targetDailyProfitTomorrow,
     idealDailyTarget,
-    expectedTargetToDate
+    expectedTargetToDate,
+    currentDateNum = 1,
+    totalDaysInMonth = 30
   } = params;
 
   if (targetProfit <= 0) return "green";
@@ -145,27 +150,25 @@ export function determineBusinessStatus(params: {
     return "amazing";
   }
 
-  // 2. Sangat Baik (Excellent): Laba melampaui >= 120% dari target kumulatif harian
-  if (paceRatio >= 1.2) {
+  // 2. Sangat Baik (Excellent): Laba melampaui >= 115% dari target kumulatif harian
+  if (paceRatio >= 1.15) {
     return "excellent";
   }
 
-  // 3. Aman (Green / On Track):
-  // - Pencapaian harian kumulatif aman (>= 85%)
-  // - ATAU beban harian mulai besok masih sangat wajar (burdenRatio <= 1.15 / hanya naik <= 15%)
-  //   karena sisa hari masih panjang sehingga target sangat realistis dicapai
-  if (paceRatio >= 0.85 || burdenRatio <= 1.15) {
+  // 3. Aman (Green / On Track): Laba berjalan tepat waktu >= 90% dari target kumulatif harian
+  if (paceRatio >= 0.90) {
     return "green";
   }
 
-  // 4. Waspada (Yellow):
-  // - Pace masih di kisaran 60% - 84%
-  // - ATAU beban harian mulai besok belum melonjak ekstrem (burdenRatio <= 1.40)
-  if (paceRatio >= 0.6 || burdenRatio <= 1.4) {
-    return "yellow";
+  // 4. Di bawah 90% (Tertinggal dari target kumulatif harian):
+  // Menjadi "Bahaya" jika sudah paruh kedua bulan (> 15 hari) DAN beban melonjak tajam (> 150%) DAN pace < 60%
+  const isLateMonth = currentDateNum > Math.floor(totalDaysInMonth * 0.5);
+  const isExtremeBurden = burdenRatio > 1.5;
+
+  if (isLateMonth && isExtremeBurden && paceRatio < 0.6) {
+    return "red";
   }
 
-  // 5. Bahaya (Red):
-  // Beban harian sudah melonjak tajam (> 140%) dan pace di bawah 60%
-  return "red";
+  // Opsi A: Tertinggal target harian, status Waspada (Kuning)
+  return "yellow";
 }
